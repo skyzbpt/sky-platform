@@ -2,7 +2,6 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no,maximum-scale=1.0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
@@ -797,7 +796,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
               <div class="fg"><label>頭像</label><div class="av-row"><div class="av lg" id="st-av">測</div><label class="btn" for="st-av-inp" style="cursor:pointer;">更換<input type="file" id="st-av-inp" accept="image/*" style="position:absolute;width:0;height:0;opacity:0;" onchange="prevAv(this,'st-av','therapist')"/></label></div></div>
               <div class="fg"><label>名稱</label><input type="text" id="st-nm" value="測試"/></div>
               <div class="fg"><label>職稱</label><input type="text" id="st-ttl" value="物理治療師"/></div>
-              <div class="fg"><label>帳號</label><input type="text" id="st-acct" value="test"/></div>
+              <div class="fg"><label>帳號</label><input type="text" id="st-acct"/></div>
               <div class="fg"><label>新密碼</label><input type="password" id="st-pwd-new" placeholder="留空不更改"/></div>
               <div style="display:flex;justify-content:flex-end;"><button class="btn pri" onclick="saveTherapist()">儲存</button></div>
             </div></div>
@@ -955,8 +954,8 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
       <div class="content"><div class="card" style="max-width:500px;"><div class="card-b" style="display:flex;flex-direction:column;gap:13px;">
         <div class="fg"><label>頭像</label><div class="av-row"><div class="av lg" id="p-av-disp">測</div><label class="btn" for="p-av-inp" style="cursor:pointer;">更換<input type="file" id="p-av-inp" accept="image/*" style="position:absolute;width:0;height:0;opacity:0;" onchange="applyPtAv(this)"/></label></div></div>
         <div class="fg"><label>名稱</label><input type="text" id="p-nm" value="測試"/></div>
-        <div class="fg"><label>帳號</label><input type="text" value="test" readonly style="opacity:.6;"/></div>
-        <div class="fg"><label>新密碼</label><input type="password" placeholder="留空不更改"/></div>
+        <div class="fg"><label>帳號</label><input type="text" id="p-acct" placeholder="留空不更改"/></div>
+        <div class="fg"><label>新密碼</label><input type="password" id="p-pwd-new" placeholder="留空不更改"/></div>
         <div style="display:flex;justify-content:flex-end;"><button class="btn pri" onclick="savePtAccount()">儲存</button></div>
       </div></div></div>
     </div>
@@ -969,8 +968,8 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
   <div class="mh"><h3 id="m-pt-ttl">新增個案</h3><button class="ibt" onclick="closeM('m-pt')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
   <div class="mb" style="display:flex;flex-direction:column;gap:13px;">
     <div class="fg" style="margin:0;"><label>頭像</label><div class="av-row"><div class="av lg" id="m-av">?</div><label class="btn" for="m-av-inp" style="cursor:pointer;">選擇<input type="file" id="m-av-inp" accept="image/*" style="position:absolute;width:0;height:0;opacity:0;" onchange="prevAv(this,'m-av','ptmodal')"/></label></div></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;"><div class="fg" style="margin:0;"><label>姓名</label><input type="text" id="m-pt-nm" placeholder="王小明"/></div><div class="fg" style="margin:0;"><label>性別</label><select id="m-pt-sex"><option>女</option><option>男</option><option>其他</option></select></div></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;"><div class="fg" style="margin:0;"><label>帳號</label><input type="text" id="m-pt-acct" placeholder="patient.xxx"/></div><div class="fg" style="margin:0;"><label>密碼</label><input type="password" id="m-pt-pwd" placeholder="預設密碼"/></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;"><div class="fg" style="margin:0;"><label>姓名</label><input type="text" id="m-pt-nm"/></div><div class="fg" style="margin:0;"><label>性別</label><select id="m-pt-sex"><option>女</option><option>男</option><option>其他</option></select></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;"><div class="fg" style="margin:0;"><label>帳號</label><input type="text" id="m-pt-acct"/></div><div class="fg" style="margin:0;"><label>密碼</label><input type="password" id="m-pt-pwd"/></div></div>
     <div class="fg" style="margin:0;"><label>標籤</label><div style="display:flex;flex-wrap:wrap;gap:5px;padding:7px;border:1px solid var(--border);border-radius:7px;background:var(--bg);min-height:36px;margin-bottom:7px;" id="m-pt-tags"></div><div style="display:flex;flex-wrap:wrap;gap:5px;" id="m-pt-tag-opts"></div></div>
     <div class="fg" style="margin:0;"><label>備註</label><textarea rows="3" id="m-pt-note"></textarea></div>
   </div>
@@ -1099,6 +1098,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     </div>
     <span>聯繫</span>
   </button>
+  
   <button class="mtab" data-pv="lrn" onclick="goP('lrn')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2Z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7Z"/></svg><span>衛教</span></button>
   <button class="mtab" onclick="openPMore()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg><span>更多</span></button>
 </nav>
@@ -1297,7 +1297,7 @@ function goT(v){
   if(v==='vd')renderVideos();
   if(v==='kn')renderKnows();
   if(v==='tg'){renderTagList();renderCatList();}
-  if(v==='st'){syncFrontInputs();document.getElementById('st-nm').value=therapistState.name;document.getElementById('st-ttl').value=therapistState.title;therapistImg=therapistState.img;setAv(document.getElementById('st-av'),therapistState.img,therapistState.name[0]||'?');}
+  if(v==='st'){syncFrontInputs();therapistImg=therapistState.img;setAv(document.getElementById('st-av'),therapistState.img,therapistState.name[0]||'?');}
 }
 function goP(v){
   document.querySelectorAll('#p-app [data-pv]').forEach(el=>el.classList.toggle('on',el.dataset.pv===v));
@@ -1305,10 +1305,10 @@ function goP(v){
   ensureHamburger('p-app');
   if(v==='dr')initDailyRpt();
   if(v==='pmr')renderPMr();
-  if(v==='pc'){pUnread=0;updUnread();renderPMsgs();renderPAnn();}
+  if(v==='pc'){pUnread=0;patients[PIDX].ptUnread=0;updPtUnread();updUnread();renderPMsgs();renderPAnn();}
   if(v==='lrn')renderLearn();
   if(v==='ph'){renderPHomeRec();syncHomeStats();}
-  if(v==='pac'){pendingPtAvImg=null;const i=document.getElementById('p-nm');if(i)i.value=patientSelf.name;setAv(document.getElementById('p-av-disp'),patientSelf.img,patientSelf.initials);}
+  if(v==='pac'){pendingPtAvImg=null;const i=document.getElementById('p-nm');if(i)i.value=patientSelf.name;setAv(document.getElementById('p-av-disp'),patientSelf.img,patientSelf.initials);const pa=document.getElementById('p-acct');if(pa)pa.value='';const pp=document.getElementById('p-pwd-new');if(pp)pp.value='';}
 }
 function toggleDrop(id){document.querySelectorAll('.udrop').forEach(d=>{if(d.id!==id)d.classList.remove('on');});document.getElementById(id).classList.toggle('on');}
 function closeDrop(){document.querySelectorAll('.udrop').forEach(d=>d.classList.remove('on'));}
@@ -1332,13 +1332,69 @@ function setLogoEl(el,src){if(!el)return;el.innerHTML='';if(src){const img=docum
 function renderPt(){
   const kw=(document.getElementById('pt-search')?.value||'').toLowerCase();
   const tbody=document.getElementById('pt-tbody');if(!tbody)return;
-  tbody.innerHTML=patients.filter((p)=>{
+  const filtered=patients.filter((p)=>{
     if(ptTagFilter.length>0&&!ptTagFilter.some(ti=>p.tags.includes(ti)))return false;
     return !kw||(p.name.toLowerCase().includes(kw)||p.acct.toLowerCase().includes(kw));
-  }).map(p=>{
+  });
+  tbody.innerHTML=filtered.map(p=>{
     const i=patients.indexOf(p);
-    return`<tr><td><div style="display:flex;align-items:center;gap:8px;">${avHTML(p,'width:28px;height:28px;font-size:11px;')}<div><div style="font-weight:500;font-size:13px;">${H(p.name)}</div><div style="font-size:11px;color:var(--ink3);">${H(p.acct)}</div></div></div></td><td style="font-size:13px;">${H(p.sex)}</td><td>${p.tags.map(ti=>`<span style="${tStyle(tags[ti])}display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;margin-right:3px;">${H(tags[ti]?.name||'')}</span>`).join('')}</td><td style="font-size:12.5px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${H(p.note)}</td><td><div class="row-act"><button class="ibt" onclick="openPtModal(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="ibt" style="color:var(--red);" onclick="deletePt(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td></tr>`;
+    return`<tr draggable="true" data-idx="${i}" style="cursor:grab;">
+      <td><div style="display:flex;align-items:center;gap:8px;">
+        <div style="color:var(--ink3);cursor:grab;flex-shrink:0;padding:2px 4px;" title="拖曳排序">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+        </div>
+        ${avHTML(p,'width:28px;height:28px;font-size:11px;')}
+        <div><div style="font-weight:500;font-size:13px;">${H(p.name)}</div><div style="font-size:11px;color:var(--ink3);">${H(p.acct)}</div></div>
+      </div></td>
+      <td style="font-size:13px;">${H(p.sex)}</td>
+      <td>${p.tags.map(ti=>`<span style="${tStyle(tags[ti])}display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;margin-right:3px;">${H(tags[ti]?.name||'')}</span>`).join('')}</td>
+      <td style="font-size:12.5px;color:var(--ink3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${H(p.note)}</td>
+      <td><div class="row-act">
+        <button class="ibt" onclick="openPtModal(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="ibt" style="color:var(--red);" onclick="deletePt(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+      </div></td>
+    </tr>`;
   }).join('');
+  initPtDrag(tbody);
+}
+
+let _dragIdx=null;
+function initPtDrag(tbody){
+  tbody.querySelectorAll('tr[draggable]').forEach(tr=>{
+    tr.addEventListener('dragstart',e=>{
+      _dragIdx=parseInt(tr.dataset.idx);
+      tr.style.opacity='.4';
+      e.dataTransfer.effectAllowed='move';
+    });
+    tr.addEventListener('dragend',()=>{tr.style.opacity='';_dragIdx=null;});
+    tr.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';tr.style.background='var(--blue-bg)';});
+    tr.addEventListener('dragleave',()=>{tr.style.background='';});
+    tr.addEventListener('drop',e=>{
+      e.preventDefault();tr.style.background='';
+      const toIdx=parseInt(tr.dataset.idx);
+      if(_dragIdx===null||_dragIdx===toIdx)return;
+      const moved=patients.splice(_dragIdx,1)[0];
+      const newTo=_dragIdx<toIdx?toIdx-1:toIdx;
+      patients.splice(newTo,0,moved);
+      // 修正 msgMap / annMap / tAlbumsMap / tNotesMap 的 key
+      [msgMap,annMap,tAlbumsMap,tNotesMap].forEach(map=>{
+        const tmp={};
+        Object.keys(map).forEach(k=>{
+          let ni=parseInt(k);
+          if(ni===_dragIdx)ni=newTo;
+          else if(_dragIdx<newTo&&ni>_dragIdx&&ni<=newTo)ni--;
+          else if(_dragIdx>newTo&&ni>=newTo&&ni<_dragIdx)ni++;
+          tmp[ni]=map[k];
+        });
+        Object.keys(map).forEach(k=>delete map[k]);
+        Object.assign(map,tmp);
+      });
+      if(activeCI===_dragIdx)activeCI=newTo;
+      if(selPtIdx===_dragIdx)selPtIdx=newTo;
+      if(mrPtIdx===_dragIdx)mrPtIdx=newTo;
+      renderPt();renderCL();renderOv();saveState();toast('排序已更新');
+    });
+  });
 }
 function toggleTagFilter(){document.getElementById('tag-fp').classList.toggle('on');renderTagFpOpts();}
 function renderTagFpOpts(){const el=document.getElementById('tag-fp-opts');if(!el)return;el.innerHTML='<button class="btn xs" style="'+(ptTagFilter.length===0?'background:var(--ink);color:#fff;border-color:var(--ink);':'')+'" onclick="clearPtTagFilter()">全部</button>'+tags.map((t,i)=>{const p=tPair(t);return'<button class="btn xs" style="'+(ptTagFilter.includes(i)?'outline:2px solid var(--blue);':'')+'" onclick="togglePtTF('+i+')"><span style="background:'+p.bg+';color:'+p.ink+';display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">'+H(t.name)+'</span></button>';}).join('');}
@@ -1428,7 +1484,7 @@ function renderAnn(stripId,cntId,readOnly,ci){
   if(!bd)return;
   if(!annItems.length){bd.innerHTML='<div class="ann-empty">目前沒有公告</div>';return;}
   bd.innerHTML=annItems.map((a,i)=>{
-    const actHtml=readOnly?'':'<div class="ann-actions"><button class="ann-ab" onclick="annEdit('+i+',\''+stripId+'\',\''+cntId+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="ann-ab del" onclick="annDel('+i+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div>';
+    const actHtml=readOnly?'':'<div class="ann-actions"><button class="ann-ab del" onclick="annDel('+i+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div>';
     const imgHtml=a.imgSrc?`<img src="${a.imgSrc}" onclick="annJump(${i})" style="height:30px;width:45px;object-fit:cover;border-radius:4px;cursor:pointer;flex-shrink:0;"/>`:'<div class="ann-dot"></div>';
     return`<div class="ann-row">${imgHtml}<span class="ann-text" onclick="annJump(${i})">${H(a.text)}</span>${actHtml}</div>`;
   }).join('');
@@ -1475,6 +1531,7 @@ function markAnn(){
   const m=getMsgs(activeCI)[ctxIdx];if(!m)return;
   const anns=getAnns(PIDX);
   if(anns.length>=3){toast('公告最多 3 則');closeCtx();return;}
+  if(anns.some(a=>a.msgIdx===ctxIdx)){toast('此訊息已設為公告');closeCtx();return;}
   anns.push({
     text:m.type==='img'?'[圖片]':(m.txt||''),
     imgSrc:m.type==='img'?m.src:'',
@@ -1505,7 +1562,10 @@ function sendMsg(){
   const now=new Date();
   getMsgs(activeCI).push({who:'me',t:pad(now.getHours())+':'+pad(now.getMinutes()),txt});
   inp.value='';renderMsgs();
-  // 若對話的是個案端對應的個案，同步個案端畫面
+  // 新增個案端未讀通知
+  if(!patients[activeCI])return;
+  patients[activeCI].ptUnread=(patients[activeCI].ptUnread||0)+1;
+  updPtUnread();
   if(activeCI===PIDX)renderPMsgs();
 }
 function sendPtMsg(){
@@ -1516,6 +1576,16 @@ function sendPtMsg(){
   patients[PIDX].unread=(patients[PIDX].unread||0)+1;updUnread();
   addNotif(patients[PIDX].name+' 傳送訊息：'+txt.slice(0,28)+(txt.length>28?'…':''),'💬');
   if(activeCI===PIDX)renderMsgs();
+}
+
+// 個案端未讀角標
+function updPtUnread(){
+  const u=patients[PIDX]?.ptUnread||0;
+  const b=document.getElementById('mp-unread');
+  if(b){b.textContent=u;b.style.display=u?'':'none';}
+  // topbar 角標（個案聊天頁）
+  const hb=document.getElementById('p-chat-badge');
+  if(hb){hb.textContent=u;hb.style.display=u?'':'none';}
 }
 function clearChat(){
   skyConfirm('確定清除所有對話？',ok=>{
@@ -1767,8 +1837,7 @@ function addSub(ci){skyPrompt('次主題名稱…',val=>{if(!val?.trim())return;
 function saveTherapist(){
   const nm=document.getElementById('st-nm').value.trim()||therapistState.name;
   const ttl=document.getElementById('st-ttl').value.trim()||therapistState.title;
-  const newAcct=document.getElementById('st-acct')?.value.trim()||therapistState.acct;
-  const newPwd=document.getElementById('st-pwd-new')?.value.trim();
+  const newAcct=document.getElementById('st-acct')?.value.trim()||therapistState.acct;  const newPwd=document.getElementById('st-pwd-new')?.value.trim();
   therapistState.name=nm;therapistState.title=ttl;therapistState.img=therapistImg;
   therapistState.acct=newAcct;
   if(newPwd)therapistState.pwd=newPwd;
@@ -1778,7 +1847,8 @@ function saveTherapist(){
   setAv(document.getElementById('st-av'),therapistImg,nm[0]||'?');
   setAv(document.getElementById('p-chat-t-av'),therapistImg,nm[0]||'?');
   const pnm=document.getElementById('p-chat-t-nm');if(pnm)pnm.textContent=nm+' 治療師';
-  if(document.getElementById('st-acct'))document.getElementById('st-acct').value=newAcct;
+  const acctEl=document.getElementById('st-acct');if(acctEl)acctEl.value=therapistState.acct;
+  const pwdEl=document.getElementById('st-pwd-new');if(pwdEl)pwdEl.value='';
   renderMsgs();saveState();toast('已儲存');
 }
 function syncFrontInputs(){document.getElementById('st-f-title').value=frontState.title;document.getElementById('st-f-sub').value=frontState.sub;updFrontPrev();}
@@ -1877,24 +1947,56 @@ function dlPdf(ri){const item=knows[ri];if(!item?.pdfSrc)return;try{const b64=it
 
 function syncPtName(nm){nm=nm.trim();if(!nm)return;patientSelf.name=nm;patientSelf.initials=nm[0]||'?';setAv(document.getElementById('p-sb-av'),patientSelf.img,patientSelf.initials);const sn=document.getElementById('p-sb-nm');if(sn)sn.textContent=nm;const gr=document.getElementById('p-greet');if(gr)gr.textContent='嗨，'+nm+' 👋🏻';if(patients[PIDX]){patients[PIDX].name=nm;patients[PIDX].av=nm[0]||'?';}renderCL();syncChatHdr();renderMsgs();renderPt();}
 function applyPtAv(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{pendingPtAvImg=ev.target.result;setAv(document.getElementById('p-av-disp'),pendingPtAvImg,patientSelf.initials);};r.readAsDataURL(f);}
-function savePtAccount(){const nm=document.getElementById('p-nm').value.trim()||patientSelf.name;const finalImg=pendingPtAvImg!==null?pendingPtAvImg:patientSelf.img;patientSelf.name=nm;patientSelf.initials=nm[0]||'?';patientSelf.img=finalImg;patientImg=finalImg;pendingPtAvImg=null;setAv(document.getElementById('p-sb-av'),finalImg,nm[0]||'?');const sn=document.getElementById('p-sb-nm');if(sn)sn.textContent=nm;setAv(document.getElementById('p-av-disp'),finalImg,nm[0]||'?');const gr=document.getElementById('p-greet');if(gr)gr.textContent='嗨，'+nm+' 👋';if(patients[PIDX]){patients[PIDX].name=nm;patients[PIDX].av=nm[0]||'?';patients[PIDX].imgSrc=finalImg;}renderCL();syncChatHdr();renderMsgs();renderPt();renderOv();toast('已儲存');}
+function savePtAccount(){
+  const nm=document.getElementById('p-nm').value.trim()||patientSelf.name;
+  const newAcct=document.getElementById('p-acct')?.value.trim();
+  const newPwd=document.getElementById('p-pwd-new')?.value.trim();
+  const finalImg=pendingPtAvImg!==null?pendingPtAvImg:patientSelf.img;
+  // 帳號重複檢查
+  if(newAcct){
+    const dup=patients.findIndex((p,i)=>i!==PIDX&&p.acct===newAcct);
+    if(dup!==-1){toast('⚠️ 此帳號已被使用，請換一個');return;}
+  }
+  patientSelf.name=nm;patientSelf.initials=nm[0]||'?';patientSelf.img=finalImg;
+  patientImg=finalImg;pendingPtAvImg=null;
+  if(patients[PIDX]){
+    patients[PIDX].name=nm;patients[PIDX].av=nm[0]||'?';patients[PIDX].imgSrc=finalImg;
+    if(newAcct)patients[PIDX].acct=newAcct;
+    if(newPwd)patients[PIDX].pwd=newPwd;
+  }
+  setAv(document.getElementById('p-sb-av'),finalImg,nm[0]||'?');
+  const sn=document.getElementById('p-sb-nm');if(sn)sn.textContent=nm;
+  setAv(document.getElementById('p-av-disp'),finalImg,nm[0]||'?');
+  const gr=document.getElementById('p-greet');if(gr)gr.textContent='嗨，'+nm+' 👋';
+  // 清空欄位
+  const pa=document.getElementById('p-acct');if(pa)pa.value='';
+  const pp=document.getElementById('p-pwd-new');if(pp)pp.value='';
+  renderCL();syncChatHdr();renderMsgs();renderPt();renderOv();saveState();toast('已儲存');
+}
 
 // ── PERSISTENCE（localStorage，偵測不到時退回記憶體）──
 // Claude 預覽若封鎖 localStorage 會自動退回記憶體（單次工作階段有效）；
 // 打包成 Capacitor App 後，WKWebView 的 localStorage 可正常持久化。
-const SKY_STORE=(()=>{
-  try{
-    const k='__sky_probe__';
-    window.localStorage.setItem(k,'1');
-    window.localStorage.removeItem(k);
-    return window.localStorage;
-  }catch(e){
-    const mem={};
-    return{getItem:k=>(k in mem?mem[k]:null),setItem:(k,v)=>{mem[k]=String(v);},removeItem:k=>{delete mem[k];}};
-  }
-})();
+// ── SUPABASE 雲端儲存 ──
+const SB_URL='https://emavpbedpxrrmvvnccxj.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtYXZwYmVkcHhycm12dm5jY3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTkwMDYsImV4cCI6MjA5NTY5NTAwNn0.NDR3rX_TCaqIW9ag3B5BOsSPqUqwFeEZBRqKPsZ9Ak8';
 const SKY_KEY='sky_state_v1';
-let _lastSaved='',_quotaWarned=false;
+let _lastSaved='',_saveTimer=null,_sbReady=false;
+
+async function sbGet(key){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/sky_store?key=eq.${encodeURIComponent(key)}&select=value`,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    if(!r.ok)return null;
+    const d=await r.json();
+    return d.length?d[0].value:null;
+  }catch(e){return null;}
+}
+async function sbSet(key,value){
+  try{
+    await fetch(`${SB_URL}/rest/v1/sky_store`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},body:JSON.stringify({key,value})});
+  }catch(e){}
+}
+
 function snapshotState(){
   return{
     patients,tags,cats,mediaSubs,videos,knows,medRecords,notifications,
@@ -1903,29 +2005,22 @@ function snapshotState(){
   };
 }
 function saveState(){
-  let json;
-  try{json=JSON.stringify(snapshotState());}catch(e){return;}
-  if(json===_lastSaved)return;
-  try{
-    SKY_STORE.setItem(SKY_KEY,json);
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(async()=>{
+    let json;
+    try{json=JSON.stringify(snapshotState());}catch(e){return;}
+    if(json===_lastSaved)return;
     _lastSaved=json;
-  }catch(e){
-    if(!_quotaWarned){
-      _quotaWarned=true;
-      console.warn('sky：本機儲存空間已滿，圖片等大型資料可能未完整儲存。正式版請改用後端檔案儲存。');
-      try{toast('⚠️ 本機儲存空間已滿，建議正式版改用後端');}catch(_){}
-    }
-  }
+    await sbSet(SKY_KEY,json);
+  },1500);
 }
 function _copyInto(target,src){if(!src||typeof src!=='object')return;Object.keys(target).forEach(k=>delete target[k]);Object.keys(src).forEach(k=>{target[k]=src[k];});}
 function _replaceArr(target,src){if(!Array.isArray(src))return;target.length=0;src.forEach(x=>target.push(x));}
-function loadState(){
-  let raw=null;
-  try{raw=SKY_STORE.getItem(SKY_KEY);}catch(e){return;}
+async function loadState(){
+  const raw=await sbGet(SKY_KEY);
   if(!raw)return;
   let d;try{d=JSON.parse(raw);}catch(e){return;}
   if(!d||typeof d!=='object')return;
-  // let 變數：直接覆寫
   if(Array.isArray(d.patients))patients=d.patients;
   if(Array.isArray(d.tags))tags=d.tags;
   if(Array.isArray(d.cats))cats=d.cats;
@@ -1936,7 +2031,6 @@ function loadState(){
   if(Array.isArray(d.notifications))notifications=d.notifications;
   if(d.msgMap&&typeof d.msgMap==='object')msgMap=d.msgMap;
   if(d.annMap&&typeof d.annMap==='object')annMap=d.annMap;
-  // const 容器：原地更新
   _copyInto(tAlbumsMap,d.tAlbumsMap);
   _copyInto(tNotesMap,d.tNotesMap);
   _copyInto(pAlbumsMap,d.pAlbumsMap);
@@ -1945,7 +2039,6 @@ function loadState(){
   if(d.rptDraft)Object.assign(rptDraft,d.rptDraft);
   if(d.frontState)Object.assign(frontState,d.frontState);
   if(d.therapistState)Object.assign(therapistState,d.therapistState);
-  // 遷移：舊版存檔沒有 acct/pwd，補上預設值防止鎖死
   if(!therapistState.acct)therapistState.acct='test';
   if(!therapistState.pwd)therapistState.pwd='test';
   patients.forEach(p=>{if(!p.pwd)p.pwd=p.acct;if(!p.acct)p.acct='patient';});
@@ -1963,6 +2056,8 @@ function applyRestoredUI(){
   const pcn=document.getElementById('p-chat-t-nm');if(pcn)pcn.textContent=therapistState.name+' 治療師';
   const stnm=document.getElementById('st-nm');if(stnm)stnm.value=therapistState.name;
   const stttl=document.getElementById('st-ttl');if(stttl)stttl.value=therapistState.title;
+  const stacct=document.getElementById('st-acct');if(stacct)stacct.value=therapistState.acct;
+  const stpwd=document.getElementById('st-pwd-new');if(stpwd)stpwd.value='';
   // 前台外觀
   const ft=document.getElementById('front-title');if(ft)ft.textContent=frontState.title;
   const fsub=document.getElementById('front-sub');if(fsub)fsub.textContent=frontState.sub;
@@ -1974,7 +2069,7 @@ function applyRestoredUI(){
   syncPatientUI();
 }
 // 自動儲存：定時 + 進入背景 / 關閉前
-setInterval(saveState,4000);
+setInterval(saveState,8000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
 window.addEventListener('pagehide',saveState);
 window.addEventListener('beforeunload',saveState);
@@ -1982,8 +2077,30 @@ window.addEventListener('beforeunload',saveState);
 // ── INIT ──
 document.getElementById('login').classList.add('on');
 let pressT,pressCx=0,pressCy=0;
-loadState();
-applyRestoredUI();
+(async()=>{
+  toast('載入雲端資料中…');
+  await loadState();
+  applyRestoredUI();
+  renderPt();
+  renderCL();
+  renderMsgs();
+  renderPMsgs();
+  renderAlbums('t');
+  renderNotes('t');
+  renderVideos();
+  renderKnows();
+  renderTagList();
+  renderCatList();
+  renderLearn();
+  renderPHomeRec();
+  renderOv();
+  updUnread();
+  renderAnn('t-ann','t-ann-cnt',false,PIDX);
+  renderPAnn();
+  updFrontPrev();
+  initDailyRpt();
+  toast('✅ 雲端資料載入完成');
+})();
 renderPt();
 renderCL();
 renderMsgs();
@@ -2010,6 +2127,8 @@ initDailyRpt();
   selectContact=function(i){_selectContact(i);document.querySelector('#t-app .chat-wrap')?.classList.add('show-chat');};
   goT=function(v){_goT(v);if(v==='ch')document.querySelector('#t-app .chat-wrap')?.classList.remove('show-chat');};
   updUnread=function(){_updUnread();const t=patients.reduce((s,p)=>s+(p.unread||0),0);const mb=document.getElementById('mt-unread');if(mb){mb.textContent=t;mb.style.display=t?'':'none';}};
+  // 初始化個案端未讀
+  updPtUnread();
   // 在治療師聊天標頭注入返回鍵
   const hdr=document.querySelector('#t-app .chat-hdr');
   if(hdr&&!hdr.querySelector('.chat-back')){
