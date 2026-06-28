@@ -1431,8 +1431,8 @@ const newPwd=document.getElementById('m-pt-pwd').value;
 if(editPtIdx===-1&&!newPwd){toast('新增個案須設定密碼');return;}
 const pwd=newPwd||(editPtIdx!==-1?patients[editPtIdx]?.pwd||'':'');
 const dup=patients.findIndex((p,i)=>{if(editPtIdx!==-1&&i===editPtIdx)return false;return p.name===nm&&p.sex===sex&&p.acct===acct&&p.note===note;});
-if(dup!==-1){toast('⚠️ 已有相同的個案資料（'+nm+'），請確認是否重複');return;}  const existImg=editPtIdx===-1?'':(patients[editPtIdx]?.imgSrc||'');const imgSrc=pendingPtImg||existImg;const p={name:nm,sex,acct,pwd,av:nm[0]||'?',imgSrc,tags:sel,note,unread:0,assignedVids:[],assignedKnows:[]};if(editPtIdx===-1)patients.push(p);else{p.assignedVids=patients[editPtIdx].assignedVids||[];p.assignedKnows=patients[editPtIdx].assignedKnows||[];Object.assign(patients[editPtIdx],p);}if(editPtIdx===PIDX)syncPatientUI();pendingPtImg='';closeM('m-pt');renderPt();renderCL();renderOv();toast(editPtIdx===-1?'已新增個案':'已更新個案');}
-function deletePt(i){skyConfirm('確定刪除「'+patients[i].name+'」？',ok=>{if(!ok)return;patients.splice(i,1);medRecords=medRecords.filter(r=>r.ptIdx!==i).map(r=>{if(r.ptIdx>i)r.ptIdx--;return r;});if(selPtIdx>=patients.length)selPtIdx=Math.max(0,patients.length-1);if(mrPtIdx>=patients.length)mrPtIdx=Math.max(0,patients.length-1);if(activeCI>=patients.length)activeCI=Math.max(0,patients.length-1);renderPt();renderCL();renderOv();toast('已刪除個案');});}
+if(dup!==-1){toast('⚠️ 已有相同的個案資料（'+nm+'），請確認是否重複');return;}  const existImg=editPtIdx===-1?'':(patients[editPtIdx]?.imgSrc||'');const imgSrc=pendingPtImg||existImg;const p={name:nm,sex,acct,pwd,av:nm[0]||'?',imgSrc,tags:sel,note,unread:0,assignedVids:[],assignedKnows:[]};if(editPtIdx===-1){patients.push(p);ptStats.push({weekRate:0,trend:'+0%',rates:[0,0,0,0,0,0,0],vas:[0,0,0,0,0,0,0],logs:[],lastVas:0});}else{p.assignedVids=patients[editPtIdx].assignedVids||[];p.assignedKnows=patients[editPtIdx].assignedKnows||[];Object.assign(patients[editPtIdx],p);}if(editPtIdx===PIDX)syncPatientUI();pendingPtImg='';closeM('m-pt');renderPt();renderCL();renderOv();toast(editPtIdx===-1?'已新增個案':'已更新個案');}
+function deletePt(i){skyConfirm('確定刪除「'+patients[i].name+'」？',ok=>{if(!ok)return;patients.splice(i,1);ptStats.splice(i,1);medRecords=medRecords.filter(r=>r.ptIdx!==i).map(r=>{if(r.ptIdx>i)r.ptIdx--;return r;});if(selPtIdx>=patients.length)selPtIdx=Math.max(0,patients.length-1);if(mrPtIdx>=patients.length)mrPtIdx=Math.max(0,patients.length-1);if(activeCI>=patients.length)activeCI=Math.max(0,patients.length-1);renderPt();renderCL();renderOv();toast('已刪除個案');});}
 function syncPatientUI(){const p=patients[PIDX];if(!p)return;patientSelf.name=p.name;patientSelf.initials=p.av||p.name[0]||'?';patientSelf.img=p.imgSrc||'';setAv(document.getElementById('p-sb-av'),patientSelf.img,patientSelf.initials);const sn=document.getElementById('p-sb-nm');if(sn)sn.textContent=patientSelf.name;const gr=document.getElementById('p-greet');if(gr)gr.textContent='嗨，'+patientSelf.name+' 👋🏻';renderCL();}
 
 // ── OVERVIEW ──
@@ -1529,13 +1529,13 @@ function toggleAnnStrip(id){
 }
 function annJump(i){
   // 治療師端跳訊息
-  scrollToMsg(getAnns(PIDX)[i]?.msgIdx??0);
+  scrollToMsg(getAnns(activeCI)[i]?.msgIdx??0);
 }
 function annEdit(i,stripId,cntId){
   const strip=document.getElementById(stripId);if(!strip)return;
   const rows=strip.querySelectorAll('.ann-row');if(!rows[i])return;
   const txt=rows[i].querySelector('.ann-text');if(!txt)return;
-  const old=getAnns(PIDX)[i].text;
+  const old=getAnns(activeCI)[i].text;
   txt.outerHTML=`<input class="ann-einp" value="${H(old)}"
     onblur="annSaveEdit(${i},this,'${stripId}','${cntId}')"
     onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value='${H(old)}';this.blur();}"
@@ -1543,22 +1543,22 @@ function annEdit(i,stripId,cntId){
   setTimeout(()=>strip.querySelectorAll('.ann-einp')[0]?.focus(),30);
 }
 function annSaveEdit(i,inp,stripId,cntId){
-  const v=inp.value.trim();if(v)getAnns(PIDX)[i].text=v;
-  renderAnn('t-ann','t-ann-cnt',false,PIDX);
+  const v=inp.value.trim();if(v)getAnns(activeCI)[i].text=v;
+  renderAnn('t-ann','t-ann-cnt',false,activeCI);
   renderPAnn();
 }
 function annDel(i){
   skyConfirm('確定移除此公告？',ok=>{
     if(!ok)return;
-    getAnns(PIDX).splice(i,1);
-    renderAnn('t-ann','t-ann-cnt',false,PIDX);
+    getAnns(activeCI).splice(i,1);
+    renderAnn('t-ann','t-ann-cnt',false,activeCI);
     renderPAnn();
     toast('已移除公告');
   });
 }
 function markAnn(){
   const m=getMsgs(activeCI)[ctxIdx];if(!m)return;
-  const anns=getAnns(PIDX);
+  const anns=getAnns(activeCI);
   if(anns.length>=3){toast('公告最多 3 則');closeCtx();return;}
   if(anns.some(a=>a.msgIdx===ctxIdx)){toast('此訊息已設為公告');closeCtx();return;}
   anns.push({
@@ -1566,7 +1566,7 @@ function markAnn(){
     imgSrc:m.type==='img'?m.src:'',
     msgIdx:ctxIdx
   });
-  renderAnn('t-ann','t-ann-cnt',false,PIDX);
+  renderAnn('t-ann','t-ann-cnt',false,activeCI);
   renderPAnn();
   closeCtx();toast('已設為公告');
 }
