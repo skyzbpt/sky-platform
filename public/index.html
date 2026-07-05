@@ -1969,41 +1969,27 @@ function savePtAccount(){
   renderCL();syncChatHdr();renderMsgs();renderPt();renderOv();saveState();toast('已儲存');
 }
 
-// ── PERSISTENCE（localStorage，偵測不到時退回記憶體）──
-// Claude 預覽若封鎖 localStorage 會自動退回記憶體（單次工作階段有效）；
-// 打包成 Capacitor App 後，WKWebView 的 localStorage 可正常持久化。
-// ── SUPABASE 雲端儲存 ──
-const SB_URL='https://emavpbedpxrrmvvnccxj.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtYXZwYmVkcHhycm12dm5jY3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTkwMDYsImV4cCI6MjA5NTY5NTAwNn0.NDR3rX_TCaqIW9ag3B5BOsSPqUqwFeEZBRqKPsZ9Ak8';
-const SKY_KEY='sky_state_v1';
+// ── CLOUDFLARE 雲端儲存（同源 Worker /api/state → KV）──
+// 靜態頁面與 API 由同一個 Cloudflare Worker 提供，狀態 JSON 存於 KV（key: sky_state_v1）。
+const API_STATE='/api/state';
 let _lastSaved='',_saveTimer=null;
-
-async function initFirebase(){
-  // 自動喚醒：每次開啟網頁時 ping Supabase 保持活躍
-  try{await fetch(`${SB_URL}/rest/v1/sky_store?limit=1`,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});}catch(e){}
-  return true;
-}
 
 async function fbGet(){
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/sky_store?key=eq.${encodeURIComponent(SKY_KEY)}&select=value`,{
-      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
-    });
+    const r=await fetch(API_STATE,{cache:'no-store'});
+    if(r.status===404)return null;
     if(!r.ok){console.warn('fbGet HTTP error',r.status);return null;}
-    const d=await r.json();
-    return d.length?d[0].value:null;
+    const t=await r.text();
+    return t||null;
   }catch(e){console.warn('fbGet error',e);return null;}
 }
 async function fbSet(value){
   if(!window._cloudReady){console.warn('阻止：雲端尚未就緒，不儲存');return;}
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/sky_store`,{
-      method:'POST',
-      headers:{
-        'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,
-        'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'
-      },
-      body:JSON.stringify({key:SKY_KEY,value})
+    const r=await fetch(API_STATE,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:value
     });
     if(!r.ok)console.warn('fbSet HTTP error',r.status);
     else console.log('fbSet OK');
@@ -2100,7 +2086,6 @@ let pressT,pressCx=0,pressCy=0;
 window._cloudReady=false;
 (async()=>{
   toast('載入雲端資料中…');
-  await initFirebase();
   const ok=await loadState();
   applyRestoredUI();
   renderPt();
