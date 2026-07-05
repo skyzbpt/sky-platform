@@ -444,7 +444,9 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .filter-panel #tag-fp-opts{display:flex;flex-wrap:wrap;gap:5px;}
 
 /* TOAST */
-.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:20px;font-size:12.5px;z-index:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:20px;font-size:12.5px;z-index:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.toast-ico{display:inline-flex;align-items:center;color:#4ADE80;flex-shrink:0;}
+.toast-ico svg{width:15px;height:15px;display:block;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
 
 /* 側欄收合鈕（置於側邊欄標頭） */
@@ -1165,7 +1167,8 @@ const H=s=>s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 function skyConfirm(msg,cb,title='確認刪除'){document.getElementById('m-confirm-ttl').textContent=title;document.getElementById('m-confirm-msg').textContent=msg;_confCb=cb;openM('m-confirm');}
 function skyPrompt(ph,cb,title='輸入'){document.getElementById('m-prompt-ttl').textContent=title;const i=document.getElementById('m-prompt-inp');i.placeholder=ph;i.value='';_promptCb=cb;openM('m-prompt');setTimeout(()=>i.focus(),80);}
 function pad(n){return String(n).padStart(2,'0');}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+const TOAST_ICONS={check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'};
+function toast(msg,icon){const t=document.getElementById('toast');t.innerHTML='';if(icon&&TOAST_ICONS[icon]){const ic=document.createElement('span');ic.className='toast-ico';ic.innerHTML=TOAST_ICONS[icon];t.appendChild(ic);}const sp=document.createElement('span');sp.textContent=msg;t.appendChild(sp);t.classList.add('show');clearTimeout(t._tt);t._tt=setTimeout(()=>t.classList.remove('show'),2200);}
 function openM(id){document.getElementById(id).classList.add('on');}
 function closeM(id){document.getElementById(id).classList.remove('on');}
 document.querySelectorAll('.mbg').forEach(b=>b.addEventListener('click',ev=>{if(ev.target===b)b.classList.remove('on');}));
@@ -2115,7 +2118,7 @@ window._cloudReady=false;
   initDailyRpt();
   _cloudReady=true;
   window._cloudReady=true;
-  toast('✅ 雲端資料載入完成');
+  toast('雲端資料載入完成','check');
 })();
 renderPt();
 renderCL();
