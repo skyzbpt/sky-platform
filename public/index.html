@@ -447,10 +447,10 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:20px;font-size:12.5px;z-index:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
 
-/* 側欄收合鈕（桌面／平板顯示；手機於下方媒體查詢隱藏） */
-.hamburger{display:flex;flex-direction:column;justify-content:center;gap:4px;width:34px;height:34px;padding:9px 8px;border-radius:7px;flex-shrink:0;transition:background .15s;}
-.hamburger:hover{background:var(--blue-bg);}
-.hamburger span{display:block;height:2px;border-radius:2px;background:var(--ink2);}
+/* 側欄收合鈕（置於側邊欄標頭） */
+.sb-toggle{display:flex;flex-direction:column;justify-content:center;gap:4px;width:34px;height:34px;padding:9px 8px;border-radius:7px;flex-shrink:0;transition:background .15s;}
+.sb-toggle:hover{background:var(--blue-bg);}
+.sb-toggle span{display:block;width:100%;height:2px;border-radius:2px;background:var(--ink2);transition:background .15s;}
 .flex-r{display:flex;align-items:center;gap:7px;}
 .mute{color:var(--ink3);}
 .mono{font-family:monospace;}
@@ -509,9 +509,8 @@ body{background:var(--bg);display:flex;align-items:stretch;justify-content:cente
 #login.scr.on{display:flex;align-items:center;justify-content:center;}
 .l-box{width:100%;max-width:360px;padding:20px;}
 
-/* 隱藏桌面側欄 / 漢堡鍵 */
+/* 隱藏桌面側欄（手機改用底部分頁列） */
 .sb{display:none!important;}
-.hamburger{display:none!important;}
 
 /* App 填滿、單欄 */
 .app{display:block!important;grid-template-columns:none!important;height:100%;}
@@ -635,6 +634,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <div class="sb-top">
       <div class="sb-logo" id="t-sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div>
       <span class="sb-title" id="t-sb-name">sky 衛教平台</span>
+      <button class="sb-toggle" title="收合選單" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
     </div>
     <div class="sb-nav">
       <div class="nav-sec">主功能</div>
@@ -667,8 +667,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- OVERVIEW -->
     <div class="view on" data-tv="ov">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">總覽</div></div>
+                <div><div class="pg-title">總覽</div></div>
         <div class="tb-r">
           <select id="ov-pt-sel" onchange="selStatPt(parseInt(this.value))" style="padding:6px 11px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:12.5px;cursor:pointer;"></select>
           <div class="notif-wrap">
@@ -694,8 +693,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- PATIENTS -->
     <div class="view" data-tv="pt">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">個案管理</div></div>
+                <div><div class="pg-title">個案管理</div></div>
         <div class="tb-r"><button class="btn pri" onclick="openPtModal(-1)">+ 新增個案</button></div></div>
       <div class="content">
         <div class="toolbar">
@@ -718,8 +716,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- CHAT -->
     <div class="view" data-tv="ch">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">對話聯繫</div></div></div>
+                <div><div class="pg-title">對話聯繫</div></div></div>
       <div class="chat-wrap">
         <div class="cl-list">
           <div class="cl-head"><h4>聯絡個案</h4>
@@ -772,8 +769,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- EXERCISE -->
     <div class="view" data-tv="ex">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">運動追蹤</div></div>
+                <div><div class="pg-title">運動追蹤</div></div>
         <div class="tb-r"><select id="ex-pt-sel" onchange="selStatPt(parseInt(this.value))" style="padding:6px 11px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:12.5px;cursor:pointer;"></select><button class="btn" onclick="exportPdf()">匯出 PDF</button></div></div>
       <div class="content">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px;">
@@ -793,8 +789,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- RECORDS -->
     <div class="view" data-tv="mr">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">病歷管理</div></div>
+                <div><div class="pg-title">病歷管理</div></div>
         <div class="tb-r"><select id="mr-pt-sel" onchange="selMrPt(parseInt(this.value))" style="padding:6px 11px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:12.5px;cursor:pointer;"></select><button class="btn pri" onclick="openMrNew()">+ 新增病歷</button></div></div>
       <div class="content"><div id="mr-list"></div></div>
     </div>
@@ -802,24 +797,21 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- VIDEOS -->
     <div class="view" data-tv="vd">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">衛教影片</div></div><div class="tb-r"><button class="btn pri" onclick="openMediaModal('video',-1)">+ 新增</button></div></div>
+                <div><div class="pg-title">衛教影片</div></div><div class="tb-r"><button class="btn pri" onclick="openMediaModal('video',-1)">+ 新增</button></div></div>
       <div class="content"><div class="mf-bar" id="vid-filter"></div><div class="media-grid" id="vid-grid"></div></div>
     </div>
 
     <!-- KNOWLEDGE -->
     <div class="view" data-tv="kn">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">衛教知識</div></div><div class="tb-r"><button class="btn pri" onclick="openMediaModal('know',-1)">+ 新增</button></div></div>
+                <div><div class="pg-title">衛教知識</div></div><div class="tb-r"><button class="btn pri" onclick="openMediaModal('know',-1)">+ 新增</button></div></div>
       <div class="content"><div class="mf-bar" id="kn-filter"></div><div class="media-grid" id="kn-grid"></div></div>
     </div>
 
     <!-- TAGS -->
     <div class="view" data-tv="tg">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">標籤分類</div></div></div>
+                <div><div class="pg-title">標籤分類</div></div></div>
       <div class="content">
         <div class="set-grid">
           <div class="card"><div class="card-h"><h3>個案標籤</h3><button class="btn sm pri" onclick="openTagModal(-1)" style="margin-left:auto;">+ 新增</button></div><div class="card-b" id="tag-list-el"></div></div>
@@ -831,8 +823,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- SETTINGS -->
     <div class="view" data-tv="st">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('t-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">設定</div></div></div>
+                <div><div class="pg-title">設定</div></div></div>
       <div class="content">
         <div class="set-grid">
           <div class="card"><div class="card-h"><h3>治療師資料</h3></div>
@@ -866,6 +857,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <div class="sb-top">
       <div class="sb-logo" id="p-sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div>
       <span class="sb-title" id="p-sb-title">sky 衛教平台</span>
+      <button class="sb-toggle" title="收合選單" onclick="toggleSb('p-app')"><span></span><span></span><span></span></button>
     </div>
     <div class="sb-nav">
       <div class="nav-sec">我的康復</div>
@@ -890,8 +882,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- PATIENT HOME -->
     <div class="view on" data-pv="ph">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('p-app')"><span></span><span></span><span></span></button>
-        <div>        <div class="pg-title" id="p-greet">嗨，測試 👋🏻</div><div class="pg-sub">歡迎使用 sky 衛教平台</div></div></div>
+                <div>        <div class="pg-title" id="p-greet">嗨，測試 👋🏻</div><div class="pg-sub">歡迎使用 sky 衛教平台</div></div></div>
       <div class="content">
         <div class="hero"><h2>開始你的康復旅程</h2><p>完成每日運動回報，讓治療師即時掌握你的狀況。</p><div class="hero-stats"><div><b>0</b><span>連續天數</span></div><div><b>0%</b><span>本月達成率</span></div><div><b>—</b><span>VAS 趨勢</span></div></div></div>
         <div class="p-grid">
@@ -917,8 +908,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- DAILY REPORT -->
     <div class="view" data-pv="dr">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('p-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">每日運動回報</div><div class="pg-sub" id="rpt-date"></div></div><div class="tb-r"><span class="tag gray" id="rpt-status">尚未提交</span></div></div>
+                <div><div class="pg-title">每日運動回報</div><div class="pg-sub" id="rpt-date"></div></div><div class="tb-r"><span class="tag gray" id="rpt-status">尚未提交</span></div></div>
       <div class="content">
         <div class="card" style="max-width:620px;">
           <div class="card-b" style="display:flex;flex-direction:column;gap:17px;" id="rpt-form">
@@ -936,8 +926,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- LEARNING -->
     <div class="view" data-pv="lrn">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('p-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">我的衛教</div></div></div>
+                <div><div class="pg-title">我的衛教</div></div></div>
       <div class="content">
         <div class="mf-bar"><button class="btn ghost" data-lf="all" onclick="filterLearn(this,'all')">全部</button><button class="btn" data-lf="vid" onclick="filterLearn(this,'vid')">影片</button><button class="btn" data-lf="pdf" onclick="filterLearn(this,'pdf')">文章</button></div>
         <div class="media-grid" id="lrn-grid"></div>
@@ -947,8 +936,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
     <!-- PATIENT CHAT -->
     <div class="view" data-pv="pc">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('p-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">聯繫治療師</div></div></div>
+                <div><div class="pg-title">聯繫治療師</div></div></div>
       <div class="chat-wrap" style="grid-template-columns:1fr;">
         <div class="chat-main">
           <div class="chat-hdr">
@@ -990,11 +978,10 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
       </div>
     </div>
 
-    <div class="view" data-pv="pmr"><div class="topbar"><button class="hamburger" onclick="toggleSb('p-app')"><span></span><span></span><span></span></button><div><div class="pg-title">我的病歷</div></div></div><div class="content"><div id="p-mr-list"></div></div></div>
+    <div class="view" data-pv="pmr"><div class="topbar"><div><div class="pg-title">我的病歷</div></div></div><div class="content"><div id="p-mr-list"></div></div></div>
     <div class="view" data-pv="pac">
       <div class="topbar">
-        <button class="hamburger" onclick="toggleSb('p-app')"><span></span><span></span><span></span></button>
-        <div><div class="pg-title">帳號設定</div></div></div>
+                <div><div class="pg-title">帳號設定</div></div></div>
       <div class="content"><div class="card" style="max-width:500px;"><div class="card-b" style="display:flex;flex-direction:column;gap:13px;">
         <div class="fg"><label>頭像</label><div class="av-row"><div class="av lg" id="p-av-disp">測</div><label class="btn" for="p-av-inp" style="cursor:pointer;">更換<input type="file" id="p-av-inp" accept="image/*" style="position:absolute;width:0;height:0;opacity:0;" onchange="applyPtAv(this)"/></label></div></div>
         <div class="fg"><label>名稱</label><input type="text" id="p-nm" value="測試"/></div>
@@ -1325,15 +1312,8 @@ function logout(){['t-app','p-app'].forEach(id=>document.getElementById(id).clas
 // 每次切換頁面時，同步所有 topbar 的漢堡按鈕（治療師端只需一個，動態插入）
 function ensureHamburger(appId){
   const app=document.getElementById(appId);if(!app)return;
-  app.querySelectorAll('.topbar').forEach(tb=>{
-    // 移除舊的，重新插到最前面確保位置正確
-    const old=tb.querySelector('.hamburger');if(old)old.remove();
-    const btn=document.createElement('button');
-    btn.className='hamburger';btn.title='收折選單';
-    btn.onclick=()=>toggleSb(appId);
-    btn.innerHTML='<span></span><span></span><span></span>';
-    tb.insertBefore(btn,tb.firstChild);
-  });
+  // 收合鈕已移至側邊欄標頭（.sb-toggle）；清除頁面頂欄殘留的舊版漢堡鈕
+  app.querySelectorAll('.topbar .hamburger').forEach(h=>h.remove());
 }
 function goT(v){
   document.querySelectorAll('#t-app [data-tv]').forEach(el=>el.classList.toggle('on',el.dataset.tv===v));
