@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no,maximum-scale=1.0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="theme-color" content="#E8F4FD"/>
 <link rel="icon" type="image/png" href="/favicon.png"/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
 <title>sky 衛教平台</title>
@@ -446,7 +447,10 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:20px;font-size:12.5px;z-index:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
 
-.hamburger{display:none!important;}
+/* 側欄收合鈕（桌面／平板顯示；手機於下方媒體查詢隱藏） */
+.hamburger{display:flex;flex-direction:column;justify-content:center;gap:4px;width:34px;height:34px;padding:9px 8px;border-radius:7px;flex-shrink:0;transition:background .15s;}
+.hamburger:hover{background:var(--blue-bg);}
+.hamburger span{display:block;height:2px;border-radius:2px;background:var(--ink2);}
 .flex-r{display:flex;align-items:center;gap:7px;}
 .mute{color:var(--ink3);}
 .mono{font-family:monospace;}
@@ -456,23 +460,44 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 *{-webkit-tap-highlight-color:transparent;}
 html{-webkit-text-size-adjust:100%;}
 
-/* ---------- 桌面（>1024px）：完整側欄版面 ---------- */
-@media (min-width:769px){
+/* ---------- 桌面／平板（≥741px）：側欄版面，隱藏手機元件 ---------- */
+@media (min-width:741px){
   .mtabbar{display:none!important;}
   .more-sheet-bg{display:none!important;}
   .chat-back{display:none!important;}
 }
 
-/* ---------- 平板（769–1024px）：窄側欄、版面調整 ---------- */
-@media (min-width:769px) and (max-width:1024px){
+/* ---------- 平板（741–1024px，含 iPad 直向）：窄側欄、版面調整 ---------- */
+@media (min-width:741px) and (max-width:1024px){
   .app{grid-template-columns:180px 1fr;}
   .stat-grid{grid-template-columns:1fr 1fr;}
   .ov-grid,.set-grid,.p-grid{grid-template-columns:1fr;}
   .chat-wrap{grid-template-columns:200px 1fr;}
+  .content{padding:18px;}
 }
 
-/* ---------- 手機（≤768px）：底部分頁列版面 ---------- */
-@media (max-width:768px){
+/* ---------- 寬桌面（≥1440px）：內容留白 ---------- */
+@media (min-width:1440px){
+  .content{padding:28px 40px;}
+}
+
+/* ---------- 中窄寬度（≤900px）：寬表格改為橫向捲動 ---------- */
+@media (max-width:900px){
+  .content table.t{display:block;overflow-x:auto;white-space:nowrap;max-width:100%;}
+}
+
+/* ---------- 觸控裝置：hover 型操作常駐顯示、放大點擊目標 ---------- */
+@media (hover:none){
+  .ann-actions{opacity:1;}
+}
+@media (pointer:coarse){
+  .ibt{width:36px;height:36px;}
+  .ann-ab{width:24px;height:24px;}
+  .ann-ab svg{width:12px;height:12px;}
+}
+
+/* ---------- 手機（≤740px，含 iPad 分割畫面）：底部分頁列版面 ---------- */
+@media (max-width:740px){
 html,body{overflow:hidden;height:100%;}
 body{background:var(--bg);display:flex;align-items:stretch;justify-content:center;}
 
@@ -507,7 +532,6 @@ body{background:var(--bg);display:flex;align-items:stretch;justify-content:cente
 html,body{overflow:hidden;height:100%;max-width:100%;}
 *{box-sizing:border-box;max-width:100%;}
 img,video,table,pre,code{max-width:100%;}
-.content table.t{display:block;overflow-x:auto;white-space:nowrap;max-width:100%;}
 .stat-grid{grid-template-columns:1fr 1fr;gap:10px;}
 .ov-grid,.set-grid,.p-grid{grid-template-columns:1fr;}
 .media-grid{grid-template-columns:1fr;}
@@ -1266,7 +1290,8 @@ function toggleSb(appId){
   const sb=app?.querySelector('.sb');
   if(!app||!sb)return;
   const collapsed=sb.classList.toggle('collapsed');
-  app.classList.toggle('sb-collapsed',collapsed);
+  // sb-collapsed 需加在 .app 格線容器上（CSS 選擇器為 .app.sb-collapsed），而非外層 section
+  (app.classList.contains('app')?app:app.querySelector('.app'))?.classList.toggle('sb-collapsed',collapsed);
 }
 
 // ── AUTH ──
