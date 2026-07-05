@@ -6,6 +6,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no,maximum-scale=1.0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<link rel="icon" type="image/png" href="/favicon.png"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
 <title>sky 衛教平台</title>
 
 <style>
@@ -44,11 +46,11 @@ input,textarea,select{font-family:inherit;color:var(--ink);font-size:14px;}
 
 /* LOGIN */
 .l-box{width:400px;padding:34px 30px 26px;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-lg);}
-.l-icon{width:44px;height:44px;border-radius:12px;background:var(--ink);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.l-icon{width:44px;height:44px;border-radius:12px;background:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
 .l-icon svg{width:22px;height:22px;color:#fff;}
 .l-h{text-align:center;font-size:22px;font-weight:600;margin-bottom:4px;}
 .l-s{text-align:center;font-size:13px;color:var(--ink3);margin-bottom:28px;}
-.l-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--border);border-radius:var(--r);padding:3px;gap:3px;margin-bottom:20px;}
+.l-tabs{display:grid;grid-template-columns:1fr 1fr;background:#C8E4F5;border-radius:var(--r);padding:3px;gap:3px;margin-bottom:20px;}
 .l-tab{padding:9px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink3);text-align:center;transition:all .2s;cursor:pointer;}
 .l-tab.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);}
 .fld{margin-bottom:14px;}
@@ -58,7 +60,7 @@ input,textarea,select{font-family:inherit;color:var(--ink);font-size:14px;}
 .fld-w input:focus{outline:none;border-color:var(--ink);}
 .eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--ink3);}
 .eye-btn svg{width:16px;height:16px;}
-.l-submit{width:100%;padding:12px;background:var(--ink);color:#fff;border-radius:var(--r);font-size:14px;font-weight:500;margin-top:8px;transition:opacity .2s;}
+.l-submit{width:100%;padding:12px;background:var(--blue);color:#fff;border-radius:var(--r);font-size:14px;font-weight:500;margin-top:8px;transition:opacity .2s;}
 .l-submit:hover{opacity:.85;}
 .l-foot{text-align:center;font-size:11px;color:var(--ink3);margin-top:16px;}
 
@@ -67,7 +69,7 @@ input,textarea,select{font-family:inherit;color:var(--ink);font-size:14px;}
 .app.sb-collapsed{grid-template-columns:54px 1fr;}
 
 /* SIDEBAR */
-.sb{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100vh;height:100dvh;transition:width .22s cubic-bezier(.4,0,.2,1);}
+.sb{background:#EAF5FD;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;height:100vh;height:100dvh;transition:width .22s cubic-bezier(.4,0,.2,1);}
 .sb.collapsed{width:54px!important;}
 .sb-top{padding:0 12px;height:64px;min-height:64px;max-height:64px;box-sizing:border-box;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .sb-logo{width:38px;height:38px;border-radius:10px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
@@ -77,26 +79,13 @@ input,textarea,select{font-family:inherit;color:var(--ink);font-size:14px;}
 .sb.collapsed .sb-title{opacity:0;width:0;pointer-events:none;}
 .sb.collapsed .sb-top{justify-content:center;}
 .sb.collapsed .sb-logo{display:none;}
-.nav-btn{width:100%;display:flex;align-items:center;gap:8px;padding:8px 10px 8px 14px;border-radius:8px;font-size:13px;color:var(--ink2);text-align:left;margin-bottom:1px;transition:all .15s;white-space:nowrap;overflow:hidden;}
 .sb-nav{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px 6px;-webkit-overflow-scrolling:touch;}
 .nav-sec{font-size:10px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;padding:10px 8px 4px;font-weight:500;white-space:nowrap;overflow:hidden;transition:opacity .15s;}
 .sb.collapsed .nav-sec{opacity:0;height:0;padding:0;margin:0;}
 .nav-btn{width:100%;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--ink2);text-align:left;margin-bottom:1px;transition:all .15s;white-space:nowrap;overflow:hidden;}
-.nav-btn:hover{background:var(--bg);color:var(--ink);}
 .nav-btn.on{background:#D0EAFB;color:var(--blue-dark);font-weight:500;}
 .nav-btn:hover{background:#DBF0FC;color:var(--ink);}
-.sb{background:#EAF5FD;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .22s cubic-bezier(.4,0,.2,1);}
-.topbar{padding:14px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:#EAF5FD;flex-shrink:0;}
 .hero{background:linear-gradient(135deg,var(--blue-dark),var(--blue));color:#fff;border-radius:var(--r-lg);padding:22px 24px;margin-bottom:14px;position:relative;overflow:hidden;}
-.btn.pri{background:var(--blue);color:#fff;border-color:var(--blue);}
-.btn.pri:hover{opacity:.85;}
-.send-btn{width:34px;height:34px;min-width:34px;min-height:34px;flex-shrink:0;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;}
-.send-btn svg{width:17px;height:17px;}
-.l-icon{width:44px;height:44px;border-radius:12px;background:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
-.l-submit{width:100%;padding:12px;background:var(--blue);color:#fff;border-radius:var(--r);font-size:14px;font-weight:500;margin-top:8px;transition:opacity .2s;}
-.l-tab.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);}
-.l-tabs{display:grid;grid-template-columns:1fr 1fr;background:#C8E4F5;border-radius:var(--r);padding:3px;gap:3px;margin-bottom:20px;}
-table.t th{text-align:left;font-size:11px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;padding:10px 14px;background:#DFF0FA;border-bottom:1px solid var(--border);font-weight:500;}
 .nav-btn svg{width:15px;height:15px;flex-shrink:0;}
 .nav-btn span.nav-label{transition:opacity .15s;}
 .sb.collapsed .nav-btn span.nav-label{opacity:0;width:0;overflow:hidden;}
@@ -287,7 +276,7 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 }
 .chat-inp-row .ibt{flex-shrink:0;width:32px;min-width:32px;}
 .chat-inp-row .ibt svg{width:22px;height:22px;}
-.send-btn{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;}
+.send-btn{width:32px;height:32px;flex-shrink:0;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;}
 .send-btn:hover{opacity:.8;}
 .send-btn svg{width:14px;height:14px;}
 
@@ -1161,7 +1150,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
 <script>
 // ── UTILS ──
 let _confCb=()=>{},_promptCb=()=>{};
-const H=s=>s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const H=s=>s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 function skyConfirm(msg,cb,title='確認刪除'){document.getElementById('m-confirm-ttl').textContent=title;document.getElementById('m-confirm-msg').textContent=msg;_confCb=cb;openM('m-confirm');}
 function skyPrompt(ph,cb,title='輸入'){document.getElementById('m-prompt-ttl').textContent=title;const i=document.getElementById('m-prompt-inp');i.placeholder=ph;i.value='';_promptCb=cb;openM('m-prompt');setTimeout(()=>i.focus(),80);}
 function pad(n){return String(n).padStart(2,'0');}
@@ -1247,9 +1236,6 @@ let annMap={};  // 每位個案各自的公告
 function getMsgs(ci){if(!msgMap[ci])msgMap[ci]=[];return msgMap[ci];}
 function getAnns(ci){if(!annMap[ci])annMap[ci]=[];return annMap[ci];}
 
-// aliases
-function msgs_cur(){return getMsgs(activeCI);}
-function anns_cur(){return getAnns(activeCI);}
 
 // 治療師/個案 端相簿與記事（proxy getter，保持與 activeCI 同步）
 Object.defineProperty(window,'tAlbums',{get:()=>getTAlbums(activeCI),configurable:true});
@@ -1361,7 +1347,7 @@ document.addEventListener('click',ev=>{
 
 // ── AVATAR ──
 function setAv(el,imgSrc,text){if(!el)return;el.innerHTML='';if(imgSrc){el.style.padding='0';el.style.background='transparent';const img=document.createElement('img');img.src=imgSrc;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';el.appendChild(img);}else{el.style.padding='';el.style.background='';el.textContent=text;}}
-function avHTML(p,sz='width:32px;height:32px;font-size:12px;'){if(p.imgSrc)return`<div class="av" style="${sz}padding:0;background:transparent;"><img src="${p.imgSrc}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"/></div>`;return`<div class="av" style="${sz}">${H(p.av)}</div>`;}
+function avHTML(p,sz='width:32px;height:32px;font-size:12px;'){if(p.imgSrc)return`<div class="av" style="${sz}padding:0;background:transparent;"><img src="${H(p.imgSrc)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"/></div>`;return`<div class="av" style="${sz}">${H(p.av)}</div>`;}
 function prevAv(inp,dispId,key){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const src=ev.target.result;if(key==='therapist')therapistImg=src;else if(key==='ptmodal')pendingPtImg=src;setAv(document.getElementById(dispId),src,'');};r.readAsDataURL(f);}
 function prevLogo(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(frontState._savedLogo===undefined)frontState._savedLogo=frontState.logoSrc;frontState.logoSrc=ev.target.result;setLogoEl(document.getElementById('st-logo'),frontState.logoSrc);updFrontPrev();};r.readAsDataURL(f);}
 function setLogoEl(el,src){if(!el)return;el.innerHTML='';if(src){const img=document.createElement('img');img.src=src;img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;';el.appendChild(img);}else el.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';}
@@ -1465,9 +1451,9 @@ function renderOv(){
 function mkStat(label,val,trend,up){return`<div class="stat-c"><div class="stat-lbl">${label}</div><div class="stat-val">${val}</div><div class="stat-tr${up?'':' dn'}">${trend}</div></div>`;}
 
 // ── CHAT ──
-function renderCL(filter=''){const el=document.getElementById('cl-items');if(!el)return;el.innerHTML=patients.filter(p=>!filter||p.name.includes(filter)||p.acct.includes(filter)).map((p,i)=>`<div class="cl-item ${i===activeCI?'on':''}" onclick="selectContact(${i})">${avHTML(p,'width:32px;height:32px;font-size:12px;')}<div class="cl-meta"><b>${H(p.name)}</b><div class="cl-tags">${p.tags.map(ti=>{const pr=tPair(tags[ti]);return`<span style="background:${pr.bg};color:${pr.ink};font-size:10px;padding:1px 5px;border-radius:4px;font-weight:500;">${H(tags[ti]?.name||'')}</span>`;}).join('')}</div></div>${p.unread?'<div class="unread"></div>':''}</div>`).join('');}
+function renderCL(filter=''){const el=document.getElementById('cl-items');if(!el)return;el.innerHTML=patients.filter(p=>!filter||p.name.includes(filter)||p.acct.includes(filter)).map(p=>{const i=patients.indexOf(p);return`<div class="cl-item ${i===activeCI?'on':''}" onclick="selectContact(${i})">${avHTML(p,'width:32px;height:32px;font-size:12px;')}<div class="cl-meta"><b>${H(p.name)}</b><div class="cl-tags">${p.tags.map(ti=>{const pr=tPair(tags[ti]);return`<span style="background:${pr.bg};color:${pr.ink};font-size:10px;padding:1px 5px;border-radius:4px;font-weight:500;">${H(tags[ti]?.name||'')}</span>`;}).join('')}</div></div>${p.unread?'<div class="unread"></div>':''}</div>`;}).join('');}
 function filterCL(v){renderCL(v);}
-function selectContact(i){activeCI=i;patients[i].unread=0;renderCL();syncChatHdr();renderMsgs();updUnread();renderOv();}
+function selectContact(i){activeCI=i;patients[i].unread=0;renderCL();syncChatHdr();renderMsgs();renderAnn('t-ann','t-ann-cnt',false,activeCI);updUnread();renderOv();}
 function syncChatHdr(){const p=patients[activeCI];if(!p)return;setAv(document.getElementById('ch-av'),p.imgSrc||'',p.av);document.getElementById('ch-nm').textContent=p.name;}
 function updUnread(){const t=patients.reduce((s,p)=>s+p.unread,0);const b=document.getElementById('t-unread-badge');b.textContent=t;b.style.display=t?'':'none';}
 
@@ -1500,7 +1486,6 @@ function openNotif(i){
   renderNotifPanel();
 }
 function clearNotifs(){notifications=[];renderNotifPanel();saveState();}
-function readNotif(i){notifications[i].read=true;renderNotifPanel();}
 function markAllRead(){notifications.forEach(n=>n.read=true);renderNotifPanel();}
 
 // 公告
@@ -1514,7 +1499,7 @@ function renderAnn(stripId,cntId,readOnly,ci){
   if(!annItems.length){bd.innerHTML='<div class="ann-empty">目前沒有公告</div>';return;}
   bd.innerHTML=annItems.map((a,i)=>{
     const actHtml=readOnly?'':'<div class="ann-actions"><button class="ann-ab del" onclick="annDel('+i+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div>';
-    const imgHtml=a.imgSrc?`<img src="${a.imgSrc}" onclick="annJump(${i})" style="height:30px;width:45px;object-fit:cover;border-radius:4px;cursor:pointer;flex-shrink:0;"/>`:'<div class="ann-dot"></div>';
+    const imgHtml=a.imgSrc?`<img src="${H(a.imgSrc)}" onclick="annJump(${i})" style="height:30px;width:45px;object-fit:cover;border-radius:4px;cursor:pointer;flex-shrink:0;"/>`:'<div class="ann-dot"></div>';
     return`<div class="ann-row">${imgHtml}<span class="ann-text" onclick="annJump(${i})">${H(a.text)}</span>${actHtml}</div>`;
   }).join('');
 }
@@ -1530,22 +1515,6 @@ function toggleAnnStrip(id){
 function annJump(i){
   // 治療師端跳訊息
   scrollToMsg(getAnns(activeCI)[i]?.msgIdx??0);
-}
-function annEdit(i,stripId,cntId){
-  const strip=document.getElementById(stripId);if(!strip)return;
-  const rows=strip.querySelectorAll('.ann-row');if(!rows[i])return;
-  const txt=rows[i].querySelector('.ann-text');if(!txt)return;
-  const old=getAnns(activeCI)[i].text;
-  txt.outerHTML=`<input class="ann-einp" value="${H(old)}"
-    onblur="annSaveEdit(${i},this,'${stripId}','${cntId}')"
-    onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.value='${H(old)}';this.blur();}"
-    autofocus/>`;
-  setTimeout(()=>strip.querySelectorAll('.ann-einp')[0]?.focus(),30);
-}
-function annSaveEdit(i,inp,stripId,cntId){
-  const v=inp.value.trim();if(v)getAnns(activeCI)[i].text=v;
-  renderAnn('t-ann','t-ann-cnt',false,activeCI);
-  renderPAnn();
 }
 function annDel(i){
   skyConfirm('確定移除此公告？',ok=>{
@@ -1575,14 +1544,14 @@ function markAnn(){
 function renderMsgs(){
   const bd=document.getElementById('c-body');if(!bd)return;
   const msgs=getMsgs(activeCI);
-  bd.innerHTML=msgs.map((m,i)=>{const content=m.type==='img'&&m.src?`<img src="${m.src}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${m.who}" data-idx="${i}"><div>${content}<div class="msg-time">${m.t}</div></div></div>`;}).join('');
+  bd.innerHTML=msgs.map((m,i)=>{const content=m.type==='img'&&m.src?`<img src="${H(m.src)}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${m.who}" data-idx="${i}"><div>${content}<div class="msg-time">${m.t}</div></div></div>`;}).join('');
   bd.scrollTop=bd.scrollHeight;
   if(!bd._ctxBound){initLongPress('c-body');bd._ctxBound=true;}
 }
 function renderPMsgs(){
   const bd=document.getElementById('p-c-body');if(!bd)return;
   const msgs=getMsgs(PIDX);
-  bd.innerHTML=msgs.map((m,i)=>{const rw=m.who==='me'?'them':'me';const content=m.type==='img'&&m.src?`<img src="${m.src}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${rw}" data-idx="${i}"><div>${content}<div class="msg-time">${m.t}</div></div></div>`;}).join('');
+  bd.innerHTML=msgs.map((m,i)=>{const rw=m.who==='me'?'them':'me';const content=m.type==='img'&&m.src?`<img src="${H(m.src)}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${rw}" data-idx="${i}"><div>${content}<div class="msg-time">${m.t}</div></div></div>`;}).join('');
   bd.scrollTop=bd.scrollHeight;
   if(!bd._ctxBound){initLongPress('p-c-body');bd._ctxBound=true;}
 }
@@ -1683,7 +1652,7 @@ function closeChatOv(who){const ov=document.getElementById(who==='p'?'p-chat-ov'
 function switchOv(btn,which,who){openChatOv(which);}
 
 // albums
-function renderAlbums(who){const g=document.getElementById(who==='t'?'t-alb-grid':'p-alb-grid');if(!g)return;const albs=who==='t'?tAlbums:pAlbums;const cntEl=document.getElementById(who==='t'?'t-alb-cnt':'');if(cntEl)cntEl.textContent=albs.length+' 本';g.innerHTML=albs.map((a,i)=>{const ph=a.photos||[];const th=ph.length?`<img src="${ph[0]}" style="width:100%;height:100%;object-fit:cover;display:block;"/>`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';return`<div style="position:relative;"><div class="alb-c" onclick="openAlbum(${i},'${who}')"><div class="alb-thumb">${th}</div><div class="alb-info"><b>${H(a.title)}</b><small>${ph.length} 張</small></div></div><button onclick="event.stopPropagation();delAlbum(${i},'${who}')" style="position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;border:none;cursor:pointer;">×</button></div>`;}).join('');}
+function renderAlbums(who){const g=document.getElementById(who==='t'?'t-alb-grid':'p-alb-grid');if(!g)return;const albs=who==='t'?tAlbums:pAlbums;const cntEl=document.getElementById(who==='t'?'t-alb-cnt':'');if(cntEl)cntEl.textContent=albs.length+' 本';g.innerHTML=albs.map((a,i)=>{const ph=a.photos||[];const th=ph.length?`<img src="${H(ph[0])}" style="width:100%;height:100%;object-fit:cover;display:block;"/>`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';return`<div style="position:relative;"><div class="alb-c" onclick="openAlbum(${i},'${who}')"><div class="alb-thumb">${th}</div><div class="alb-info"><b>${H(a.title)}</b><small>${ph.length} 張</small></div></div><button onclick="event.stopPropagation();delAlbum(${i},'${who}')" style="position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;border:none;cursor:pointer;">×</button></div>`;}).join('');}
 function addAlbum(who){(who==='t'?tAlbums:pAlbums).unshift({title:new Date().toISOString().slice(0,10),photos:[]});renderAlbums(who);toast('已新增相簿');}
 function openAlbum(i,who){curAlbIdx=i;curAlbWho=who;const a=(who==='t'?tAlbums:pAlbums)[i];document.getElementById('m-alb-disp').textContent=a.title;document.getElementById('m-alb-disp').style.display='';document.getElementById('m-alb-inp-ttl').style.display='none';document.getElementById('m-alb-pencil-btn').style.display='';document.getElementById('m-alb-ok-btn').style.display='none';albPhotos=[...(a.photos||[])];renderAlbPhotos();openM('m-alb');}
 function albEdit(){const d=document.getElementById('m-alb-disp');const i=document.getElementById('m-alb-inp-ttl');i.value=d.textContent;d.style.display='none';i.style.display='';document.getElementById('m-alb-pencil-btn').style.display='none';document.getElementById('m-alb-ok-btn').style.display='';i.focus();i.select();}
@@ -1751,7 +1720,7 @@ function medCoverHTML(item,isVid,ri){
   const playIco='<svg viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px;position:relative;z-index:1;"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
   const pdfIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
   const ca=ri!=null?`style="cursor:pointer;" onclick="openViewModal('${isVid?'video':'pdf'}',${ri})"` :'';
-  if(item.coverSrc)return`<div class="media-cov" ${ca}><img src="${item.coverSrc}"/>${isVid?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);">'+playIco+'</div>':''}</div>`;
+  if(item.coverSrc)return`<div class="media-cov" ${ca}><img src="${H(item.coverSrc)}"/>${isVid?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);">'+playIco+'</div>':''}</div>`;
   return`<div class="media-cov ${item.cv||''}" ${ca}>${isVid?playIco:pdfIco}</div>`;
 }
 function renderVideos(filter='all'){
@@ -1772,7 +1741,7 @@ function renderVidFlt(){
     `<button class="btn ${curVidFilter==='all'?'ghost':''}" onclick="renderVideos('all')">全部</button>`+
     allC.map(c=>{
       const cp=getCatColor(c);const isOn=curVidFilter===c;
-      return`<button class="btn" onclick="renderVideos('${H(c)}')" style="${isOn?`background:${cp.bg};color:${cp.ink};border-color:${cp.bg};`:''}">${H(c)}</button>`;
+      return`<button class="btn" data-cat="${H(c)}" onclick="renderVideos(this.dataset.cat)" style="${isOn?`background:${cp.bg};color:${cp.ink};border-color:${cp.bg};`:''}">${H(c)}</button>`;
     }).join('');
 }
 function renderKnows(filter='all'){
@@ -1793,7 +1762,7 @@ function renderKnFlt(){
     `<button class="btn ${curKnFilter==='all'?'ghost':''}" onclick="renderKnows('all')">全部</button>`+
     allC.map(c=>{
       const cp=getCatColor(c);const isOn=curKnFilter===c;
-      return`<button class="btn" onclick="renderKnows('${H(c)}')" style="${isOn?`background:${cp.bg};color:${cp.ink};border-color:${cp.bg};`:''}">${H(c)}</button>`;
+      return`<button class="btn" data-cat="${H(c)}" onclick="renderKnows(this.dataset.cat)" style="${isOn?`background:${cp.bg};color:${cp.ink};border-color:${cp.bg};`:''}">${H(c)}</button>`;
     }).join('');
 }
 function openMediaModal(type,i){
@@ -1881,18 +1850,18 @@ function saveTherapist(){
   renderMsgs();saveState();toast('已儲存');
 }
 function syncFrontInputs(){document.getElementById('st-f-title').value=frontState.title;document.getElementById('st-f-sub').value=frontState.sub;updFrontPrev();}
-function updFrontPrev(){const pv=document.getElementById('front-prev-card');if(!pv)return;const t=document.getElementById('st-f-title')?.value||frontState.title;const s=document.getElementById('st-f-sub')?.value||frontState.sub;const lh=frontState.logoSrc?`<img src="${frontState.logoSrc}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;"/>`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:#fff;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';pv.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px;background:var(--bg);border-radius:9px;border:1px solid var(--border);"><div style="width:32px;height:32px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;">${lh}</div><div style="font-size:14px;font-weight:600;">${H(t)}</div><div style="font-size:11px;color:var(--ink3);text-align:center;">${H(s)}</div></div>`;}
+function updFrontPrev(){const pv=document.getElementById('front-prev-card');if(!pv)return;const t=document.getElementById('st-f-title')?.value||frontState.title;const s=document.getElementById('st-f-sub')?.value||frontState.sub;const lh=frontState.logoSrc?`<img src="${H(frontState.logoSrc)}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;"/>`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:#fff;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';pv.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px;background:var(--bg);border-radius:9px;border:1px solid var(--border);"><div style="width:32px;height:32px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;">${lh}</div><div style="font-size:14px;font-weight:600;">${H(t)}</div><div style="font-size:11px;color:var(--ink3);text-align:center;">${H(s)}</div></div>`;}
 function applyFront(){const t=document.getElementById('st-f-title').value.trim()||frontState.title;const s=document.getElementById('st-f-sub').value.trim()||frontState.sub;frontState.title=t;frontState.sub=s;document.getElementById('front-title').textContent=t;document.getElementById('front-sub').textContent=s;['t-sb-name','p-sb-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});['front-logo','t-sb-logo','p-sb-logo','st-logo'].forEach(id=>setLogoEl(document.getElementById(id),frontState.logoSrc));document.title=t;updFrontPrev();toast('已套用');}
 
 // ── MEDICAL RECORDS ──
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function buildMrSel(id,cur){const s=document.getElementById(id);if(!s)return;s.innerHTML=patients.map((p,i)=>`<option value="${i}"${i===cur?' selected':''}>${H(p.name)}</option>`).join('');}
 function selMrPt(i){mrPtIdx=i;renderMedRecords();}
-function renderMrImgs(){const g=document.getElementById('m-mr-imgs');if(!g)return;g.innerHTML=pendingMrImgs.map((src,i)=>`<div style="position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;"><img src="${src}" style="width:100%;height:100%;object-fit:cover;"/><button onclick="rmMrImg(${i})" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:11px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button></div>`).join('');}
+function renderMrImgs(){const g=document.getElementById('m-mr-imgs');if(!g)return;g.innerHTML=pendingMrImgs.map((src,i)=>`<div style="position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;"><img src="${H(src)}" style="width:100%;height:100%;object-fit:cover;"/><button onclick="rmMrImg(${i})" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:11px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button></div>`).join('');}
 function rmMrImg(i){pendingMrImgs.splice(i,1);renderMrImgs();}
 function addMrImgs(inp){Array.from(inp.files).forEach(f=>{const r=new FileReader();r.onload=ev=>{pendingMrImgs.push(ev.target.result);renderMrImgs();};r.readAsDataURL(f);});inp.value='';}
 function mrSoap(r){return[{l:'S',bg:'#2563EB',border:'#BFDBFE',bg2:'#EFF6FF',txt:r.s,n:'主觀 Subjective'},{l:'O',bg:'#059669',border:'#A7F3D0',bg2:'#ECFDF5',txt:r.o,n:'客觀 Objective'},{l:'A',bg:'#D97706',border:'#FDE68A',bg2:'#FFFBEB',txt:r.a,n:'評估 Assessment'},{l:'P',bg:'#DC2626',border:'#FECACA',bg2:'#FEF2F2',txt:r.p,n:'計劃 Plan'}].filter(it=>it.txt).map(it=>`<div style="display:grid;grid-template-columns:20px 1fr;gap:8px 10px;align-items:start;padding:10px 12px;border-radius:9px;border:1px solid ${it.border};background:${it.bg2};margin-bottom:6px;"><div style="width:20px;height:20px;border-radius:5px;background:${it.bg};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">${it.l}</div><div><div style="font-size:10px;font-weight:600;color:${it.bg};margin-bottom:3px;letter-spacing:.04em;">${it.n}</div><div class="soap-txt" style="color:#1F2937;">${H(it.txt)}</div></div></div>`).join('');}
-function renderMedRecords(){const g=document.getElementById('mr-list');if(!g)return;buildMrSel('mr-pt-sel',mrPtIdx);const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===mrPtIdx).sort((a,b)=>b.date.localeCompare(a.date));if(!recs.length){g.innerHTML='<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷</div>';return;}g.innerHTML=recs.map(r=>{const prev=[r.s,r.o,r.a,r.p].filter(Boolean).map(t=>t.slice(0,38)+(t.length>38?'…':'')).join(' · ');return`<div class="mr-card" data-idx="${r._i}"><div class="mr-hd" data-action="toggle"><div style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;pointer-events:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;pointer-events:none;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1;min-width:0;pointer-events:none;"><div style="font-weight:600;font-size:13.5px;">${H(r.date)}</div>${r.sent?'<div><span style="background:var(--green-bg);color:var(--green);font-size:10px;padding:1px 6px;border-radius:4px;">已傳送</span></div>':''}<div style="font-size:11.5px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${H(prev||'（無內容）')}</div></div><button type="button" class="btn sm pri" data-action="send">${r.sent?'重新傳送':'傳送給個案'}</button><button type="button" class="btn sm" data-action="edit">編輯</button><button type="button" class="btn sm danger" data-action="delete">刪除</button><svg style="width:14px;height:14px;color:var(--ink3);flex-shrink:0;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="mr-bd">${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g">'+r.imgs.map((src,si)=>`<img src="${src}" data-ri="${r._i}" data-si="${si}" alt="附圖"/>`).join('')+'</div>':''}</div></div>`;}).join('');}
+function renderMedRecords(){const g=document.getElementById('mr-list');if(!g)return;buildMrSel('mr-pt-sel',mrPtIdx);const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===mrPtIdx).sort((a,b)=>b.date.localeCompare(a.date));if(!recs.length){g.innerHTML='<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷</div>';return;}g.innerHTML=recs.map(r=>{const prev=[r.s,r.o,r.a,r.p].filter(Boolean).map(t=>t.slice(0,38)+(t.length>38?'…':'')).join(' · ');return`<div class="mr-card" data-idx="${r._i}"><div class="mr-hd" data-action="toggle"><div style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;pointer-events:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;pointer-events:none;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1;min-width:0;pointer-events:none;"><div style="font-weight:600;font-size:13.5px;">${H(r.date)}</div>${r.sent?'<div><span style="background:var(--green-bg);color:var(--green);font-size:10px;padding:1px 6px;border-radius:4px;">已傳送</span></div>':''}<div style="font-size:11.5px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${H(prev||'（無內容）')}</div></div><button type="button" class="btn sm pri" data-action="send">${r.sent?'重新傳送':'傳送給個案'}</button><button type="button" class="btn sm" data-action="edit">編輯</button><button type="button" class="btn sm danger" data-action="delete">刪除</button><svg style="width:14px;height:14px;color:var(--ink3);flex-shrink:0;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="mr-bd">${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g">'+r.imgs.map((src,si)=>`<img src="${H(src)}" data-ri="${r._i}" data-si="${si}" alt="附圖"/>`).join('')+'</div>':''}</div></div>`;}).join('');}
 function bindMrEvents(){const g=document.getElementById('mr-list');if(!g||g._bound)return;g._bound=true;g.addEventListener('click',ev=>{const act=ev.target.closest('[data-action]');if(!act)return;const card=act.closest('.mr-card');if(!card)return;const idx=parseInt(card.dataset.idx);const action=act.dataset.action;ev.stopPropagation();if(action==='toggle'){const bd=card.querySelector('.mr-bd');const chev=card.querySelector('svg:last-child');const open=bd.classList.toggle('open');if(chev)chev.style.transform=open?'rotate(180deg)':'';}else if(action==='edit')openMrModal(idx);else if(action==='delete')delMr(idx,false);else if(action==='send')sendMr(idx);});g.addEventListener('click',ev=>{const img=ev.target.closest('img[data-ri]');if(!img)return;viewMrImg(parseInt(img.dataset.ri),parseInt(img.dataset.si));});}
 function sendMr(i){const r=medRecords[i];if(!r)return;r.sent=true;renderMedRecords();if(r.ptIdx===PIDX)renderPMr();toast('已傳送給 '+patients[r.ptIdx]?.name);}
 function openMrNew(){openMrModal(-1);}
@@ -1900,7 +1869,7 @@ function openMrModal(i){mrEditIdx=i;const r=i===-1?null:medRecords[i];pendingMrI
 function saveMr(){const date=document.getElementById('m-mr-date').value;if(!date){toast('請選擇日期');return;}const s=document.getElementById('m-mr-s').value.trim();const o=document.getElementById('m-mr-o').value.trim();const a=document.getElementById('m-mr-a').value.trim();const p=document.getElementById('m-mr-p').value.trim();if(!s&&!o&&!a&&!p&&!pendingMrImgs.length){toast('請填寫 SOAP 內容');return;}const ptIdx=parseInt(document.getElementById('m-mr-pt').value)||0;const obj={ptIdx,date,s,o,a,p,imgs:[...pendingMrImgs],sent:false};if(mrEditIdx===-1)medRecords.push(obj);else Object.assign(medRecords[mrEditIdx],{ptIdx,date,s,o,a,p,imgs:[...pendingMrImgs]});closeM('m-mr');renderMedRecords();toast(mrEditIdx===-1?'已新增病歷':'已更新病歷');}
 function delMr(i,fromModal){if(i==null||i<0||i>=medRecords.length)return;skyConfirm('確定刪除此筆病歷？',ok=>{if(!ok)return;medRecords.splice(i,1);if(fromModal)closeM('m-mr');renderMedRecords();toast('已刪除病歷');});}
 function viewMrImg(ri,si){const r=medRecords[ri];if(!r||!r.imgs[si])return;const bg=document.createElement('div');bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';const img=document.createElement('img');img.src=r.imgs[si];img.style.cssText='max-width:90vw;max-height:90vh;border-radius:10px;object-fit:contain;';bg.appendChild(img);bg.onclick=()=>document.body.removeChild(bg);document.body.appendChild(bg);}
-function renderPMr(){const g=document.getElementById('p-mr-list');if(!g)return;const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===PIDX&&r.sent).sort((a,b)=>b.date.localeCompare(a.date));if(!recs.length){g.innerHTML='<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷紀錄</div>';return;}g.innerHTML=recs.map(r=>`<div class="card" style="margin-bottom:10px;overflow:hidden;"><div class="card-b"><div style="font-size:11px;color:var(--ink3);margin-bottom:10px;">${H(r.date)}</div>${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g" style="margin-top:10px;">'+r.imgs.map((src,si)=>`<img src="${src}" data-pri="${r._i}" data-psi="${si}" style="cursor:pointer;" alt="附圖"/>`).join('')+'</div>':''}</div></div>`).join('');if(!g._pmrBound){g._pmrBound=true;g.addEventListener('click',ev=>{const img=ev.target.closest('img[data-pri]');if(!img)return;viewMrImg(parseInt(img.dataset.pri),parseInt(img.dataset.psi));});}}
+function renderPMr(){const g=document.getElementById('p-mr-list');if(!g)return;const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===PIDX&&r.sent).sort((a,b)=>b.date.localeCompare(a.date));if(!recs.length){g.innerHTML='<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷紀錄</div>';return;}g.innerHTML=recs.map(r=>`<div class="card" style="margin-bottom:10px;overflow:hidden;"><div class="card-b"><div style="font-size:11px;color:var(--ink3);margin-bottom:10px;">${H(r.date)}</div>${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g" style="margin-top:10px;">'+r.imgs.map((src,si)=>`<img src="${H(src)}" data-pri="${r._i}" data-psi="${si}" style="cursor:pointer;" alt="附圖"/>`).join('')+'</div>':''}</div></div>`).join('');if(!g._pmrBound){g._pmrBound=true;g.addEventListener('click',ev=>{const img=ev.target.closest('img[data-pri]');if(!img)return;viewMrImg(parseInt(img.dataset.pri),parseInt(img.dataset.psi));});}}
 
 // ── PATIENT FUNCS ──
 function initDailyRpt(){const now=new Date();const days=['日','一','二','三','四','五','六'];const de=document.getElementById('rpt-date');if(de)de.textContent=`${now.getFullYear()} / ${pad(now.getMonth()+1)} / ${pad(now.getDate())} · 週${days[now.getDay()]}`;const p=patients[PIDX];const items=(p.assignedVids||[]).map(i=>videos[i]?.title).filter(Boolean);if(!items.length)items.push('今日復健運動');const el=document.getElementById('ex-list');if(el)el.innerHTML=items.map((nm,i)=>`<label style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;"><input type="checkbox" class="ex-cb" data-idx="${i}" style="accent-color:var(--ink);width:15px;height:15px;" onchange="onExChg()" ${rptDraft.exercises[i]?'checked':''}/><div><div style="font-size:13px;">${H(nm)}</div><div style="font-size:11px;color:var(--ink3);">✓ 今日有執行</div></div></label>`).join('');const vi=document.getElementById('vas-inp');if(vi){vi.value=rptDraft.vas;setVas(rptDraft.vas);}const ni=document.getElementById('rpt-note');if(ni)ni.value=rptDraft.note;const se=document.getElementById('rpt-status');if(rptDraft.submitted){se.className='tag green';se.textContent='已提交';document.getElementById('rpt-summary').style.display='';document.getElementById('rpt-btns').style.display='none';lockRpt();}else{se.className='tag gray';se.textContent='尚未提交';document.getElementById('rpt-summary').style.display='none';document.getElementById('rpt-btns').style.display='flex';}}
@@ -1971,10 +1940,9 @@ function renderPHomeRec(){
   g.innerHTML=list.map((a,idx)=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;${idx<list.length-1?'border-bottom:1px solid var(--border);':''}cursor:pointer;" onclick="openViewModal('${a._t}',${a._ri})"><div style="width:34px;height:34px;border-radius:8px;background:${a._t==='vid'?'var(--ink)':'#F0F0F0'};color:${a._t==='vid'?'#fff':'var(--ink)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${a._t==='vid'?'<svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'}</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${H(a.title)}</div><div style="font-size:11px;color:var(--ink3);">${a._t==='vid'?'影片':'PDF'}</div></div></div>`).join('');
 }
 
-function openViewModal(type,ri){const isVid=type==='vid'||type==='video';const item=isVid?videos[ri]:knows[ri];if(!item){toast('找不到內容');return;}document.getElementById('m-view-ttl').textContent=item.title;const covH=item.coverSrc?`<div style="border-radius:9px;overflow:hidden;aspect-ratio:16/9;margin-bottom:14px;"><img src="${item.coverSrc}" style="width:100%;height:100%;object-fit:cover;display:block;"/></div>`:'';const descH=item.desc?`<p style="font-size:13.5px;color:var(--ink2);line-height:1.65;margin:10px 0 0;">${H(item.desc)}</p>`:'';let actH='';if(isVid){actH=item.url?`<button class="btn pri" onclick="window.open('${H(item.url)}','_blank','noopener');closeM('m-view');">▶ 播放影片</button>`:'<button class="btn" disabled style="opacity:.45;">尚未設定連結</button>';}else{actH=item.pdfSrc?`<button class="btn pri" id="dl-btn" data-ri="${ri}">⬇ 下載 PDF</button>`:'<button class="btn" disabled style="opacity:.45;">尚未上傳 PDF</button>';}document.getElementById('m-view-body').innerHTML=covH+descH+`<div style="margin-top:14px;">${actH}</div>`;if(!isVid&&item.pdfSrc){setTimeout(()=>{const btn=document.getElementById('dl-btn');if(btn)btn.onclick=()=>dlPdf(ri);},0);}openM('m-view');}
+function openViewModal(type,ri){const isVid=type==='vid'||type==='video';const item=isVid?videos[ri]:knows[ri];if(!item){toast('找不到內容');return;}document.getElementById('m-view-ttl').textContent=item.title;const covH=item.coverSrc?`<div style="border-radius:9px;overflow:hidden;aspect-ratio:16/9;margin-bottom:14px;"><img src="${H(item.coverSrc)}" style="width:100%;height:100%;object-fit:cover;display:block;"/></div>`:'';const descH=item.desc?`<p style="font-size:13.5px;color:var(--ink2);line-height:1.65;margin:10px 0 0;">${H(item.desc)}</p>`:'';let actH='';if(isVid){actH=item.url?`<button class="btn pri" id="play-btn">▶ 播放影片</button>`:'<button class="btn" disabled style="opacity:.45;">尚未設定連結</button>';}else{actH=item.pdfSrc?`<button class="btn pri" id="dl-btn" data-ri="${ri}">⬇ 下載 PDF</button>`:'<button class="btn" disabled style="opacity:.45;">尚未上傳 PDF</button>';}document.getElementById('m-view-body').innerHTML=covH+descH+`<div style="margin-top:14px;">${actH}</div>`;if(isVid&&item.url){setTimeout(()=>{const btn=document.getElementById('play-btn');if(btn)btn.onclick=()=>{const u=(item.url||'').trim();if(/^\s*(javascript|data|vbscript):/i.test(u)){toast('連結格式不正確');}else{window.open(u,'_blank','noopener');}closeM('m-view');};},0);}if(!isVid&&item.pdfSrc){setTimeout(()=>{const btn=document.getElementById('dl-btn');if(btn)btn.onclick=()=>dlPdf(ri);},0);}openM('m-view');}
 function dlPdf(ri){const item=knows[ri];if(!item?.pdfSrc)return;try{const b64=item.pdfSrc.split(',')[1];const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);const blob=new Blob([arr],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(item.pdfName||item.title||'doc')+'.pdf';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000);toast('PDF 下載中…');}catch(e){window.open(item.pdfSrc,'_blank');}}
 
-function syncPtName(nm){nm=nm.trim();if(!nm)return;patientSelf.name=nm;patientSelf.initials=nm[0]||'?';setAv(document.getElementById('p-sb-av'),patientSelf.img,patientSelf.initials);const sn=document.getElementById('p-sb-nm');if(sn)sn.textContent=nm;const gr=document.getElementById('p-greet');if(gr)gr.textContent='嗨，'+nm+' 👋🏻';if(patients[PIDX]){patients[PIDX].name=nm;patients[PIDX].av=nm[0]||'?';}renderCL();syncChatHdr();renderMsgs();renderPt();}
 function applyPtAv(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{pendingPtAvImg=ev.target.result;setAv(document.getElementById('p-av-disp'),pendingPtAvImg,patientSelf.initials);};r.readAsDataURL(f);}
 function savePtAccount(){
   const nm=document.getElementById('p-nm').value.trim()||patientSelf.name;
@@ -2003,41 +1971,27 @@ function savePtAccount(){
   renderCL();syncChatHdr();renderMsgs();renderPt();renderOv();saveState();toast('已儲存');
 }
 
-// ── PERSISTENCE（localStorage，偵測不到時退回記憶體）──
-// Claude 預覽若封鎖 localStorage 會自動退回記憶體（單次工作階段有效）；
-// 打包成 Capacitor App 後，WKWebView 的 localStorage 可正常持久化。
-// ── SUPABASE 雲端儲存 ──
-const SB_URL='https://emavpbedpxrrmvvnccxj.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtYXZwYmVkcHhycm12dm5jY3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTkwMDYsImV4cCI6MjA5NTY5NTAwNn0.NDR3rX_TCaqIW9ag3B5BOsSPqUqwFeEZBRqKPsZ9Ak8';
-const SKY_KEY='sky_state_v1';
+// ── CLOUDFLARE 雲端儲存（同源 Worker /api/state → KV）──
+// 靜態頁面與 API 由同一個 Cloudflare Worker 提供，狀態 JSON 存於 KV（key: sky_state_v1）。
+const API_STATE='/api/state';
 let _lastSaved='',_saveTimer=null;
-
-async function initFirebase(){
-  // 自動喚醒：每次開啟網頁時 ping Supabase 保持活躍
-  try{await fetch(`${SB_URL}/rest/v1/sky_store?limit=1`,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});}catch(e){}
-  return true;
-}
 
 async function fbGet(){
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/sky_store?key=eq.${encodeURIComponent(SKY_KEY)}&select=value`,{
-      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
-    });
+    const r=await fetch(API_STATE,{cache:'no-store'});
+    if(r.status===404)return null;
     if(!r.ok){console.warn('fbGet HTTP error',r.status);return null;}
-    const d=await r.json();
-    return d.length?d[0].value:null;
+    const t=await r.text();
+    return t||null;
   }catch(e){console.warn('fbGet error',e);return null;}
 }
 async function fbSet(value){
   if(!window._cloudReady){console.warn('阻止：雲端尚未就緒，不儲存');return;}
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/sky_store`,{
-      method:'POST',
-      headers:{
-        'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,
-        'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'
-      },
-      body:JSON.stringify({key:SKY_KEY,value})
+    const r=await fetch(API_STATE,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:value
     });
     if(!r.ok)console.warn('fbSet HTTP error',r.status);
     else console.log('fbSet OK');
@@ -2134,7 +2088,6 @@ let pressT,pressCx=0,pressCy=0;
 window._cloudReady=false;
 (async()=>{
   toast('載入雲端資料中…');
-  await initFirebase();
   const ok=await loadState();
   applyRestoredUI();
   renderPt();
@@ -2151,7 +2104,7 @@ window._cloudReady=false;
   renderPHomeRec();
   renderOv();
   updUnread();
-  renderAnn('t-ann','t-ann-cnt',false,PIDX);
+  renderAnn('t-ann','t-ann-cnt',false,activeCI);
   renderPAnn();
   updFrontPrev();
   initDailyRpt();
@@ -2173,7 +2126,7 @@ renderLearn();
 renderPHomeRec();
 renderOv();
 updUnread();
-renderAnn('t-ann','t-ann-cnt',false,PIDX);
+renderAnn('t-ann','t-ann-cnt',false,activeCI);
 renderPAnn();
 updFrontPrev();
 initDailyRpt();
@@ -2225,7 +2178,7 @@ function importBackup(inp){
       renderPt();renderCL();renderMsgs();renderPMsgs();
       renderVideos();renderKnows();renderTagList();renderCatList();
       renderLearn();renderPHomeRec();renderOv();updUnread();
-      renderAnn('t-ann','t-ann-cnt',false,PIDX);renderPAnn();
+      renderAnn('t-ann','t-ann-cnt',false,activeCI);renderPAnn();
       updFrontPrev();initDailyRpt();
       saveState();
       toast('✅ 備份匯入成功');
