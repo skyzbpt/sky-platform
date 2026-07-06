@@ -246,7 +246,6 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .ann-ab:hover{background:var(--border);}
 .ann-ab.del:hover{background:var(--red-bg);color:var(--red);}
 .ann-ab svg{width:10px;height:10px;}
-.ann-einp{flex:1;border:none;background:transparent;font-size:12px;outline:none;border-bottom:1px solid var(--blue);padding:1px 0;}
 
 /* MESSAGES */
 .msg-body{flex:1;min-height:0;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:11px;background:var(--bg);-webkit-overflow-scrolling:touch;}
@@ -336,8 +335,6 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .mr-hd:hover{background:var(--bg);}
 .mr-bd{display:none;flex-direction:column;gap:11px;padding:14px;}
 .mr-bd.open{display:flex;}
-.soap-row{display:grid;grid-template-columns:20px 1fr;gap:8px 10px;align-items:start;}
-.soap-lbl{width:20px;height:20px;border-radius:5px;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .soap-txt{font-size:13px;white-space:pre-wrap;line-height:1.6;}
 .mr-imgs-g{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
 .mr-imgs-g img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;cursor:pointer;}
@@ -455,7 +452,6 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .sb-toggle span{display:block;width:100%;height:2px;border-radius:2px;background:var(--ink2);transition:background .15s;}
 .flex-r{display:flex;align-items:center;gap:7px;}
 .mute{color:var(--ink3);}
-.mono{font-family:monospace;}
 
 /* ==================== 響應式切版 ==================== */
 :root{ --tabbar-h:60px; }
@@ -1315,16 +1311,10 @@ function logout(){['t-app','p-app'].forEach(id=>document.getElementById(id).clas
 
 // ── NAV ──
 // 每次切換頁面時，同步所有 topbar 的漢堡按鈕（治療師端只需一個，動態插入）
-function ensureHamburger(appId){
-  const app=document.getElementById(appId);if(!app)return;
-  // 收合鈕已移至側邊欄標頭（.sb-toggle）；清除頁面頂欄殘留的舊版漢堡鈕
-  app.querySelectorAll('.topbar .hamburger').forEach(h=>h.remove());
-}
 function goT(v){
   document.querySelectorAll('#t-app [data-tv]').forEach(el=>el.classList.toggle('on',el.dataset.tv===v));
   document.querySelectorAll('#t-app [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   closeAllPanels();
-  ensureHamburger('t-app');
   if(v==='ex'){renderTracking();buildSel('ex-pt-sel',selPtIdx);}
   if(v==='mr'){renderMedRecords();bindMrEvents();}
   if(v==='ch'){renderCL();syncChatHdr();}
@@ -1336,7 +1326,6 @@ function goT(v){
 function goP(v){
   document.querySelectorAll('#p-app [data-pv]').forEach(el=>el.classList.toggle('on',el.dataset.pv===v));
   closeDrop();
-  ensureHamburger('p-app');
   if(v==='dr')initDailyRpt();
   if(v==='pmr')renderPMr();
   if(v==='pc'){pUnread=0;patients[PIDX].ptUnread=0;updPtUnread();updUnread();renderPMsgs();renderPAnn();}
@@ -1390,7 +1379,6 @@ function renderPt(){
       </div></td>
     </tr>`;
   }).join('');
-  initPtDrag(tbody);
 }
 
 function movePt(i,dir){
@@ -1408,8 +1396,6 @@ function movePt(i,dir){
   renderPt();renderCL();renderOv();saveState();
 }
 
-let _dragIdx=null,_dragEl=null,_dragOverIdx=null;
-function initPtDrag(){}
 function toggleTagFilter(){document.getElementById('tag-fp').classList.toggle('on');renderTagFpOpts();}
 function renderTagFpOpts(){const el=document.getElementById('tag-fp-opts');if(!el)return;el.innerHTML='<button class="btn xs" style="'+(ptTagFilter.length===0?'background:var(--ink);color:#fff;border-color:var(--ink);':'')+'" onclick="clearPtTagFilter()">全部</button>'+tags.map((t,i)=>{const p=tPair(t);return'<button class="btn xs" style="'+(ptTagFilter.includes(i)?'outline:2px solid var(--blue);':'')+'" onclick="togglePtTF('+i+')"><span style="background:'+p.bg+';color:'+p.ink+';display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">'+H(t.name)+'</span></button>';}).join('');}
 function togglePtTF(i){const pos=ptTagFilter.indexOf(i);if(pos>-1)ptTagFilter.splice(pos,1);else ptTagFilter.push(i);renderTagFpOpts();renderPt();}
