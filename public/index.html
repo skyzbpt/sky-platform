@@ -919,7 +919,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
               <div class="vas-wrap"><div class="vas-num" id="vas-disp">0</div><input type="range" min="0" max="10" value="0" id="vas-inp" oninput="setVas(this.value)"/><div class="vas-emj"><span>😌</span><span>🙂</span><span>😐</span><span>😣</span><span>😫</span></div><div class="vas-lbls"><span>無痛</span><span>劇痛</span></div></div></div>
             <div class="fg" style="margin:0;"><label>備註（選填）</label><textarea rows="3" id="rpt-note" placeholder="想告訴治療師的任何事…"></textarea></div>
             <div style="display:flex;justify-content:flex-end;gap:7px;" id="rpt-btns"><button class="btn" onclick="saveDraft()">儲存草稿</button><button class="btn pri" onclick="submitRpt()">提交回報</button></div>
-            <div id="rpt-summary" style="display:none;padding:13px;background:var(--green-bg);border-radius:8px;border:1px solid #BBF7D0;"><div style="font-weight:500;color:var(--green);margin-bottom:5px;">✅ 已提交</div><div id="rpt-summary-txt" style="font-size:13px;color:#374151;"></div><button class="btn sm" style="margin-top:9px;" onclick="resetRpt()">重新填寫</button></div>
+            <div id="rpt-summary" style="display:none;padding:13px;background:var(--green-bg);border-radius:8px;border:1px solid #BBF7D0;"><div style="font-weight:500;color:var(--green);margin-bottom:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-.15em;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 已提交</div><div id="rpt-summary-txt" style="font-size:13px;color:#374151;"></div><button class="btn sm" style="margin-top:9px;" onclick="resetRpt()">重新填寫</button></div>
           </div>
         </div>
       </div>
@@ -1168,6 +1168,8 @@ function skyConfirm(msg,cb,title='確認刪除'){document.getElementById('m-conf
 function skyPrompt(ph,cb,title='輸入'){document.getElementById('m-prompt-ttl').textContent=title;const i=document.getElementById('m-prompt-inp');i.placeholder=ph;i.value='';_promptCb=cb;openM('m-prompt');setTimeout(()=>i.focus(),80);}
 function pad(n){return String(n).padStart(2,'0');}
 const TOAST_ICONS={check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'};
+// 內嵌於文字中的成功打勾圖示（沿用當前文字顏色 currentColor）
+const ICO_OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-.15em;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
 function toast(msg,icon){const t=document.getElementById('toast');t.innerHTML='';if(icon&&TOAST_ICONS[icon]){const ic=document.createElement('span');ic.className='toast-ico';ic.innerHTML=TOAST_ICONS[icon];t.appendChild(ic);}const sp=document.createElement('span');sp.textContent=msg;t.appendChild(sp);t.classList.add('show');clearTimeout(t._tt);t._tt=setTimeout(()=>t.classList.remove('show'),2200);}
 function openM(id){document.getElementById(id).classList.add('on');}
 function closeM(id){document.getElementById(id).classList.remove('on');}
@@ -1792,7 +1794,7 @@ function openMediaModal(type,i){
   document.getElementById('m-med-desc').value=src?.desc||'';
   if(src?.coverSrc){pendingCoverSrc=src.coverSrc;document.getElementById('m-cov-img').src=src.coverSrc;document.getElementById('m-cov-prev').style.display='block';document.getElementById('m-cov-name').textContent='已有封面';}
   else{document.getElementById('m-cov-prev').style.display='none';document.getElementById('m-cov-name').textContent='點擊上傳封面';}
-  if(!isVid&&src?.pdfSrc){pendingPdfSrc=src.pdfSrc;pendingPdfName=src.pdfName||'';document.getElementById('m-pdf-name').textContent='✅ '+(src.pdfName||'已有 PDF');}
+  if(!isVid&&src?.pdfSrc){pendingPdfSrc=src.pdfSrc;pendingPdfName=src.pdfName||'';document.getElementById('m-pdf-name').innerHTML=ICO_OK+' '+H(src.pdfName||'已有 PDF');}
   else document.getElementById('m-pdf-name').textContent='點擊上傳 PDF';
   if(src?.cat&&catNames.includes(src.cat))ce.value=src.cat;
   if(src?.sub&&mediaSubs.includes(src.sub))se.value=src.sub;
@@ -1800,7 +1802,7 @@ function openMediaModal(type,i){
 }
 function delCurMedia(){const arr=mediaType==='video'?videos:knows;skyConfirm('刪除「'+arr[mediaEditIdx]?.title+'」？',ok=>{if(!ok)return;arr.splice(mediaEditIdx,1);closeM('m-med');if(mediaType==='video')renderVideos(curVidFilter);else renderKnows(curKnFilter);renderLearn();toast('已刪除');});}
 function saveMedia(){const title=document.getElementById('m-med-title').value.trim();if(!title){toast('請輸入標題');return;}const obj={title,url:document.getElementById('m-med-url').value.trim(),cat:document.getElementById('m-med-cat').value,sub:document.getElementById('m-med-sub').value,desc:document.getElementById('m-med-desc').value.trim(),coverSrc:pendingCoverSrc,pdfSrc:pendingPdfSrc,pdfName:pendingPdfName,cv:['','c2','c3'][Math.floor(Math.random()*3)]};const arr=mediaType==='video'?videos:knows;if(mediaEditIdx===-1)arr.push(obj);else Object.assign(arr[mediaEditIdx],obj);pendingCoverSrc='';pendingPdfSrc='';pendingPdfName='';closeM('m-med');if(mediaType==='video')renderVideos(curVidFilter);else renderKnows(curKnFilter);renderLearn();toast('已儲存');}
-function loadPdf(inp){const f=inp.files[0];if(!f)return;pendingPdfName=f.name;document.getElementById('m-pdf-name').textContent='讀取中…';const r=new FileReader();r.onload=ev=>{pendingPdfSrc=ev.target.result;document.getElementById('m-pdf-name').textContent='✅ '+f.name;};r.readAsDataURL(f);}
+function loadPdf(inp){const f=inp.files[0];if(!f)return;pendingPdfName=f.name;document.getElementById('m-pdf-name').textContent='讀取中…';const r=new FileReader();r.onload=ev=>{pendingPdfSrc=ev.target.result;document.getElementById('m-pdf-name').innerHTML=ICO_OK+' '+H(f.name);};r.readAsDataURL(f);}
 function prevCover(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{pendingCoverSrc=ev.target.result;document.getElementById('m-cov-img').src=pendingCoverSrc;document.getElementById('m-cov-prev').style.display='block';document.getElementById('m-cov-name').textContent=f.name;};r.readAsDataURL(f);}
 
 // push
@@ -1880,7 +1882,7 @@ function viewMrImg(ri,si){const r=medRecords[ri];if(!r||!r.imgs[si])return;const
 function renderPMr(){const g=document.getElementById('p-mr-list');if(!g)return;const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===PIDX&&r.sent).sort((a,b)=>b.date.localeCompare(a.date));if(!recs.length){g.innerHTML='<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷紀錄</div>';return;}g.innerHTML=recs.map(r=>`<div class="card" style="margin-bottom:10px;overflow:hidden;"><div class="card-b"><div style="font-size:11px;color:var(--ink3);margin-bottom:10px;">${H(r.date)}</div>${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g" style="margin-top:10px;">'+r.imgs.map((src,si)=>`<img src="${H(src)}" data-pri="${r._i}" data-psi="${si}" style="cursor:pointer;" alt="附圖"/>`).join('')+'</div>':''}</div></div>`).join('');if(!g._pmrBound){g._pmrBound=true;g.addEventListener('click',ev=>{const img=ev.target.closest('img[data-pri]');if(!img)return;viewMrImg(parseInt(img.dataset.pri),parseInt(img.dataset.psi));});}}
 
 // ── PATIENT FUNCS ──
-function initDailyRpt(){const now=new Date();const days=['日','一','二','三','四','五','六'];const de=document.getElementById('rpt-date');if(de)de.textContent=`${now.getFullYear()} / ${pad(now.getMonth()+1)} / ${pad(now.getDate())} · 週${days[now.getDay()]}`;const p=patients[PIDX];const items=(p.assignedVids||[]).map(i=>videos[i]?.title).filter(Boolean);if(!items.length)items.push('今日復健運動');const el=document.getElementById('ex-list');if(el)el.innerHTML=items.map((nm,i)=>`<label style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;"><input type="checkbox" class="ex-cb" data-idx="${i}" style="accent-color:var(--ink);width:15px;height:15px;" onchange="onExChg()" ${rptDraft.exercises[i]?'checked':''}/><div><div style="font-size:13px;">${H(nm)}</div><div style="font-size:11px;color:var(--ink3);">✓ 今日有執行</div></div></label>`).join('');const vi=document.getElementById('vas-inp');if(vi){vi.value=rptDraft.vas;setVas(rptDraft.vas);}const ni=document.getElementById('rpt-note');if(ni)ni.value=rptDraft.note;const se=document.getElementById('rpt-status');if(rptDraft.submitted){se.className='tag green';se.textContent='已提交';document.getElementById('rpt-summary').style.display='';document.getElementById('rpt-btns').style.display='none';lockRpt();}else{se.className='tag gray';se.textContent='尚未提交';document.getElementById('rpt-summary').style.display='none';document.getElementById('rpt-btns').style.display='flex';}}
+function initDailyRpt(){const now=new Date();const days=['日','一','二','三','四','五','六'];const de=document.getElementById('rpt-date');if(de)de.textContent=`${now.getFullYear()} / ${pad(now.getMonth()+1)} / ${pad(now.getDate())} · 週${days[now.getDay()]}`;const p=patients[PIDX];const items=(p.assignedVids||[]).map(i=>videos[i]?.title).filter(Boolean);if(!items.length)items.push('今日復健運動');const el=document.getElementById('ex-list');if(el)el.innerHTML=items.map((nm,i)=>`<label style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;"><input type="checkbox" class="ex-cb" data-idx="${i}" style="accent-color:var(--ink);width:15px;height:15px;" onchange="onExChg()" ${rptDraft.exercises[i]?'checked':''}/><div><div style="font-size:13px;">${H(nm)}</div><div style="font-size:11px;color:var(--ink3);">${ICO_OK} 今日有執行</div></div></label>`).join('');const vi=document.getElementById('vas-inp');if(vi){vi.value=rptDraft.vas;setVas(rptDraft.vas);}const ni=document.getElementById('rpt-note');if(ni)ni.value=rptDraft.note;const se=document.getElementById('rpt-status');if(rptDraft.submitted){se.className='tag green';se.textContent='已提交';document.getElementById('rpt-summary').style.display='';document.getElementById('rpt-btns').style.display='none';lockRpt();}else{se.className='tag gray';se.textContent='尚未提交';document.getElementById('rpt-summary').style.display='none';document.getElementById('rpt-btns').style.display='flex';}}
 function onExChg(){document.querySelectorAll('.ex-cb').forEach(cb=>{rptDraft.exercises[cb.dataset.idx]=cb.checked;});}
 function setVas(v){const d=document.getElementById('vas-disp');if(d)d.textContent=v;rptDraft.vas=parseInt(v);}
 function saveDraft(){document.querySelectorAll('.ex-cb').forEach(cb=>{rptDraft.exercises[cb.dataset.idx]=cb.checked;});rptDraft.vas=parseInt(document.getElementById('vas-inp').value);rptDraft.note=document.getElementById('rpt-note').value;const se=document.getElementById('rpt-status');se.className='tag orange';se.textContent='草稿已儲存';toast('草稿已儲存');}
@@ -1895,7 +1897,7 @@ s.rates[6]=pct;s.vas[6]=rptDraft.vas;s.weekRate=pct;patients[PIDX].unread=(patie
   const autoMsg='📋 每日回報已提交\n完成率：'+pct+'%（'+done+'/'+total+' 項）\nVAS 疼痛：'+rptDraft.vas+' 分'+noteStr;
   getMsgs(PIDX).push({who:'them',t:pad(now.getHours())+':'+pad(now.getMinutes()),txt:autoMsg,auto:true});
   if(activeCI===PIDX)renderMsgs();
-  renderOv();renderTracking();toast('✅ 已提交，並自動通知治療師');}
+  renderOv();renderTracking();toast('已提交，並自動通知治療師','check');}
 function lockRpt(){document.querySelectorAll('#rpt-form input,#rpt-form textarea').forEach(el=>el.disabled=true);}
 function resetRpt(){Object.keys(rptDraft.exercises).forEach(k=>delete rptDraft.exercises[k]);rptDraft.vas=0;rptDraft.note='';rptDraft.submitted=false;document.getElementById('rpt-summary').style.display='none';document.getElementById('rpt-btns').style.display='flex';document.getElementById('rpt-status').className='tag gray';document.getElementById('rpt-status').textContent='尚未提交';document.querySelectorAll('#rpt-form input,#rpt-form textarea').forEach(el=>el.disabled=false);initDailyRpt();}
 
@@ -1927,7 +1929,7 @@ function syncHomeStats(){
   const todoBtn = document.querySelector('#p-app [data-pv="ph"] .btn.sm.pri');
   if(todoBtn){
     if(rptDraft.submitted){
-      todoBtn.textContent = '已完成 ✅';
+      todoBtn.innerHTML = '已完成 ' + ICO_OK;
       todoBtn.disabled = true;
       todoBtn.style.opacity = '.55';
     }else{
@@ -2150,7 +2152,7 @@ function exportBackup(){
   const a=document.createElement('a');a.href=url;a.download=fname;
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(url),1000);
-  toast('✅ 備份已下載：'+fname);
+  toast('備份已下載：'+fname,'check');
 }
 function triggerImport(){document.getElementById('import-file-inp').click();}
 function importBackup(inp){
@@ -2189,7 +2191,7 @@ function importBackup(inp){
       renderAnn('t-ann','t-ann-cnt',false,activeCI);renderPAnn();
       updFrontPrev();initDailyRpt();
       saveState();
-      toast('✅ 備份匯入成功');
+      toast('備份匯入成功','check');
     });
   };
   r.readAsText(f);
