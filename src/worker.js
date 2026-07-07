@@ -28,6 +28,12 @@ export default {
       return new Response('method not allowed', { status: 405, headers: { allow: 'GET, PUT, POST' } });
     }
 
+    // 瀏覽器預設會抓 /favicon.ico；若交給 SPA fallback 會回 index.html（HTML 而非圖片），
+    // 部分瀏覽器（含 iOS Safari）因此不顯示圖示。改為直接回傳 favicon.png。
+    if (url.pathname === '/favicon.ico') {
+      return env.ASSETS.fetch(new Request(new URL('/favicon.png', request.url)));
+    }
+
     return env.ASSETS.fetch(request);
   },
 };
