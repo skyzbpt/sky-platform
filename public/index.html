@@ -1480,10 +1480,10 @@ function daySeries(st,n){
   for(let i=n-1;i>=0;i--){const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()-i),ds=dstr(d);out.push({date:ds,label:i?'週'+'日一二三四五六'[d.getDay()]:'今日',log:by[ds]||null});}
   return out;
 }
-// 一段期間的平均完成率：沒回報的日子算 0；第一次回報之前的日子不列入
+// 一段期間的平均完成率：沒回報的日子算 0；第一次回報之前的日子、以及「今天還沒回報」都不列入
 function avgRate(st,days){
-  const first=(st?.logs||[]).reduce((m,l)=>!m||l.date<m?l.date:m,'');
-  const use=days.filter(d=>first&&d.date>=first);
+  const first=(st?.logs||[]).reduce((m,l)=>!m||l.date<m?l.date:m,''),today=todayStr();
+  const use=days.filter(d=>first&&d.date>=first&&(d.log||d.date!==today));
   return use.length?Math.round(use.reduce((s,d)=>s+(d.log?d.log.pct:0),0)/use.length):0;
 }
 // 連續回報天數（今天還沒回報就從昨天往回算）
@@ -2241,6 +2241,8 @@ function initDailyRpt(){
   const items=(p.assignedVids||[]).map(i=>videos[i]?.title).filter(Boolean);if(!items.length)items.push('今日復健運動');
   const el=document.getElementById('ex-list');
   if(el)setHTML(el,items.map((nm,i)=>`<label style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;"><input type="checkbox" class="ex-cb" data-idx="${i}" style="accent-color:var(--ink);width:15px;height:15px;" onchange="onExChg()" ${d.exercises[i]?'checked':''}/><div><div style="font-size:13px;">${H(nm)}</div><div style="font-size:11px;color:var(--ink3);">${ICO_OK} 今日有執行</div></div></label>`).join(''));
+  // 勾選狀態一律以草稿為準（清單內容沒變時不會重畫，所以要另外同步，否則會殘留上一位個案或前一天的勾選）
+  document.querySelectorAll('.ex-cb').forEach(cb=>{cb.checked=!!d.exercises[cb.dataset.idx];});
   const vi=document.getElementById('vas-inp');if(vi){vi.value=d.vas||0;document.getElementById('vas-disp').textContent=d.vas||0;}
   const ni=document.getElementById('rpt-note');if(ni&&ni.value!==(d.note||''))ni.value=d.note||'';
   // 已提交就鎖定表單；尚未提交一定要解鎖（否則換一位個案登入時，表單會停留在上一位的鎖定狀態）
@@ -2361,8 +2363,14 @@ let _pushed=[];                  // 取回之後自己上傳過的版本 [{ver,j
 let _hist=[];                    // 目前這份資料的版本來歷（含 _ver），新的在前
 let _syncP=null,_again=false,_wantPull=false,_flush=false,_needPull=false;
 let _touched=true,_lastCheck=0,_recheckAt=Infinity,_lastPoll=0,_lastPush=0,_lastAct=Date.now();
-let _pushFails=0,_nextPush=0,_tooBig='';
+let _fails=0,_retryAt=0,_tooBig='',_cloudEmpty=false;
 window._cloudReady=false;
+// 連線或儲存失敗：逐次拉長重試間隔，連續 3 次就提醒使用者；恢復後告知
+function netFail(code){
+  _fails++;_retryAt=Date.now()+Math.min(30000,2000*_fails);
+  if(_fails===3)toast(code===503?'⚠️ 雲端暫時無法寫入（可能已達今日寫入上限），系統會自動重試':'⚠️ 無法連線到雲端，恢復後會自動同步；有變更尚未上傳時請勿關閉頁面');
+}
+function netOk(){if(_fails>=3)toast('雲端同步已恢復','check');_fails=0;_retryAt=0;}
 
 function liveState(){return{patients,tags,cats,mediaSubs,videos,knows,medRecords,notifications,msgMap,annMap,tAlbumsMap,tNotesMap,pAlbumsMap,pNotesMap,ptStats,rptDraftMap,frontState,therapistState};}
 function snapshotState(){return canonState(liveState());}
@@ -2414,7 +2422,8 @@ function parseRemote(text){
 async function firstLoad(){
   for(let n=0;;n++){
     const res=await apiGet('');
-    if(res.st==='empty'){_ver=_baseVer='0';_hist=[];_baseJson='';return;} // 雲端尚無資料 → 稍後以目前的預設資料建立
+    // 雲端尚無資料：先用預設資料操作，等到真的有變更才建立雲端資料（單純開啟頁面不寫入）
+    if(res.st==='empty'){_ver=_baseVer='0';_hist=[];_baseJson=JSON.stringify(snapshotState());_cloudEmpty=true;return;}
     const p=res.st==='ok'?parseRemote(res.text):null;
     if(p){
       applyStateData(p.d);
@@ -2433,7 +2442,10 @@ async function pullRemote(){
   if(res.st==='error')return false;
   _lastPoll=Date.now();
   if(res.st==='same')return true;
-  if(res.st==='empty'){_ver=_baseVer='0';_baseJson='';_pushed=[];_hist=[];_touched=true;return true;} // 雲端被清空 → 以本機資料重建
+  if(res.st==='empty'){ // 原本有資料的雲端被清空 → 以本機資料重建
+    if(!_cloudEmpty){_ver=_baseVer='0';_baseJson='';_pushed=[];_hist=[];_touched=true;}
+    return true;
+  }
   const p=parseRemote(res.text);if(!p)return false;
   const anc=new Set([res.ver,...p.hist]);            // 雲端這一版的來歷
   const cur=JSON.stringify(snapshotState());
@@ -2477,21 +2489,22 @@ function draftOnly(cur){
   const x=cut(cur);return x!==null&&x===cut(srv);
 }
 async function syncLoop(){
+  const stamp=()=>_ver==='0'&&!_cloudEmpty; // 雲端是沒有版本號的舊資料 → 即使內容沒變也要上傳一次補上版本號
   for(let round=0;round<6;round++){
+    if(Date.now()<_retryAt&&!_wantPull&&!_flush)return; // 剛失敗過，稍後再試（使用者主動操作時不等）
     // 1) 取回雲端新版（上傳被拒、有人要求、或到了確認時間）
     if((_needPull||_wantPull||Date.now()-_lastPoll>=pollEvery())&&!uiBusy()){
       _wantPull=false;
-      if(!await pullRemote())return;
-      _needPull=false;
+      if(!await pullRemote()){netFail();return;}
+      netOk();_needPull=false;
     }
     if(_needPull)return; // 上傳被拒但視窗開著不能合併，等關閉後再處理
     // 2) 本機有變更就上傳
     const now=Date.now();
-    if(now<_nextPush)return;
-    if(!(_flush||_touched||now>=_recheckAt||now-_lastCheck>12000||_ver==='0'))return;
+    if(!(_flush||_touched||now>=_recheckAt||now-_lastCheck>12000||stamp()))return;
     _touched=false;_lastCheck=now;_recheckAt=Infinity;
     const cur=JSON.stringify(snapshotState());
-    if((cur===serverJson()&&_ver!=='0')||cur===_tooBig)return;
+    if((cur===serverJson()&&!stamp())||cur===_tooBig)return;
     if(!_flush){
       const wait=draftOnly(cur)?_lastAct+DRAFT_WAIT-now:_lastPush+PUSH_GAP-now;
       if(wait>0){_recheckAt=now+wait;return;}
@@ -2503,15 +2516,13 @@ async function syncLoop(){
       _pushed.unshift({ver,json:cur});
       let size=0;_pushed=_pushed.filter((x,i)=>i===0||(i<8&&(size+=x.json.length)<6e6));
       _ver=ver;_hist=[ver,..._hist].slice(0,HIST_MAX);_lastPush=Date.now();
-      if(_pushFails>=3)toast('雲端同步已恢復','check');
-      _pushFails=0;_nextPush=0;_tooBig='';
+      _cloudEmpty=false;_tooBig='';netOk();
       return;
     }
     _touched=true;
     if(res.st==='conflict'){_needPull=true;continue;} // 雲端已有別人的新版本 → 取回合併後再上傳
     if(res.st==='toobig'){_tooBig=cur;toast('⚠️ 資料量超過雲端上限（約 24 MB），請刪除部分照片或 PDF');return;}
-    _pushFails++;_nextPush=Date.now()+Math.min(30000,2000*_pushFails);
-    if(_pushFails===3)toast('⚠️ 雲端儲存失敗，系統會自動重試，請確認網路連線');
+    netFail(res.code);
     return;
   }
 }
@@ -2531,7 +2542,7 @@ const softPull=()=>{if(Date.now()-_lastPoll>2500)syncNow(true);};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)syncNow(false,true);else{_lastAct=Date.now();softPull();}});
 window.addEventListener('pagehide',()=>syncNow(false,true));
 window.addEventListener('focus',softPull);
-window.addEventListener('online',softPull);
+window.addEventListener('online',()=>{_retryAt=0;softPull();});
 window.addEventListener('beforeunload',e=>{
   if(!window._cloudReady)return;
   const cur=JSON.stringify(snapshotState());

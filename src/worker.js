@@ -56,16 +56,16 @@ export default {
         const body = await request.arrayBuffer();
         if (!body.byteLength) return json({ error: 'empty body' }, 400);
         if (body.byteLength > MAX_BYTES) return json({ error: 'payload too large' }, 413);
-        const c = new Uint8Array(body, 0, 1)[0];
-        if (c !== 0x7b && c !== 0x5b) return json({ error: 'invalid json' }, 400); // 必須以 { 或 [ 開頭
+        // 狀態一定是 JSON 物件：粗略檢查以 { 開頭、以 } 結尾，擋掉其他內容或被截斷的資料
+        // （不做完整解析，資料大時會超過免費方案的 CPU 時間）
+        const bytes = new Uint8Array(body);
+        if (bytes[0] !== 0x7b || bytes[bytes.length - 1] !== 0x7d) return json({ error: 'invalid json' }, 400);
 
-        if (base !== '*') {
-          const entry = await readState(env);
-          if (entry.value) await entry.value.cancel();
-          const current = versionOf(entry);
-          // 版本不符是多裝置同時使用時的正常情況，以 200 + ok:false 回覆（前端會取回新版、合併後重傳）
-          if (current !== base) return json({ ok: false, conflict: true, v: current });
-        }
+        const entry = await readState(env);
+        if (entry.value) await entry.value.cancel();
+        const current = versionOf(entry);
+        // 版本不符是多裝置同時使用時的正常情況，以 200 + ok:false 回覆（前端會取回新版、合併後重傳）
+        if (current !== base) return json({ ok: false, conflict: true, v: current });
 
         const wanted = request.headers.get('x-sky-version');
         const v = wanted && VER_RE.test(wanted) ? wanted : Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
