@@ -252,7 +252,7 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .msg-row{display:flex;gap:7px;max-width:70%;}
 .msg-row.me{align-self:flex-end;flex-direction:row-reverse;}
 .msg-row.them{align-self:flex-start;}
-.bubble{padding:9px 12px;border-radius:13px;font-size:13.5px;line-height:1.55;word-break:break-word;cursor:context-menu;-webkit-user-select:none;user-select:none;}
+.bubble{padding:9px 12px;border-radius:13px;font-size:13.5px;line-height:1.55;word-break:break-word;white-space:pre-wrap;cursor:context-menu;-webkit-user-select:none;user-select:none;}
 .msg-row.them .bubble{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:3px;}
 .msg-row.me .bubble{background:var(--ink);color:#fff;border-bottom-right-radius:3px;}
 .msg-img{max-width:200px;max-height:240px;border-radius:10px;display:block;object-fit:contain;cursor:zoom-in;}
@@ -313,6 +313,7 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .vb[data-v="1"]{background:#22C55E;}.vb[data-v="2"]{background:#4ADE80;}.vb[data-v="3"]{background:#86EFAC;}
 .vb[data-v="4"]{background:#BEF264;}.vb[data-v="5"]{background:#FDE047;}.vb[data-v="6"]{background:#FDBA74;}
 .vb[data-v="7"]{background:#FB923C;}.vb[data-v="8"]{background:#F87171;}.vb[data-v="9"]{background:#EF4444;}.vb[data-v="10"]{background:#DC2626;}
+.vb.none{background:var(--border);}
 .vb small{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-size:9px;color:var(--ink3);}
 
 /* MEDIA */
@@ -441,7 +442,7 @@ table.t td:last-child{min-width:0;width:1%;white-space:nowrap;}
 .filter-panel #tag-fp-opts{display:flex;flex-wrap:wrap;gap:5px;}
 
 /* TOAST */
-.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:20px;font-size:12.5px;z-index:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:20px;font-size:12.5px;z-index:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;display:inline-flex;align-items:center;gap:6px;width:max-content;max-width:calc(100vw - 32px);line-height:1.45;}
 .toast-ico{display:inline-flex;align-items:center;color:#4ADE80;flex-shrink:0;}
 .toast-ico svg{width:15px;height:15px;display:block;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
@@ -611,10 +612,10 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
       <div class="l-tab on" onclick="pickRole('therapist')">治療師</div>
       <div class="l-tab" onclick="pickRole('patient')">個案</div>
     </div>
-    <div class="fld"><label>帳號</label><div class="fld-w"><input type="text" id="l-acct" placeholder="帳號"/></div></div>
+    <div class="fld"><label>帳號</label><div class="fld-w"><input type="text" id="l-acct" placeholder="帳號" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/></div></div>
     <div class="fld"><label>密碼</label>
       <div class="fld-w">
-        <input type="password" id="l-pwd" placeholder="密碼"/>
+        <input type="password" id="l-pwd" placeholder="密碼" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
         <button class="eye-btn" onclick="togglePwd()">
           <svg id="eye-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
@@ -841,6 +842,11 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
               <div class="fg"><label>預覽</label><div id="front-prev-card"></div></div>
               <div style="display:flex;justify-content:flex-end;"><button class="btn pri" onclick="applyFront()">套用</button></div>
             </div></div>
+          <div class="card"><div class="card-h"><h3>資料備份</h3></div>
+            <div class="card-b" style="display:flex;flex-direction:column;gap:13px;">
+              <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;">匯出目前所有資料（個案、對話、病歷、衛教內容）成備份檔；匯入備份會覆蓋目前所有資料。</div>
+              <div style="display:flex;gap:7px;flex-wrap:wrap;"><button class="btn" onclick="exportBackup()">匯出備份</button><button class="btn" onclick="triggerImport()">匯入備份</button></div>
+            </div></div>
         </div>
       </div>
     </div>
@@ -863,7 +869,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
       <button class="nav-btn" data-pv="dr" data-tip="每日回報" onclick="goP('dr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span class="nav-label">每日回報</span></button>
       <button class="nav-btn" data-pv="lrn" data-tip="我的衛教" onclick="goP('lrn')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2Z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7Z"/></svg><span class="nav-label">我的衛教</span></button>
       <button class="nav-btn" data-pv="pmr" data-tip="我的病歷" onclick="goP('pmr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="nav-label">我的病歷</span></button>
-      <button class="nav-btn" data-pv="pc" data-tip="聯繫治療師" onclick="goP('pc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg><span class="nav-label">聯繫治療師</span></button>
+      <button class="nav-btn" data-pv="pc" data-tip="聯繫治療師" onclick="goP('pc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg><span class="nav-label">聯繫治療師</span><span class="nb-badge" id="p-chat-badge" style="display:none;"></span></button>
     </div>
     <div class="sb-foot">
       <div class="u-row" onclick="toggleDrop('p-udrop')">
@@ -913,7 +919,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
             <div><div style="font-size:13px;font-weight:500;margin-bottom:9px;">今日執行的運動</div><div id="ex-list" style="display:flex;flex-direction:column;gap:6px;"></div></div>
             <div><div style="font-size:13px;font-weight:500;margin-bottom:9px;">VAS 疼痛量表 (0–10)</div>
               <div class="vas-wrap"><div class="vas-num" id="vas-disp">0</div><input type="range" min="0" max="10" value="0" id="vas-inp" oninput="setVas(this.value)"/><div class="vas-emj"><span>😌</span><span>🙂</span><span>😐</span><span>😣</span><span>😫</span></div><div class="vas-lbls"><span>無痛</span><span>劇痛</span></div></div></div>
-            <div class="fg" style="margin:0;"><label>備註（選填）</label><textarea rows="3" id="rpt-note" placeholder="想告訴治療師的任何事…"></textarea></div>
+            <div class="fg" style="margin:0;"><label>備註（選填）</label><textarea rows="3" id="rpt-note" placeholder="想告訴治療師的任何事…" oninput="onRptNote(this.value)"></textarea></div>
             <div style="display:flex;justify-content:flex-end;gap:7px;" id="rpt-btns"><button class="btn" onclick="saveDraft()">儲存草稿</button><button class="btn pri" onclick="submitRpt()">提交回報</button></div>
             <div id="rpt-summary" style="display:none;padding:13px;background:var(--green-bg);border-radius:8px;border:1px solid #BBF7D0;"><div style="font-weight:500;color:var(--green);margin-bottom:5px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-.15em;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 已提交</div><div id="rpt-summary-txt" style="font-size:13px;color:#374151;"></div><button class="btn sm" style="margin-top:9px;" onclick="resetRpt()">重新填寫</button></div>
           </div>
@@ -1090,7 +1096,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
 
 <div class="mbg" id="m-img-prev"><div class="modal sm"><div class="mh"><h3>傳送圖片</h3><button class="ibt" onclick="cancelImg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="mb" style="text-align:center;"><img id="m-img-prev-el" style="max-width:100%;max-height:48vh;border-radius:8px;display:block;margin:0 auto;"/><small id="m-img-prev-name" style="display:block;margin-top:7px;font-size:12px;color:var(--ink3);"></small></div><div class="mf"><button class="btn" onclick="cancelImg()">取消</button><button class="btn pri" onclick="confirmImg()">傳送</button></div></div></div>
 
-<div class="mbg" id="m-confirm"><div class="modal sm"><div class="mh"><h3 id="m-confirm-ttl">確認</h3></div><div class="mb"><p id="m-confirm-msg" style="font-size:13.5px;color:var(--ink2);line-height:1.6;"></p></div><div class="mf"><button class="btn" onclick="closeM('m-confirm');_confCb(false)">取消</button><button class="btn" style="background:var(--red);color:#fff;border-color:var(--red);" onclick="closeM('m-confirm');_confCb(true)">確認刪除</button></div></div></div>
+<div class="mbg" id="m-confirm"><div class="modal sm"><div class="mh"><h3 id="m-confirm-ttl">確認</h3></div><div class="mb"><p id="m-confirm-msg" style="font-size:13.5px;color:var(--ink2);line-height:1.6;"></p></div><div class="mf"><button class="btn" onclick="closeM('m-confirm');_confCb(false)">取消</button><button class="btn" id="m-confirm-ok" style="background:var(--red);color:#fff;border-color:var(--red);" onclick="closeM('m-confirm');_confCb(true)">確認刪除</button></div></div></div>
 
 <div class="mbg" id="m-prompt"><div class="modal sm"><div class="mh"><h3 id="m-prompt-ttl">輸入</h3></div><div class="mb"><input type="text" id="m-prompt-inp" style="width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:7px;background:var(--bg);font-size:14px;" onkeydown="if(event.key==='Enter'){closeM('m-prompt');_promptCb(this.value);}"/></div><div class="mf"><button class="btn" onclick="closeM('m-prompt');_promptCb(null)">取消</button><button class="btn pri" onclick="closeM('m-prompt');_promptCb(document.getElementById('m-prompt-inp').value)">確認</button></div></div></div>
 
@@ -1102,6 +1108,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
 </div>
 
 <div class="toast" id="toast"></div>
+<input type="file" id="import-file-inp" accept=".json,application/json" style="position:fixed;left:0;top:0;width:0;height:0;opacity:0;" onchange="importBackup(this)"/>
 
 <!-- iOS 底部分頁列 -->
 <nav class="mtabbar" id="t-tabbar">
@@ -1143,7 +1150,6 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
           <button class="more-item" onclick="goMore('st')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>設定與個人資料</button>
     <button class="more-item" onclick="closeMore();exportBackup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出備份</button>
     <button class="more-item" onclick="closeMore();triggerImport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>匯入備份</button>
-    <input type="file" id="import-file-inp" accept=".json" style="position:absolute;width:0;height:0;opacity:0;" onchange="importBackup(this)"/>
     <button class="more-item danger" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>登出</button>
   </div>
 </div>
@@ -1160,7 +1166,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
 // ── UTILS ──
 let _confCb=()=>{},_promptCb=()=>{};
 const H=s=>s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-function skyConfirm(msg,cb,title='確認刪除'){document.getElementById('m-confirm-ttl').textContent=title;document.getElementById('m-confirm-msg').textContent=msg;_confCb=cb;openM('m-confirm');}
+function skyConfirm(msg,cb,title='確認刪除',okLabel='確認刪除'){document.getElementById('m-confirm-ttl').textContent=title;document.getElementById('m-confirm-msg').textContent=msg;document.getElementById('m-confirm-ok').textContent=okLabel;_confCb=cb;openM('m-confirm');}
 function skyPrompt(ph,cb,title='輸入'){document.getElementById('m-prompt-ttl').textContent=title;const i=document.getElementById('m-prompt-inp');i.placeholder=ph;i.value='';_promptCb=cb;openM('m-prompt');setTimeout(()=>i.focus(),80);}
 function pad(n){return String(n).padStart(2,'0');}
 const TOAST_ICONS={check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'};
@@ -1170,18 +1176,210 @@ function toast(msg,icon){const t=document.getElementById('toast');t.innerHTML=''
 function openM(id){document.getElementById(id).classList.add('on');}
 function closeM(id){document.getElementById(id).classList.remove('on');}
 document.querySelectorAll('.mbg').forEach(b=>b.addEventListener('click',ev=>{if(ev.target===b)b.classList.remove('on');}));
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function fmtNow(){const n=new Date();return pad(n.getHours())+':'+pad(n.getMinutes());}
+function dstr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function todayStr(){return dstr(new Date());}
+// 只有內容真的不同才重畫：雲端同步更新時畫面不會閃動，捲動位置與展開狀態也不會跑掉
+function hsig(s){if(s.length<20000)return s;let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193);}return'#'+(h>>>0)+':'+s.length;}
+function setHTML(el,html){const sig=hsig(html);if(el._h===sig)return false;el._h=sig;el.innerHTML=html;return true;}
+// 沒寫 http(s):// 的連結自動補上，否則會被當成站內路徑
+function normUrl(u){u=(u||'').trim();return u&&!/^[a-z][a-z0-9+.-]*:/i.test(u)?'https://'+u.replace(/^\/+/,''):u;}
+// 圖片先縮小再存：照片以 base64 內嵌在雲端資料裡，原圖很快就會塞滿容量（上限約 24 MB）
+function readImg(file,maxDim,cb,keepAlpha){
+  if(!file)return;
+  const done=src=>{cb(src);_touched=true;};
+  const r=new FileReader();
+  r.onerror=()=>toast('讀取圖片失敗');
+  r.onload=ev=>{
+    const raw=ev.target.result,img=new Image();
+    img.onerror=()=>{if(raw.length>4e6)toast('圖片檔案過大或格式不支援');else done(raw);};
+    img.onload=()=>{
+      try{
+        const sc=Math.min(1,maxDim/Math.max(img.width,img.height,1));
+        if(sc===1&&raw.length<400000){done(raw);return;} // 本來就夠小，原樣保留
+        const w=Math.max(1,Math.round(img.width*sc)),h=Math.max(1,Math.round(img.height*sc));
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        const g=c.getContext('2d'),png=keepAlpha&&/png|gif|webp|svg/.test(file.type||'');
+        if(!png){g.fillStyle='#fff';g.fillRect(0,0,w,h);}
+        g.drawImage(img,0,0,w,h);
+        const out=c.toDataURL(png?'image/png':'image/jpeg',0.82);
+        done(out.length<raw.length?out:raw);
+      }catch(e){done(raw);}
+    };
+    img.src=raw;
+  };
+  r.readAsDataURL(file);
+}
+function viewImg(src){if(!src)return;const bg=document.createElement('div');bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';const img=document.createElement('img');img.src=src;img.style.cssText='max-width:90vw;max-height:90vh;border-radius:10px;object-fit:contain;';bg.appendChild(img);bg.onclick=()=>bg.remove();document.body.appendChild(bg);}
+
+// ── 資料格式與合併（純函式，不碰畫面與全域狀態）──
+function newStat(){return{weekRate:0,trend:'+0%',rates:[0,0,0,0,0,0,0],vas:[0,0,0,0,0,0,0],logs:[],lastVas:0};}
+const isObj=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
+// 與 key 順序無關的序列化，用來比較兩份資料是否相同
+function stable(x){
+  if(x===null||typeof x!=='object')return x===undefined?'null':JSON.stringify(x);
+  if(Array.isArray(x))return'['+x.map(stable).join(',')+']';
+  return'{'+Object.keys(x).filter(k=>x[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+stable(x[k])).join(',')+'}';
+}
+const eq=(a,b)=>a===b||stable(a)===stable(b);
+
+// 補齊欄位；確保每位個案都有不重複的 id（舊資料依位置給固定 id，各裝置算出來會一致）
+function prepState(d){
+  if(!Array.isArray(d.patients))d.patients=[];
+  const used=new Set();
+  d.patients.forEach(p=>{if(p.id&&!used.has(p.id))used.add(p.id);else p.id='';});
+  d.patients.forEach((p,i)=>{
+    if(!p.id){let k=i;while(used.has('L'+k))k++;p.id='L'+k;used.add(p.id);}
+    if(p.name==null)p.name='';
+    if(!p.acct)p.acct='patient';
+    if(!p.pwd)p.pwd=p.acct;
+    if(!p.av)p.av=p.name[0]||'?';
+    ['tags','assignedVids','assignedKnows'].forEach(k=>{if(!Array.isArray(p[k]))p[k]=[];});
+    if(typeof p.unread!=='number')p.unread=0;
+  });
+  ['tags','cats','videos','knows','medRecords','notifications'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[];});
+  if(!Array.isArray(d.mediaSubs)||!d.mediaSubs.length)d.mediaSubs=['入門','進階','一般'];
+  d.cats.forEach(c=>{if(!Array.isArray(c.subs))c.subs=[];});
+  if(!isObj(d.rptDraftMap)&&isObj(d.rptDraft))d.rptDraftMap={0:d.rptDraft}; // 舊版資料相容
+  ['msgMap','annMap','tAlbumsMap','tNotesMap','pAlbumsMap','pNotesMap','rptDraftMap'].forEach(k=>{if(!isObj(d[k]))d[k]={};});
+  const st=Array.isArray(d.ptStats)?d.ptStats:[];
+  d.ptStats=d.patients.map((_,i)=>{const s=isObj(st[i])?st[i]:newStat();if(!Array.isArray(s.logs))s.logs=[];return s;});
+  d.frontState=Object.assign({title:'sky 衛教平台',sub:'Physiotherapy Platform',logoSrc:'logo.png'},isObj(d.frontState)?d.frontState:{});
+  delete d.frontState._savedLogo;
+  if(!d.frontState.logoSrc)d.frontState.logoSrc='logo.png';
+  d.therapistState=Object.assign({name:'測試',title:'物理治療師',initials:'測',img:'',acct:'test',pwd:'test'},isObj(d.therapistState)?d.therapistState:{});
+  ['acct','pwd'].forEach(k=>{if(!d.therapistState[k])d.therapistState[k]='test';});
+  return d;
+}
+// 存檔用的標準格式：略過空陣列與空白草稿，「只看不改」就不會被當成有變更
+function canonState(s){
+  const n=s.patients.length;
+  const cm=m=>{const o={};Object.keys(m||{}).forEach(k=>{if(+k<n&&Array.isArray(m[k])&&m[k].length)o[k]=m[k];});return o;};
+  const rd={};
+  Object.keys(s.rptDraftMap||{}).forEach(k=>{const d=s.rptDraftMap[k];if(+k<n&&d&&(d.submitted||d.saved||d.note||d.vas||Object.values(d.exercises||{}).some(Boolean)))rd[k]=d;});
+  return{patients:s.patients,tags:s.tags,cats:s.cats,mediaSubs:s.mediaSubs,videos:s.videos,knows:s.knows,
+    medRecords:s.medRecords,notifications:s.notifications,
+    msgMap:cm(s.msgMap),annMap:cm(s.annMap),tAlbumsMap:cm(s.tAlbumsMap),tNotesMap:cm(s.tNotesMap),pAlbumsMap:cm(s.pAlbumsMap),pNotesMap:cm(s.pNotesMap),
+    ptStats:s.patients.map((_,i)=>(s.ptStats||[])[i]||newStat()),rptDraftMap:rd,frontState:s.frontState,therapistState:s.therapistState};
+}
+
+// 合併時把「以個案序號為 key」的資料改成「以個案 id 為 key」，個案被排序或刪除也不會對錯人
+const msgKey=m=>m&&m.id?'i:'+m.id:'c:'+stable(m);
+function toNorm(s){
+  const order=s.patients.map(p=>p.id),per={};
+  s.patients.forEach((p,i)=>{
+    const msgs=s.msgMap[i]||[];
+    per[p.id]={p,msgs,
+      anns:(s.annMap[i]||[]).map(a=>{const{msgIdx,...x}=a;return{...x,_mk:msgs[msgIdx]?msgKey(msgs[msgIdx]):''};}),
+      tAlb:s.tAlbumsMap[i]||[],tNt:s.tNotesMap[i]||[],pAlb:s.pAlbumsMap[i]||[],pNt:s.pNotesMap[i]||[],
+      rpt:s.rptDraftMap[i]||null,st:s.ptStats[i]||null};
+  });
+  return{order,per,
+    mr:s.medRecords.filter(r=>order[r.ptIdx]!=null).map(r=>{const{ptIdx,...x}=r;return{...x,_pid:order[ptIdx]};}),
+    notifs:s.notifications.map(n=>{const{ci,...x}=n;return{...x,_pid:ci!=null&&order[ci]!=null?order[ci]:null};}),
+    tags:s.tags,cats:s.cats,mediaSubs:s.mediaSubs,videos:s.videos,knows:s.knows,frontState:s.frontState,therapistState:s.therapistState};
+}
+function fromNorm(n){
+  const ids=[];
+  n.order.forEach(id=>{if(n.per[id]&&!ids.includes(id))ids.push(id);});
+  Object.keys(n.per).forEach(id=>{if(!ids.includes(id))ids.push(id);});
+  const pos={};ids.forEach((id,i)=>{pos[id]=i;});
+  const s={patients:[],tags:n.tags,cats:n.cats,mediaSubs:n.mediaSubs,videos:n.videos,knows:n.knows,medRecords:[],notifications:[],
+    msgMap:{},annMap:{},tAlbumsMap:{},tNotesMap:{},pAlbumsMap:{},pNotesMap:{},ptStats:[],rptDraftMap:{},frontState:n.frontState,therapistState:n.therapistState};
+  ids.forEach((id,i)=>{
+    const e=n.per[id],msgs=e.msgs||[],keys=msgs.map(msgKey);
+    s.patients.push(e.p);
+    if(msgs.length)s.msgMap[i]=msgs;
+    const anns=(e.anns||[]).map(a=>{const{_mk,...x}=a;const k=keys.indexOf(_mk);return k<0?null:{...x,msgIdx:k};}).filter(Boolean);
+    if(anns.length)s.annMap[i]=anns;
+    [['tAlb','tAlbumsMap'],['tNt','tNotesMap'],['pAlb','pAlbumsMap'],['pNt','pNotesMap']].forEach(([a,b])=>{if(e[a]&&e[a].length)s[b][i]=e[a];});
+    if(e.rpt)s.rptDraftMap[i]=e.rpt;
+    s.ptStats.push(e.st||newStat());
+  });
+  (n.mr||[]).forEach(r=>{const{_pid,...x}=r;if(pos[_pid]!=null)s.medRecords.push({ptIdx:pos[_pid],...x});});
+  (n.notifs||[]).forEach(v=>{const{_pid,...x}=v;s.notifications.push({...x,ci:_pid!=null&&pos[_pid]!=null?pos[_pid]:null});});
+  return s;
+}
+
+// 三方合併：base＝雙方共同的舊版本、l＝本機、r＝雲端。只有一方改過就採用那一方；
+// 雙方都改過時，物件逐欄合併、清單取聯集，真的衝突才以本機為準。
+// o.add＝雲端版本來歷不明（不是從我們看過的版本改來的）：只接收它「新增」的內容，不採信它的刪除與覆寫。
+const KEYED={msgs:msgKey,logs:x=>'d:'+(x&&x.date),notifs:n=>stable([n.msg,n.t,n._pid])};
+function mergeCount(b,l,r){ // 未讀數：一方增加、另一方歸零可以同時成立
+  b=+b||0;l=+l||0;r=+r||0;
+  const dl=l-b,dr=r-b;
+  if(dl<0&&dr<0)return Math.min(l,r);
+  if(dl<0)return Math.max(0,l+Math.max(0,dr));
+  if(dr<0)return Math.max(0,r+dl);
+  return b+dl+dr;
+}
+function merge3(b,l,r,o,k){
+  if(eq(l,r)||eq(b,r))return l;
+  if(eq(b,l)&&!o.add)return r;
+  if(isObj(l)&&isObj(r)){
+    const bb=isObj(b)?b:{},out={};
+    new Set([...Object.keys(r),...Object.keys(l)]).forEach(key=>{
+      const inL=key in l,inR=key in r,inB=key in bb;
+      if(inL&&inR)out[key]=merge3(bb[key],l[key],r[key],o,key);
+      else if(inL){if(!inB||o.add||!eq(bb[key],l[key]))out[key]=l[key];}
+      else if(!inB||!eq(bb[key],r[key]))out[key]=r[key];
+    });
+    return out;
+  }
+  if(Array.isArray(l)&&Array.isArray(r))return mergeArr(Array.isArray(b)?b:[],l,r,o,k);
+  if((k==='unread'||k==='ptUnread')&&!o.add)return mergeCount(b,l,r);
+  return l;
+}
+function mergeArr(b,l,r,o,k){
+  const idOf=KEYED[k];
+  // 等長的物件清單（標籤、分類、影片…）逐項合併，維持原本的排列位置
+  if(!idOf&&b.length===l.length&&b.length===r.length&&[b,l,r].every(a=>a.every(isObj)))return l.map((x,i)=>merge3(b[i],x,r[i],o));
+  // 其餘以內容（或 id）辨識每一筆：雙方新增的都保留，被刪除的移除
+  const kf=idOf||stable;
+  const keys=a=>{const n={};return a.map(x=>{const s=kf(x);n[s]=(n[s]||0)+1;return s+'#'+n[s];});};
+  const kb=keys(b),kl=keys(l),kr=keys(r),sb=new Set(kb),sl=new Set(kl),sr=new Set(kr);
+  // 挑出 base 沒有、對方也沒有的新項目；排在原有項目之前的放前面，其餘放後面
+  const added=(arr,ks,other)=>{const head=[],tail=[];let seen=false;arr.forEach((x,i)=>{if(sb.has(ks[i])){seen=true;return;}if(other.has(ks[i]))return;(seen?tail:head).push(x);});return[head,tail];};
+  if(o.add){const[h,t]=added(r,kr,sl);return[...h,...l,...t];}
+  const bm=new Map(kb.map((s,i)=>[s,b[i]])),lm=new Map(kl.map((s,i)=>[s,l[i]])),mid=[];
+  r.forEach((x,i)=>{const s=kr[i];
+    if(sl.has(s))mid.push(idOf?merge3(bm.get(s),lm.get(s),x,o):x);
+    else if(!sb.has(s))mid.push(x); // 雲端新增；（base 有而本機沒有＝本機已刪除，不放回）
+  });
+  const[h,t]=added(l,kl,sr);
+  return[...h,...mid,...t];
+}
+function mergePer(b,l,r,o){
+  const out={};
+  new Set([...Object.keys(r),...Object.keys(l)]).forEach(id=>{
+    const inL=id in l,inR=id in r,inB=id in b;
+    if(inL&&inR)out[id]=merge3(b[id],l[id],r[id],o);
+    else if(inL){if(!inB||o.add)out[id]=l[id];} // 本機新增的個案（雲端已刪除的不保留）
+    else if(!inB)out[id]=r[id];                 // 雲端新增的個案（本機已刪除的不復活）
+  });
+  return out;
+}
+function mergeStates(base,local,remote,additive){
+  const B=toNorm(prepState(base)),L=toNorm(prepState(local)),R=toNorm(prepState(remote)),o={add:!!additive};
+  const n={order:(!additive&&eq(B.order,L.order))?R.order:L.order,per:mergePer(B.per,L.per,R.per,o)};
+  ['mr','notifs','tags','cats','mediaSubs','videos','knows','frontState','therapistState'].forEach(k=>{n[k]=merge3(B[k],L[k],R[k],o,k);});
+  return fromNorm(n);
+}
+// ── 資料合併結束 ──
 
 // ── DATA ──
 let ROLE='therapist',pwdOn=false,ctxIdx=null,editPtIdx=-1;
+let LOGGED=false,myPid=null; // 是否已登入；個案登入時記下自己的 id（個案被排序／刪除後仍能對到本人）
 let tagEditIdx=-1,catEditIdx=-1,noteEditWho='',noteEditIdx=-1;
 let mediaType='video',mediaEditIdx=-1;
 let selTagClr='blue',selCatClr='blue',customTagBg='#DBEAFE',customCatBg='#DBEAFE';
-let therapistImg='',pendingPtImg='',patientImg='',pendingPtAvImg=null;
+let therapistImg='',pendingPtImg='',pendingPtAvImg=null,pendingLogoSrc=null;
 let curAlbIdx=0,curAlbWho='t',albPhotos=[];
 let activeCI=0,selPtIdx=0,mrPtIdx=0;
-let pushMediaIdx=-1,pushMediaType='video',pushMediaTitle='',pUnread=0;
-let curVidFilter='all',curKnFilter='all';
-let pendingCoverSrc='',pendingPdfSrc='',pendingPdfName='';
+let pushMediaIdx=-1,pushMediaType='video',pushMediaTitle='';
+let curVidFilter='all',curKnFilter='all',curLearnFilter='all',clFilter='';
+let pendingCoverSrc='',pendingPdfSrc='',pendingPdfName='',_pdfLoading=false;
 let _pendingImg=null;
 let medRecords=[],mrEditIdx=-1,pendingMrImgs=[];
 let ptTagFilter=[];
@@ -1218,7 +1416,7 @@ let mediaSubs=['入門','進階','一般'];
 
 // 個案（僅保留一位預設）
 let patients=[
-  {name:'測試',sex:'女',acct:'test',av:'測',imgSrc:'',tags:[],note:'',unread:0,assignedVids:[],assignedKnows:[]}
+  {id:'L0',name:'測試',sex:'女',acct:'test',pwd:'test',av:'測',imgSrc:'',tags:[],note:'',unread:0,assignedVids:[],assignedKnows:[]}
 ];
 
 let videos=[
@@ -1256,18 +1454,45 @@ Object.defineProperty(window,'pAlbums',{get:()=>getPAlbums(),configurable:true})
 Object.defineProperty(window,'pNotes',{get:()=>getPNotes(),configurable:true});
 
 const rptDraftMap={};
+// 每日回報草稿。個案本人登入時，換日就換一份新的（否則昨天的「已提交」會一直卡到今天）
 function getRptDraft(){
-  if(!rptDraftMap[PIDX])rptDraftMap[PIDX]={exercises:{},vas:0,note:'',submitted:false};
-  return rptDraftMap[PIDX];
+  const today=todayStr(),mine=LOGGED&&ROLE==='patient';
+  let d=rptDraftMap[PIDX];
+  // 舊資料沒有日期：已提交但今天沒有回報紀錄，表示是之前的草稿
+  if(d&&mine&&!d.date)d.date=d.submitted&&!(ptStats[PIDX]?.logs||[]).some(l=>l.date===today)?'':today;
+  if(!d||(mine&&d.date!==today)){
+    d={date:today,exercises:{},vas:0,note:'',submitted:false};
+    if(mine)rptDraftMap[PIDX]=d;
+  }
+  if(!d.exercises)d.exercises={};
+  return d;
 }
 Object.defineProperty(window,'rptDraft',{get:()=>getRptDraft(),configurable:true});
 const frontState={title:'sky 衛教平台',sub:'Physiotherapy Platform',logoSrc:'logo.png'};
-const WDAYS=['週一','週二','週三','週四','週五','週六','今日'];
 
-// 空白統計（對應單一個案）
-const ptStats=[
-  {weekRate:0,trend:'+0%',rates:[0,0,0,0,0,0,0],vas:[0,0,0,0,0,0,0],logs:[],lastVas:0}
-];
+// 每位個案的回報統計（與 patients 同序）
+const ptStats=[newStat()];
+
+// 最近 n 天（含今日）每天的回報：[{date,label,log}]，由回報紀錄依日期推算
+function daySeries(st,n){
+  const by={};(st?.logs||[]).forEach(l=>{by[l.date]=l;});
+  const t=new Date(),out=[];
+  for(let i=n-1;i>=0;i--){const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()-i),ds=dstr(d);out.push({date:ds,label:i?'週'+'日一二三四五六'[d.getDay()]:'今日',log:by[ds]||null});}
+  return out;
+}
+// 一段期間的平均完成率：沒回報的日子算 0；第一次回報之前的日子不列入
+function avgRate(st,days){
+  const first=(st?.logs||[]).reduce((m,l)=>!m||l.date<m?l.date:m,'');
+  const use=days.filter(d=>first&&d.date>=first);
+  return use.length?Math.round(use.reduce((s,d)=>s+(d.log?d.log.pct:0),0)/use.length):0;
+}
+// 連續回報天數（今天還沒回報就從昨天往回算）
+function streakDays(st){
+  const has=new Set((st?.logs||[]).map(l=>l.date)),t=new Date();let n=0;
+  for(let i=has.has(dstr(t))?0:1;;i++){if(!has.has(dstr(new Date(t.getFullYear(),t.getMonth(),t.getDate()-i))))break;n++;}
+  return n;
+}
+const sortedLogs=st=>[...(st?.logs||[])].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
 
 // ── 取得分類名稱列表（直接從 cats 讀取，保持顏色同步）──
 function getCatNames(){return cats.map(c=>c.name);}
@@ -1285,12 +1510,18 @@ function toggleSb(appId){
 // ── AUTH ──
 function pickRole(r){ROLE=r;document.querySelectorAll('.l-tab').forEach((t,i)=>t.classList.toggle('on',(r==='therapist'&&i===0)||(r==='patient'&&i===1)));}
 function togglePwd(){const i=document.getElementById('l-pwd');pwdOn=!pwdOn;i.type=pwdOn?'text':'password';document.getElementById('eye-ic').innerHTML=pwdOn?'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/>':'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';}
-function doLogin(){
+let _loggingIn=false;
+async function doLogin(){
   const acct=(document.getElementById('l-acct').value||'').trim();
   const pwd=document.getElementById('l-pwd').value||'';
   if(!acct||!pwd){toast('請輸入帳號與密碼');return;}
-  // 資料遷移：確保舊版個案資料有密碼欄位（acct 作預設密碼）
-  patients.forEach(p=>{if(!p.pwd)p.pwd=p.acct;});
+  if(!window._cloudReady){toast('雲端資料載入中，請稍候再試');return;}
+  if(_loggingIn)return;
+  // 先向雲端拿最新資料再驗證（頁面可能已開著很久，帳號或訊息早就更新過）
+  _loggingIn=true;
+  const btn=document.querySelector('.l-submit');btn.textContent='登入中…';
+  try{await Promise.race([syncNow(true),new Promise(r=>setTimeout(r,4000))]);}catch(e){}
+  btn.textContent='登入';_loggingIn=false;
   if(ROLE==='therapist'){
     if(acct!==therapistState.acct||pwd!==therapistState.pwd){
       toast('帳號或密碼錯誤');document.getElementById('l-pwd').value='';return;
@@ -1300,38 +1531,57 @@ function doLogin(){
     if(idx===-1){
       toast('帳號或密碼錯誤');document.getElementById('l-pwd').value='';return;
     }
-    PIDX=idx;
-    syncPatientUI();renderLearn();renderPHomeRec();renderPAnn();initDailyRpt();syncHomeStats();
+    PIDX=idx;myPid=patients[idx].id;
   }
+  LOGGED=true;_lastAct=Date.now();
+  document.getElementById('l-pwd').value='';
   document.getElementById('login').classList.remove('on');
   document.getElementById(ROLE==='therapist'?'t-app':'p-app').classList.add('on');
   document.body.className=(ROLE==='therapist')?'role-t':'role-p';
+  // 一律從首頁開始並重畫全部內容，不殘留上一位使用者的畫面
+  curLearnFilter='all';document.querySelectorAll('[data-lf]').forEach(b=>{b.className=b.dataset.lf==='all'?'btn ghost':'btn';});
+  renderAll();
+  if(ROLE==='therapist')goT('ov');else goP('ph');
 }
-function logout(){['t-app','p-app'].forEach(id=>document.getElementById(id).classList.remove('on'));document.getElementById('login').classList.add('on');closeDrop();}
+function logout(){
+  LOGGED=false;myPid=null;
+  ['t-app','p-app'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById('login').classList.add('on');
+  document.body.className='';
+  closeDrop();closeCtx();closeAllPanels();
+  document.querySelectorAll('.mbg.on,.more-sheet-bg.on').forEach(m=>m.classList.remove('on'));
+  ['t','p'].forEach(closeChatOv);
+  syncNow(false,true); // 登出前把尚未上傳的變更送出
+}
 
 // ── NAV ──
-// 每次切換頁面時，同步所有 topbar 的漢堡按鈕（治療師端只需一個，動態插入）
+// 手機底部分頁列上有的頁面；其餘頁面（從「更多」進入）則標示在「更多」上
+const T_TABS=['ov','pt','ch','mr'],P_TABS=['ph','dr','pc','lrn'];
 function goT(v){
   document.querySelectorAll('#t-app [data-tv]').forEach(el=>el.classList.toggle('on',el.dataset.tv===v));
   document.querySelectorAll('#t-app [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  document.querySelectorAll('#t-tabbar .mtab').forEach(b=>b.classList.toggle('on',b.dataset.v?b.dataset.v===v:!T_TABS.includes(v)));
   closeAllPanels();
-  if(v==='ex'){renderTracking();buildSel('ex-pt-sel',selPtIdx);}
+  if(v==='ov')renderOv();
+  if(v==='pt')renderPt();
+  if(v==='ex')renderTracking();
   if(v==='mr'){renderMedRecords();bindMrEvents();}
-  if(v==='ch'){renderCL();syncChatHdr();}
+  if(v==='ch'){document.querySelector('#t-app .chat-wrap')?.classList.remove('show-chat');renderCL();syncChatHdr();renderMsgs();markSeen();}
   if(v==='vd')renderVideos();
   if(v==='kn')renderKnows();
   if(v==='tg'){renderTagList();renderCatList();}
-  if(v==='st'){syncFrontInputs();therapistImg=therapistState.img;setAv(document.getElementById('st-av'),therapistState.img,therapistState.name[0]||'?');}
+  if(v==='st')syncSettingsInputs();
 }
 function goP(v){
   document.querySelectorAll('#p-app [data-pv]').forEach(el=>el.classList.toggle('on',el.dataset.pv===v));
+  document.querySelectorAll('#p-tabbar .mtab').forEach(b=>b.classList.toggle('on',b.dataset.pv?b.dataset.pv===v:!P_TABS.includes(v)));
   closeDrop();
   if(v==='dr')initDailyRpt();
   if(v==='pmr')renderPMr();
-  if(v==='pc'){pUnread=0;patients[PIDX].ptUnread=0;updPtUnread();updUnread();renderPMsgs();renderPAnn();}
+  if(v==='pc'){const p=patients[PIDX];if(p)p.ptUnread=0;updPtUnread();renderPMsgs();renderPAnn();}
   if(v==='lrn')renderLearn();
   if(v==='ph'){renderPHomeRec();syncHomeStats();}
-  if(v==='pac'){pendingPtAvImg=null;const i=document.getElementById('p-nm');if(i)i.value=patientSelf.name;setAv(document.getElementById('p-av-disp'),patientSelf.img,patientSelf.initials);const pa=document.getElementById('p-acct');if(pa)pa.value='';const pp=document.getElementById('p-pwd-new');if(pp)pp.value='';}
+  if(v==='pac'){pendingPtAvImg=null;document.getElementById('p-nm').value=patientSelf.name;setAv(document.getElementById('p-av-disp'),patientSelf.img,patientSelf.initials);document.getElementById('p-acct').value='';document.getElementById('p-pwd-new').value='';}
 }
 function toggleDrop(id){document.querySelectorAll('.udrop').forEach(d=>{if(d.id!==id)d.classList.remove('on');});document.getElementById(id).classList.toggle('on');}
 function closeDrop(){document.querySelectorAll('.udrop').forEach(d=>d.classList.remove('on'));}
@@ -1345,11 +1595,12 @@ document.addEventListener('click',ev=>{
 });
 
 // ── AVATAR ──
-function setAv(el,imgSrc,text){if(!el)return;el.innerHTML='';if(imgSrc){el.style.padding='0';el.style.background='transparent';const img=document.createElement('img');img.src=imgSrc;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';el.appendChild(img);}else{el.style.padding='';el.style.background='';el.textContent=text;}}
+function setAv(el,imgSrc,text){if(!el)return;const sig=hsig((imgSrc||'')+'|'+text);if(el._av===sig)return;el._av=sig;el.innerHTML='';if(imgSrc){el.style.padding='0';el.style.background='transparent';const img=document.createElement('img');img.src=imgSrc;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';el.appendChild(img);}else{el.style.padding='';el.style.background='';el.textContent=text;}}
 function avHTML(p,sz='width:32px;height:32px;font-size:12px;'){if(p.imgSrc)return`<div class="av" style="${sz}padding:0;background:transparent;"><img src="${H(p.imgSrc)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"/></div>`;return`<div class="av" style="${sz}">${H(p.av)}</div>`;}
-function prevAv(inp,dispId,key){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const src=ev.target.result;if(key==='therapist')therapistImg=src;else if(key==='ptmodal')pendingPtImg=src;setAv(document.getElementById(dispId),src,'');};r.readAsDataURL(f);}
-function prevLogo(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(frontState._savedLogo===undefined)frontState._savedLogo=frontState.logoSrc;frontState.logoSrc=ev.target.result;setLogoEl(document.getElementById('st-logo'),frontState.logoSrc);updFrontPrev();};r.readAsDataURL(f);}
-function setLogoEl(el,src){if(!el)return;el.innerHTML='';if(src){const img=document.createElement('img');img.src=src;img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;';el.appendChild(img);}else el.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';}
+function prevAv(inp,dispId,key){const f=inp.files[0];inp.value='';readImg(f,256,src=>{if(key==='therapist')therapistImg=src;else if(key==='ptmodal')pendingPtImg=src;setAv(document.getElementById(dispId),src,'');},true);}
+// Logo 先預覽，按「套用」才真正生效
+function prevLogo(inp){const f=inp.files[0];inp.value='';readImg(f,256,src=>{pendingLogoSrc=src;setLogoEl(document.getElementById('st-logo'),src);updFrontPrev();},true);}
+function setLogoEl(el,src){if(!el)return;const sig=hsig(src||'');if(el._lg===sig)return;el._lg=sig;el.innerHTML='';if(src){const img=document.createElement('img');img.src=src;img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;';el.appendChild(img);}else el.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';}
 
 // ── PATIENTS ──
 function renderPt(){
@@ -1359,13 +1610,13 @@ function renderPt(){
     if(ptTagFilter.length>0&&!ptTagFilter.some(ti=>p.tags.includes(ti)))return false;
     return !kw||(p.name.toLowerCase().includes(kw)||p.acct.toLowerCase().includes(kw));
   });
-  tbody.innerHTML=filtered.map(p=>{
+  setHTML(tbody,filtered.map(p=>{
     const i=patients.indexOf(p);
     return`<tr data-idx="${i}">
       <td><div style="display:flex;align-items:center;gap:8px;">
         <div style="display:flex;flex-direction:column;gap:1px;flex-shrink:0;">
-          <button class="ibt" style="width:22px;height:22px;" onclick="movePt(${i},-1)" ${i===0?'disabled style="width:22px;height:22px;opacity:.25;cursor:default;"':''} title="上移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><polyline points="18 15 12 9 6 15"/></svg></button>
-          <button class="ibt" style="width:22px;height:22px;" onclick="movePt(${i},1)" ${i===patients.length-1?'disabled style="width:22px;height:22px;opacity:.25;cursor:default;"':''} title="下移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <button class="ibt" style="width:22px;height:22px;${i===0?'opacity:.25;cursor:default;':''}" onclick="movePt(${i},-1)" ${i===0?'disabled':''} title="上移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><polyline points="18 15 12 9 6 15"/></svg></button>
+          <button class="ibt" style="width:22px;height:22px;${i===patients.length-1?'opacity:.25;cursor:default;':''}" onclick="movePt(${i},1)" ${i===patients.length-1?'disabled':''} title="下移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><polyline points="6 9 12 15 18 9"/></svg></button>
         </div>
         ${avHTML(p,'width:28px;height:28px;font-size:11px;')}
         <div><div style="font-weight:500;font-size:13px;">${H(p.name)}</div><div style="font-size:11px;color:var(--ink3);">${H(p.acct)}</div></div>
@@ -1378,22 +1629,28 @@ function renderPt(){
         <button class="ibt" style="color:var(--red);" onclick="deletePt(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
       </div></td>
     </tr>`;
-  }).join('');
+  }).join(''));
 }
 
+// 對話、公告、相簿、記事、回報草稿都以「個案序號」為 key；個案被移動或刪除時必須一起調整，
+// 病歷、通知與統計也一樣，否則資料會對到別的個案身上。
+const ptMaps=()=>[msgMap,annMap,tAlbumsMap,tNotesMap,pAlbumsMap,pNotesMap,rptDraftMap];
 function movePt(i,dir){
   const to=i+dir;
   if(to<0||to>=patients.length)return;
+  while(ptStats.length<patients.length)ptStats.push(newStat());
   [patients[i],patients[to]]=[patients[to],patients[i]];
-  [msgMap,annMap,tAlbumsMap,tNotesMap].forEach(map=>{
-    const tmp=map[i];map[i]=map[to];map[to]=tmp;
-    if(map[i]===undefined)delete map[i];
-    if(map[to]===undefined)delete map[to];
+  [ptStats[i],ptStats[to]]=[ptStats[to],ptStats[i]];
+  ptMaps().forEach(map=>{
+    const a=map[i],b=map[to];
+    if(b===undefined)delete map[i];else map[i]=b;
+    if(a===undefined)delete map[to];else map[to]=a;
   });
-  if(activeCI===i)activeCI=to;else if(activeCI===to)activeCI=i;
-  if(selPtIdx===i)selPtIdx=to;else if(selPtIdx===to)selPtIdx=i;
-  if(mrPtIdx===i)mrPtIdx=to;else if(mrPtIdx===to)mrPtIdx=i;
-  renderPt();renderCL();renderOv();saveState();
+  const sw=v=>v===i?to:v===to?i:v;
+  medRecords.forEach(r=>{r.ptIdx=sw(r.ptIdx);});
+  notifications.forEach(n=>{if(n.ci!=null)n.ci=sw(n.ci);});
+  activeCI=sw(activeCI);selPtIdx=sw(selPtIdx);mrPtIdx=sw(mrPtIdx);PIDX=sw(PIDX);
+  renderPt();renderCL();renderOv();renderNotifPanel();
 }
 
 function toggleTagFilter(){document.getElementById('tag-fp').classList.toggle('on');renderTagFpOpts();}
@@ -1407,51 +1664,89 @@ function renderPtTagOpts(sel){
   document.getElementById('m-pt-tag-opts').dataset.sel=JSON.stringify(sel);
 }
 function togglePtTag(i){let sel=JSON.parse(document.getElementById('m-pt-tag-opts').dataset.sel||'[]');const pos=sel.indexOf(i);if(pos>-1)sel.splice(pos,1);else sel.push(i);renderPtTagOpts(sel);}
-function savePt(){const nm=document.getElementById('m-pt-nm').value.trim();if(!nm){toast('請輸入姓名');return;}const acct=document.getElementById('m-pt-acct').value.trim()||'patient.new';if(nm===acct){toast('⚠️ 姓名與帳號不得相同');return;}const sex=document.getElementById('m-pt-sex').value;const note=document.getElementById('m-pt-note').value.trim();const sel=JSON.parse(document.getElementById('m-pt-tag-opts').dataset.sel||'[]');
-// 重複檢查：姓名＋性別＋帳號＋備註全部相同才視為重複
-const newPwd=document.getElementById('m-pt-pwd').value;
-if(editPtIdx===-1&&!newPwd){toast('新增個案須設定密碼');return;}
-const pwd=newPwd||(editPtIdx!==-1?patients[editPtIdx]?.pwd||'':'');
-const dup=patients.findIndex((p,i)=>{if(editPtIdx!==-1&&i===editPtIdx)return false;return p.name===nm&&p.sex===sex&&p.acct===acct&&p.note===note;});
-if(dup!==-1){toast('⚠️ 已有相同的個案資料（'+nm+'），請確認是否重複');return;}  const existImg=editPtIdx===-1?'':(patients[editPtIdx]?.imgSrc||'');const imgSrc=pendingPtImg||existImg;const p={name:nm,sex,acct,pwd,av:nm[0]||'?',imgSrc,tags:sel,note,unread:0,assignedVids:[],assignedKnows:[]};if(editPtIdx===-1){patients.push(p);ptStats.push({weekRate:0,trend:'+0%',rates:[0,0,0,0,0,0,0],vas:[0,0,0,0,0,0,0],logs:[],lastVas:0});}else{p.assignedVids=patients[editPtIdx].assignedVids||[];p.assignedKnows=patients[editPtIdx].assignedKnows||[];Object.assign(patients[editPtIdx],p);}if(editPtIdx===PIDX)syncPatientUI();pendingPtImg='';closeM('m-pt');renderPt();renderCL();renderOv();toast(editPtIdx===-1?'已新增個案':'已更新個案');}
-function deletePt(i){skyConfirm('確定刪除「'+patients[i].name+'」？',ok=>{if(!ok)return;patients.splice(i,1);ptStats.splice(i,1);medRecords=medRecords.filter(r=>r.ptIdx!==i).map(r=>{if(r.ptIdx>i)r.ptIdx--;return r;});if(selPtIdx>=patients.length)selPtIdx=Math.max(0,patients.length-1);if(mrPtIdx>=patients.length)mrPtIdx=Math.max(0,patients.length-1);if(activeCI>=patients.length)activeCI=Math.max(0,patients.length-1);renderPt();renderCL();renderOv();toast('已刪除個案');});}
+function savePt(){
+  const nm=document.getElementById('m-pt-nm').value.trim();if(!nm){toast('請輸入姓名');return;}
+  const acct=document.getElementById('m-pt-acct').value.trim()||'patient.new';
+  if(nm===acct){toast('⚠️ 姓名與帳號不得相同');return;}
+  // 帳號不可重複，否則後建立的個案永遠登入不了自己的頁面
+  if(patients.some((p,i)=>i!==editPtIdx&&p.acct===acct)){toast('⚠️ 帳號「'+acct+'」已被使用，請換一個');return;}
+  const newPwd=document.getElementById('m-pt-pwd').value;
+  if(editPtIdx===-1&&!newPwd){toast('新增個案須設定密碼');return;}
+  const old=editPtIdx===-1?null:patients[editPtIdx];
+  const p={name:nm,sex:document.getElementById('m-pt-sex').value,acct,pwd:newPwd||old?.pwd||'',av:nm[0]||'?',imgSrc:pendingPtImg||old?.imgSrc||'',
+    tags:JSON.parse(document.getElementById('m-pt-tag-opts').dataset.sel||'[]'),note:document.getElementById('m-pt-note').value.trim()};
+  if(old)Object.assign(old,p); // 編輯時保留未讀數、已推播內容等其他欄位
+  else{patients.push(Object.assign({id:'p'+uid()},p,{unread:0,assignedVids:[],assignedKnows:[]}));ptStats.push(newStat());}
+  if(editPtIdx===PIDX)syncPatientUI();
+  pendingPtImg='';closeM('m-pt');renderPt();renderCL();syncChatHdr();renderOv();toast(editPtIdx===-1?'已新增個案':'已更新個案');
+}
+function deletePt(i){
+  const p=patients[i];if(!p)return;
+  skyConfirm('確定刪除「'+p.name+'」？此個案的對話、病歷與回報紀錄會一併刪除。',ok=>{
+    if(!ok)return;
+    const n=patients.length;
+    patients.splice(i,1);ptStats.splice(i,1);
+    ptMaps().forEach(map=>{for(let k=i;k<n;k++){if(map[k+1]!==undefined)map[k]=map[k+1];else delete map[k];}});
+    medRecords=medRecords.filter(r=>r.ptIdx!==i);medRecords.forEach(r=>{if(r.ptIdx>i)r.ptIdx--;});
+    notifications=notifications.filter(x=>x.ci!==i);notifications.forEach(x=>{if(x.ci>i)x.ci--;});
+    const fix=v=>v>i?v-1:Math.min(v,Math.max(0,patients.length-1));
+    selPtIdx=fix(selPtIdx);mrPtIdx=fix(mrPtIdx);activeCI=fix(activeCI);PIDX=fix(PIDX);
+    renderAll();toast('已刪除個案');
+  });
+}
 function syncPatientUI(){const p=patients[PIDX];if(!p)return;patientSelf.name=p.name;patientSelf.initials=p.av||p.name[0]||'?';patientSelf.img=p.imgSrc||'';setAv(document.getElementById('p-sb-av'),patientSelf.img,patientSelf.initials);const sn=document.getElementById('p-sb-nm');if(sn)sn.textContent=patientSelf.name;const gr=document.getElementById('p-greet');if(gr)gr.textContent='嗨，'+patientSelf.name+' 👋🏻';renderCL();}
 
 // ── OVERVIEW ──
-function buildSel(id,cur){const s=document.getElementById(id);if(!s)return;s.innerHTML=patients.map((p,i)=>`<option value="${i}"${i===cur?' selected':''}>${H(p.name)}</option>`).join('');}
+function buildSel(id,cur){const s=document.getElementById(id);if(!s)return;setHTML(s,patients.map((p,i)=>`<option value="${i}"${i===cur?' selected':''}>${H(p.name)}</option>`).join(''));if(patients.length)s.value=cur;}
 function selStatPt(i){selPtIdx=i;renderOv();renderTracking();}
 function renderOv(){
+  if(selPtIdx>=patients.length)selPtIdx=0;
   buildSel('ov-pt-sel',selPtIdx);
-  const p=patients[selPtIdx]||patients[0];
-  const s=ptStats[selPtIdx]||{weekRate:0,rates:[0,0,0,0,0,0,0],vas:[0,0,0,0,0,0,0],logs:[],lastVas:0};
+  const p=patients[selPtIdx],st=ptStats[selPtIdx];
   const sg=document.getElementById('ov-stats');if(!sg)return;
-  const todayLog=s.logs?.find(l=>l.date===todayStr());
-  sg.innerHTML=
+  const days=daySeries(st,7),todayLog=days[6].log,wk=avgRate(st,days),un=p?(p.unread||0):0;
+  setHTML(sg,
     mkStat('今日執行率',todayLog?(todayLog.pct+'%'):'—',todayLog?`${todayLog.done}/${todayLog.total} 項`:'尚無資料',true)+
     mkStat('今日 VAS',todayLog?(todayLog.vas+' 分'):'—',todayLog?(todayLog.vas<=3?'輕微':todayLog.vas<=6?'中等':'嚴重'):'尚無資料',todayLog?todayLog.vas<=5:true)+
-    mkStat('本週達成率',s.weekRate+'%','本週平均',s.weekRate>=60)+
-    mkStat('未讀訊息',p.unread+'',p.unread?'待回覆':'無待回覆',!p.unread);
-  const ct=document.getElementById('ov-chart-ttl');if(ct)ct.textContent=p.name+' · 本週執行率';
+    mkStat('本週達成率',wk+'%','近 7 天平均',wk>=60)+
+    mkStat('未讀訊息',un+'',un?'待回覆':'無待回覆',!un));
+  const ct=document.getElementById('ov-chart-ttl');if(ct)ct.textContent=(p?p.name+' · ':'')+'本週執行率';
   const chart=document.getElementById('ov-chart');
-  if(chart){
-    const max=Math.max(...s.rates,1);
-    chart.innerHTML=s.rates.map((r,i)=>`<div class="bar" style="height:${Math.round(r/max*100)}%;background:${i===6?'var(--blue)':'var(--ink)'};opacity:${i===6?1:.7};"><span>${r}%</span><small>${WDAYS[i]}</small></div>`).join('');
-  }
+  if(chart)setHTML(chart,days.map((d,i)=>{const r=d.log?d.log.pct:0;return`<div class="bar" style="height:${r}%;background:${i===6?'var(--blue)':'var(--ink)'};opacity:${i===6?1:.7};"><span>${d.log?r+'%':'—'}</span><small>${d.label}</small></div>`;}).join(''));
   const acts=document.getElementById('ov-acts');
   if(acts){
-    const logs=(s.logs||[]).slice(-4).reverse();
-    if(!logs.length){acts.innerHTML='<div style="text-align:center;padding:24px 0;color:var(--ink3);font-size:13px;">尚無動態</div>';return;}
-    acts.innerHTML=logs.map(l=>`<div class="act-row"><div class="av sm" style="background:var(--blue-bg);color:var(--blue-dark);">📋</div><div class="act-info"><b>${l.date} 回報</b><span>完成率 ${l.pct}%・VAS ${l.vas}${l.note?'・'+l.note:''}</span></div></div>`).join('');
+    const logs=sortedLogs(st).slice(-4).reverse();
+    setHTML(acts,logs.map(l=>`<div class="act-row"><div class="av sm" style="background:var(--blue-bg);color:var(--blue-dark);">📋</div><div class="act-info"><b>${H(l.date)} 回報</b><span>完成率 ${H(l.pct)}%・VAS ${H(l.vas)}${l.note?'・'+H(l.note):''}</span></div></div>`).join('')
+      ||'<div style="text-align:center;padding:24px 0;color:var(--ink3);font-size:13px;">尚無動態</div>');
   }
 }
 function mkStat(label,val,trend,up){return`<div class="stat-c"><div class="stat-lbl">${label}</div><div class="stat-val">${val}</div><div class="stat-tr${up?'':' dn'}">${trend}</div></div>`;}
 
 // ── CHAT ──
-function renderCL(filter=''){const el=document.getElementById('cl-items');if(!el)return;el.innerHTML=patients.filter(p=>!filter||p.name.includes(filter)||p.acct.includes(filter)).map(p=>{const i=patients.indexOf(p);return`<div class="cl-item ${i===activeCI?'on':''}" onclick="selectContact(${i})">${avHTML(p,'width:32px;height:32px;font-size:12px;')}<div class="cl-meta"><b>${H(p.name)}</b><div class="cl-tags">${p.tags.map(ti=>{const pr=tPair(tags[ti]);return`<span style="background:${pr.bg};color:${pr.ink};font-size:10px;padding:1px 5px;border-radius:4px;font-weight:500;">${H(tags[ti]?.name||'')}</span>`;}).join('')}</div></div>${p.unread?'<div class="unread"></div>':''}</div>`;}).join('');}
-function filterCL(v){renderCL(v);}
-function selectContact(i){activeCI=i;patients[i].unread=0;renderCL();syncChatHdr();renderMsgs();renderAnn('t-ann','t-ann-cnt',false,activeCI);updUnread();renderOv();}
-function syncChatHdr(){const p=patients[activeCI];if(!p)return;setAv(document.getElementById('ch-av'),p.imgSrc||'',p.av);document.getElementById('ch-nm').textContent=p.name;}
-function updUnread(){const t=patients.reduce((s,p)=>s+p.unread,0);const b=document.getElementById('t-unread-badge');b.textContent=t;b.style.display=t?'':'none';}
+function renderCL(){const el=document.getElementById('cl-items');if(!el)return;const f=clFilter.toLowerCase();setHTML(el,patients.map((p,i)=>!f||p.name.toLowerCase().includes(f)||p.acct.toLowerCase().includes(f)?`<div class="cl-item ${i===activeCI?'on':''}" onclick="selectContact(${i})">${avHTML(p,'width:32px;height:32px;font-size:12px;')}<div class="cl-meta"><b>${H(p.name)}</b><div class="cl-tags">${p.tags.map(ti=>{const pr=tPair(tags[ti]);return`<span style="background:${pr.bg};color:${pr.ink};font-size:10px;padding:1px 5px;border-radius:4px;font-weight:500;">${H(tags[ti]?.name||'')}</span>`;}).join('')}</div></div>${p.unread?'<div class="unread"></div>':''}</div>`:'').join(''));}
+function filterCL(v){clFilter=v.trim();renderCL();}
+function selectContact(i){
+  if(!patients[i])return;
+  activeCI=i;patients[i].unread=0;
+  renderCL();syncChatHdr();renderMsgs();renderAnn('t-ann','t-ann-cnt',false,activeCI);
+  renderAlbums('t');renderNotes('t'); // 相簿／記事面板跟著切換到這位個案
+  updUnread();renderOv();
+  document.querySelector('#t-app .chat-wrap')?.classList.add('show-chat');
+}
+function syncChatHdr(){const p=patients[activeCI];setAv(document.getElementById('ch-av'),p?.imgSrc||'',p?p.av:'—');document.getElementById('ch-nm').textContent=p?p.name:'尚無個案';}
+function updUnread(){const t=patients.reduce((s,p)=>s+(p.unread||0),0);['t-unread-badge','mt-unread'].forEach(id=>{const b=document.getElementById(id);if(b){b.textContent=t;b.style.display=t?'':'none';}});}
+// 正在看對話時收到新訊息，直接視為已讀
+function markSeen(){
+  if(!LOGGED||document.hidden)return;
+  if(ROLE==='therapist'){
+    const p=patients[activeCI];
+    const open=document.querySelector('#t-app .view.on')?.dataset.tv==='ch'&&(window.innerWidth>740||document.querySelector('#t-app .chat-wrap')?.classList.contains('show-chat'));
+    if(p&&p.unread&&open){p.unread=0;renderCL();updUnread();renderOv();}
+  }else{
+    const p=patients[PIDX];
+    if(p&&p.ptUnread&&document.querySelector('#p-app .view.on')?.dataset.pv==='pc'){p.ptUnread=0;updPtUnread();}
+  }
+}
 
 // ── NOTIFICATIONS ──
 let notifications=[];
@@ -1460,13 +1755,12 @@ function addNotif(msg,icon='💬',ci=null){
   if(notifications.length>30)notifications.pop();
   renderNotifPanel();
 }
-function fmtNow(){const n=new Date();return pad(n.getHours())+':'+pad(n.getMinutes());}
 function renderNotifPanel(){
   const panel=document.getElementById('notif-panel');if(!panel)return;
   const unread=notifications.filter(n=>!n.read).length;
-  panel.innerHTML=`<div class="np-h"><b>通知</b><div style="display:flex;gap:10px;align-items:center;">${notifications.length?`<small style="cursor:pointer;color:var(--blue);" onclick="markAllRead()">全部已讀</small><small style="cursor:pointer;color:var(--red);" onclick="clearNotifs()">清除</small>`:''}</div></div>`+
-    (notifications.length?notifications.map((n,i)=>`<div class="n-row" onclick="openNotif(${i})"><div class="ndot${n.read?' read':''}"></div><div style="flex:1;"><b>${n.icon} ${H(n.msg)}</b><span>${n.t}</span></div></div>`).join('')
-    :'<div style="padding:24px;text-align:center;font-size:13px;color:var(--ink3);">目前沒有通知</div>');
+  setHTML(panel,`<div class="np-h"><b>通知</b><div style="display:flex;gap:10px;align-items:center;">${notifications.length?`<small style="cursor:pointer;color:var(--blue);" onclick="markAllRead()">全部已讀</small><small style="cursor:pointer;color:var(--red);" onclick="clearNotifs()">清除</small>`:''}</div></div>`+
+    (notifications.length?notifications.map((n,i)=>`<div class="n-row" onclick="openNotif(${i})"><div class="ndot${n.read?' read':''}"></div><div style="flex:1;"><b>${H(n.icon)} ${H(n.msg)}</b><span>${H(n.t)}</span></div></div>`).join('')
+    :'<div style="padding:24px;text-align:center;font-size:13px;color:var(--ink3);">目前沒有通知</div>'));
   const nb=document.getElementById('notif-badge');
   if(nb){nb.textContent=unread;nb.style.display=unread?'':'none';}
 }
@@ -1481,7 +1775,7 @@ function openNotif(i){
   document.getElementById('notif-panel')?.classList.remove('on');
   renderNotifPanel();
 }
-function clearNotifs(){notifications=[];renderNotifPanel();saveState();}
+function clearNotifs(){notifications=[];renderNotifPanel();}
 function markAllRead(){notifications.forEach(n=>n.read=true);renderNotifPanel();}
 
 // 公告
@@ -1492,12 +1786,11 @@ function renderAnn(stripId,cntId,readOnly,ci){
   const bd=strip.querySelector('.ann-bd');const cnt=document.getElementById(cntId);
   if(cnt)cnt.textContent=annItems.length;
   if(!bd)return;
-  if(!annItems.length){bd.innerHTML='<div class="ann-empty">目前沒有公告</div>';return;}
-  bd.innerHTML=annItems.map((a,i)=>{
+  setHTML(bd,annItems.map((a,i)=>{
     const actHtml=readOnly?'':'<div class="ann-actions"><button class="ann-ab del" onclick="annDel('+i+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div>';
     const imgHtml=a.imgSrc?`<img src="${H(a.imgSrc)}" onclick="annJump(${i})" style="height:30px;width:45px;object-fit:cover;border-radius:4px;cursor:pointer;flex-shrink:0;"/>`:'<div class="ann-dot"></div>';
     return`<div class="ann-row">${imgHtml}<span class="ann-text" onclick="annJump(${i})">${H(a.text)}</span>${actHtml}</div>`;
-  }).join('');
+  }).join('')||'<div class="ann-empty">目前沒有公告</div>');
 }
 // 個案端公告直接讀治療師端對 PIDX 的公告（共用同一份）
 function renderPAnn(){
@@ -1509,8 +1802,8 @@ function toggleAnnStrip(id){
   s.classList.toggle('open');s.classList.toggle('closed');
 }
 function annJump(i){
-  // 治療師端跳訊息
-  scrollToMsg(getAnns(activeCI)[i]?.msgIdx??0);
+  // 治療師端看的是目前選取的個案；個案端看的是自己
+  scrollToMsg(getAnns(ROLE==='therapist'?activeCI:PIDX)[i]?.msgIdx??0);
 }
 function annDel(i){
   skyConfirm('確定移除此公告？',ok=>{
@@ -1537,88 +1830,83 @@ function markAnn(){
 }
 
 // messages
-function renderMsgs(){
-  const bd=document.getElementById('c-body');if(!bd)return;
-  const msgs=getMsgs(activeCI);
-  bd.innerHTML=msgs.map((m,i)=>{const content=m.type==='img'&&m.src?`<img src="${H(m.src)}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${m.who}" data-idx="${i}"><div>${content}<div class="msg-time">${m.t}</div></div></div>`;}).join('');
-  bd.scrollTop=bd.scrollHeight;
-  if(!bd._ctxBound){initLongPress('c-body');bd._ctxBound=true;}
+// flip：個案端看到的左右相反（治療師的訊息在左、自己的在右）
+function paintMsgs(bdId,msgs,flip){
+  const bd=document.getElementById(bdId);if(!bd)return;
+  const html=msgs.map((m,i)=>{const content=m.type==='img'&&m.src?`<img src="${H(m.src)}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${flip?(m.who==='me'?'them':'me'):m.who}" data-idx="${i}"><div>${content}<div class="msg-time">${H(m.t)}</div></div></div>`;}).join('');
+  // 內容有變、或第一次顯示在畫面上時才捲到最底；否則維持使用者目前的捲動位置
+  const vis=bd.offsetParent!==null;
+  if(setHTML(bd,html)||(vis&&!bd._vis))bd.scrollTop=bd.scrollHeight;
+  bd._vis=vis;
+  if(!bd._ctxBound){initLongPress(bdId);bd._ctxBound=true;}
 }
-function renderPMsgs(){
-  const bd=document.getElementById('p-c-body');if(!bd)return;
-  const msgs=getMsgs(PIDX);
-  bd.innerHTML=msgs.map((m,i)=>{const rw=m.who==='me'?'them':'me';const content=m.type==='img'&&m.src?`<img src="${H(m.src)}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${rw}" data-idx="${i}"><div>${content}<div class="msg-time">${m.t}</div></div></div>`;}).join('');
-  bd.scrollTop=bd.scrollHeight;
-  if(!bd._ctxBound){initLongPress('p-c-body');bd._ctxBound=true;}
-}
+function renderMsgs(){paintMsgs('c-body',getMsgs(activeCI),false);}
+function renderPMsgs(){paintMsgs('p-c-body',getMsgs(PIDX),true);}
+// 新訊息都帶 id 與時間戳，多裝置合併時才能準確辨識每一則
 function sendMsg(){
-  const inp=document.getElementById('ch-inp');const txt=inp.value.trim();if(!txt)return;
-  const now=new Date();
-  getMsgs(activeCI).push({who:'me',t:pad(now.getHours())+':'+pad(now.getMinutes()),txt});
-  inp.value='';renderMsgs();
-  // 新增個案端未讀通知
-  if(!patients[activeCI])return;
-  patients[activeCI].ptUnread=(patients[activeCI].ptUnread||0)+1;
-  updPtUnread();
-  if(activeCI===PIDX)renderPMsgs();
+  const inp=document.getElementById('ch-inp');const txt=inp.value.trim();const p=patients[activeCI];if(!txt||!p)return;
+  getMsgs(activeCI).push({id:uid(),ts:Date.now(),who:'me',t:fmtNow(),txt});
+  p.ptUnread=(p.ptUnread||0)+1; // 個案端未讀
+  inp.value='';renderMsgs();renderPMsgs();updPtUnread();
 }
 function sendPtMsg(){
-  const inp=document.getElementById('p-ch-inp');const txt=inp.value.trim();if(!txt)return;
-  const now=new Date();
-  getMsgs(PIDX).push({who:'them',t:pad(now.getHours())+':'+pad(now.getMinutes()),txt});
-  inp.value='';renderPMsgs();
-  patients[PIDX].unread=(patients[PIDX].unread||0)+1;updUnread();
-  addNotif(patients[PIDX].name+' 傳送訊息：'+txt.slice(0,28)+(txt.length>28?'…':''),'💬',PIDX);
-  if(activeCI===PIDX)renderMsgs();
+  const inp=document.getElementById('p-ch-inp');const txt=inp.value.trim();const p=patients[PIDX];if(!txt||!p)return;
+  getMsgs(PIDX).push({id:uid(),ts:Date.now(),who:'them',t:fmtNow(),txt});
+  p.unread=(p.unread||0)+1; // 治療師端未讀
+  addNotif(p.name+' 傳送訊息：'+txt.slice(0,28)+(txt.length>28?'…':''),'💬',PIDX);
+  inp.value='';renderPMsgs();renderMsgs();updUnread();
 }
 
-// 個案端未讀角標
+// 個案端未讀角標（手機分頁列＋側邊欄）
 function updPtUnread(){
   const u=patients[PIDX]?.ptUnread||0;
-  const b=document.getElementById('mp-unread');
-  if(b){b.textContent=u;b.style.display=u?'':'none';}
-  // topbar 角標（個案聊天頁）
-  const hb=document.getElementById('p-chat-badge');
-  if(hb){hb.textContent=u;hb.style.display=u?'':'none';}
+  ['mp-unread','p-chat-badge'].forEach(id=>{const b=document.getElementById(id);if(b){b.textContent=u;b.style.display=u?'':'none';}});
 }
 function clearChat(){
+  const ci=ROLE==='therapist'?activeCI:PIDX; // 個案端只能清自己的對話
   skyConfirm('確定清除所有對話？',ok=>{
     if(!ok)return;
-  msgMap[activeCI]=[];
-  annMap[activeCI]=[];
-  renderMsgs();
-  if(activeCI===PIDX)renderPMsgs();
-  renderAnn('t-ann','t-ann-cnt',false,activeCI);
-  renderAnn('p-ann','p-ann-cnt',true,PIDX);
-  renderOv();
-  toast('已清除');
-  });
+    msgMap[ci]=[];annMap[ci]=[];
+    const p=patients[ci];if(p){p.unread=0;p.ptUnread=0;}
+    renderMsgs();renderPMsgs();
+    renderAnn('t-ann','t-ann-cnt',false,activeCI);renderPAnn();
+    renderCL();updUnread();updPtUnread();renderOv();
+    toast('已清除');
+  },'清除對話','確認清除');
 }
 function stageImg(inp,side){
-  const f=inp?.files?.[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>{_pendingImg={src:ev.target.result,side,name:f.name};document.getElementById('m-img-prev-el').src=ev.target.result;document.getElementById('m-img-prev-name').textContent=f.name;openM('m-img-prev');if(inp)inp.value='';};
-  r.readAsDataURL(f);
+  const f=inp?.files?.[0];if(inp)inp.value='';if(!f)return;
+  readImg(f,1280,src=>{_pendingImg={src,side,name:f.name};document.getElementById('m-img-prev-el').src=src;document.getElementById('m-img-prev-name').textContent=f.name;openM('m-img-prev');});
 }
 function cancelImg(){_pendingImg=null;closeM('m-img-prev');}
 function confirmImg(){
   if(!_pendingImg)return;
-  const now=new Date();
-  const who=_pendingImg.side==='t'?'me':'them';
-  const ci=_pendingImg.side==='t'?activeCI:PIDX;
-  getMsgs(ci).push({who,t:pad(now.getHours())+':'+pad(now.getMinutes()),type:'img',src:_pendingImg.src});
+  const fromT=_pendingImg.side==='t',ci=fromT?activeCI:PIDX,p=patients[ci],src=_pendingImg.src;
   _pendingImg=null;closeM('m-img-prev');
-  renderMsgs();
-  if(activeCI===PIDX)renderPMsgs();
+  if(!p)return;
+  getMsgs(ci).push({id:uid(),ts:Date.now(),who:fromT?'me':'them',t:fmtNow(),type:'img',src});
+  if(fromT)p.ptUnread=(p.ptUnread||0)+1;
+  else{p.unread=(p.unread||0)+1;addNotif(p.name+' 傳送了一張圖片','💬',ci);}
+  renderMsgs();renderPMsgs();updUnread();updPtUnread();
 }
 function scrollToMsg(idx){const bdId=ROLE==='therapist'?'c-body':'p-c-body';const bd=document.getElementById(bdId);if(!bd)return;const t=bd.querySelector(`[data-idx="${idx}"]`);if(t){t.scrollIntoView({behavior:'smooth',block:'center'});t.style.transition='background .3s';t.style.background='rgba(37,99,235,.12)';setTimeout(()=>t.style.background='',1600);}}
 
-function initLongPress(bdId){const who=bdId==='c-body'?'t':'p';const bd=document.getElementById(bdId);if(!bd)return;bd.addEventListener('contextmenu',ev=>{const m=ev.target.closest('.msg-row[data-idx]');if(!m)return;ev.preventDefault();showCtx(ev,parseInt(m.dataset.idx),who);});bd.addEventListener('touchstart',ev=>{const m=ev.target.closest('.msg-row[data-idx]');if(!m)return;const t=ev.touches[0];pressCx=t.clientX;pressCy=t.clientY;const idx=parseInt(m.dataset.idx);clearTimeout(pressT);pressT=setTimeout(()=>{ev.preventDefault();showCtx({clientX:pressCx,clientY:pressCy},idx,who);},550);},{passive:false});bd.addEventListener('touchmove',ev=>{const t=ev.touches[0];if(Math.abs(t.clientX-pressCx)>8||Math.abs(t.clientY-pressCy)>8)clearTimeout(pressT);},{passive:true});bd.addEventListener('touchend',()=>clearTimeout(pressT));}
-function showCtx(ev,idx,who){ctxIdx=idx;const isTherapist=who==='t';document.querySelector('#ctx-menu button[onclick="markAnn()"]').style.display=isTherapist?'':'none';const m=document.getElementById('ctx-menu');m.style.left=Math.min(ev.clientX,window.innerWidth-160)+'px';m.style.top=Math.min(ev.clientY,window.innerHeight-100)+'px';m.classList.add('on');}
+function initLongPress(bdId){const who=bdId==='c-body'?'t':'p';const bd=document.getElementById(bdId);if(!bd)return;bd.addEventListener('click',ev=>{const im=ev.target.closest('.msg-img');if(im)viewImg(im.src);});bd.addEventListener('contextmenu',ev=>{const m=ev.target.closest('.msg-row[data-idx]');if(!m)return;ev.preventDefault();showCtx(ev,parseInt(m.dataset.idx),who);});bd.addEventListener('touchstart',ev=>{const m=ev.target.closest('.msg-row[data-idx]');if(!m)return;const t=ev.touches[0];pressCx=t.clientX;pressCy=t.clientY;const idx=parseInt(m.dataset.idx);clearTimeout(pressT);pressT=setTimeout(()=>{ev.preventDefault();showCtx({clientX:pressCx,clientY:pressCy},idx,who);},550);},{passive:false});bd.addEventListener('touchmove',ev=>{const t=ev.touches[0];if(Math.abs(t.clientX-pressCx)>8||Math.abs(t.clientY-pressCy)>8)clearTimeout(pressT);},{passive:true});bd.addEventListener('touchend',()=>clearTimeout(pressT));}
+function showCtx(ev,idx,who){ctxIdx=idx;const isTherapist=who==='t';document.querySelector('#ctx-menu button[onclick="markAnn()"]').style.display=isTherapist?'':'none';const m=document.getElementById('ctx-menu');m.style.left=Math.min(ev.clientX,window.innerWidth-160)+'px';m.style.top=Math.max(8,Math.min(ev.clientY,window.innerHeight-130))+'px';m.classList.add('on');}
 function closeCtx(){document.getElementById('ctx-menu').classList.remove('on');}
 function copyMsg(){const ci=ROLE==='therapist'?activeCI:PIDX;const m=getMsgs(ci)[ctxIdx];if(!m)return;navigator.clipboard?.writeText(m.txt||'[圖片]').catch(()=>{});closeCtx();toast('已複製');}
-function deleteMsg(){closeCtx();const ci=ROLE==='therapist'?activeCI:PIDX;skyConfirm('刪除這則訊息？',ok=>{if(!ok)return;getMsgs(ci).splice(ctxIdx,1);// 移除指向該訊息的公告，並修正後續 index
-const anns=getAnns(ci);for(let i=anns.length-1;i>=0;i--){if(anns[i].msgIdx===ctxIdx)anns.splice(i,1);else if(anns[i].msgIdx>ctxIdx)anns[i].msgIdx--;}renderAnn('t-ann','t-ann-cnt',false,ci);renderPAnn();if(ROLE==='therapist')renderMsgs();else renderPMsgs();toast('已刪除');});}
+function deleteMsg(){
+  closeCtx();
+  const ci=ROLE==='therapist'?activeCI:PIDX,idx=ctxIdx;
+  skyConfirm('刪除這則訊息？',ok=>{
+    if(!ok||!getMsgs(ci)[idx])return;
+    getMsgs(ci).splice(idx,1);
+    // 移除指向該訊息的公告，並修正後續 index
+    const anns=getAnns(ci);
+    for(let i=anns.length-1;i>=0;i--){if(anns[i].msgIdx===idx)anns.splice(i,1);else if(anns[i].msgIdx>idx)anns[i].msgIdx--;}
+    renderAnn('t-ann','t-ann-cnt',false,activeCI);renderPAnn();renderMsgs();renderPMsgs();toast('已刪除');
+  });
+}
 function openMsgSearch(){document.getElementById('msg-kw').value='';document.getElementById('ms-results').innerHTML='';document.getElementById('ms-cnt').textContent='';openM('m-msearch');}
 function searchMsgs(kw){
   const tk=kw.trim();if(!tk){document.getElementById('ms-cnt').textContent='';document.getElementById('ms-results').innerHTML='';return;}
@@ -1648,19 +1936,19 @@ function closeChatOv(who){const ov=document.getElementById(who==='p'?'p-chat-ov'
 function switchOv(btn,which,who){openChatOv(which);}
 
 // albums
-function renderAlbums(who){const g=document.getElementById(who==='t'?'t-alb-grid':'p-alb-grid');if(!g)return;const albs=who==='t'?tAlbums:pAlbums;const cntEl=document.getElementById(who==='t'?'t-alb-cnt':'');if(cntEl)cntEl.textContent=albs.length+' 本';g.innerHTML=albs.map((a,i)=>{const ph=a.photos||[];const th=ph.length?`<img src="${H(ph[0])}" style="width:100%;height:100%;object-fit:cover;display:block;"/>`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';return`<div style="position:relative;"><div class="alb-c" onclick="openAlbum(${i},'${who}')"><div class="alb-thumb">${th}</div><div class="alb-info"><b>${H(a.title)}</b><small>${ph.length} 張</small></div></div><button onclick="event.stopPropagation();delAlbum(${i},'${who}')" style="position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;border:none;cursor:pointer;">×</button></div>`;}).join('');}
+function renderAlbums(who){const g=document.getElementById(who==='t'?'t-alb-grid':'p-alb-grid');if(!g)return;const albs=who==='t'?tAlbums:pAlbums;const cntEl=document.getElementById(who==='t'?'t-alb-cnt':'');if(cntEl)cntEl.textContent=albs.length+' 本';setHTML(g,albs.map((a,i)=>{const ph=a.photos||[];const th=ph.length?`<img src="${H(ph[0])}" style="width:100%;height:100%;object-fit:cover;display:block;"/>`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';return`<div style="position:relative;"><div class="alb-c" onclick="openAlbum(${i},'${who}')"><div class="alb-thumb">${th}</div><div class="alb-info"><b>${H(a.title)}</b><small>${ph.length} 張</small></div></div><button onclick="event.stopPropagation();delAlbum(${i},'${who}')" style="position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;border:none;cursor:pointer;">×</button></div>`;}).join(''));}
 function addAlbum(who){(who==='t'?tAlbums:pAlbums).unshift({title:new Date().toISOString().slice(0,10),photos:[]});renderAlbums(who);toast('已新增相簿');}
 function openAlbum(i,who){curAlbIdx=i;curAlbWho=who;const a=(who==='t'?tAlbums:pAlbums)[i];document.getElementById('m-alb-disp').textContent=a.title;document.getElementById('m-alb-disp').style.display='';document.getElementById('m-alb-inp-ttl').style.display='none';document.getElementById('m-alb-pencil-btn').style.display='';document.getElementById('m-alb-ok-btn').style.display='none';albPhotos=[...(a.photos||[])];renderAlbPhotos();openM('m-alb');}
 function albEdit(){const d=document.getElementById('m-alb-disp');const i=document.getElementById('m-alb-inp-ttl');i.value=d.textContent;d.style.display='none';i.style.display='';document.getElementById('m-alb-pencil-btn').style.display='none';document.getElementById('m-alb-ok-btn').style.display='';i.focus();i.select();}
 function albSave(){const d=document.getElementById('m-alb-disp');const i=document.getElementById('m-alb-inp-ttl');const v=i.value.trim();if(v)d.textContent=v;i.style.display='none';d.style.display='';document.getElementById('m-alb-pencil-btn').style.display='';document.getElementById('m-alb-ok-btn').style.display='none';}
 function albCancelEdit(){document.getElementById('m-alb-inp-ttl').style.display='none';document.getElementById('m-alb-disp').style.display='';document.getElementById('m-alb-pencil-btn').style.display='';document.getElementById('m-alb-ok-btn').style.display='none';}
-function saveAlbum(){const a=(curAlbWho==='t'?tAlbums:pAlbums)[curAlbIdx];if(!a)return;const t=document.getElementById('m-alb-disp').textContent.trim();if(t)a.title=t;a.photos=[...albPhotos];closeM('m-alb');renderAlbums(curAlbWho);toast('已儲存');}
+function saveAlbum(){const a=(curAlbWho==='t'?tAlbums:pAlbums)[curAlbIdx];if(!a)return;if(document.getElementById('m-alb-inp-ttl').style.display!=='none')albSave();/* 標題改到一半直接按儲存也要生效 */const t=document.getElementById('m-alb-disp').textContent.trim();if(t)a.title=t;a.photos=[...albPhotos];closeM('m-alb');renderAlbums(curAlbWho);toast('已儲存');}
 function renderAlbPhotos(){const g=document.getElementById('m-alb-imgs');if(!g)return;[...g.children].forEach(c=>{if(c.id!=='m-alb-add-btn')c.remove();});albPhotos.forEach((src,i)=>{const d=document.createElement('div');d.style.cssText='aspect-ratio:1;border-radius:8px;overflow:hidden;position:relative;';const img=document.createElement('img');img.src=src;img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;';const btn=document.createElement('button');btn.textContent='×';btn.style.cssText='position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;font-size:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;';btn.onclick=()=>{albPhotos.splice(i,1);renderAlbPhotos();};d.appendChild(img);d.appendChild(btn);g.insertBefore(d,document.getElementById('m-alb-add-btn'));});const c=document.getElementById('m-alb-cnt');if(c)c.textContent=albPhotos.length;}
 function delAlbum(i,who){const albs=who==='t'?tAlbums:pAlbums;skyConfirm('刪除「'+albs[i].title+'」？',ok=>{if(!ok)return;albs.splice(i,1);renderAlbums(who);toast('已刪除');});}
-function addAlbPhotos(inp){Array.from(inp.files).forEach(f=>{const r=new FileReader();r.onload=ev=>{albPhotos.push(ev.target.result);renderAlbPhotos();};r.readAsDataURL(f);});inp.value='';}
+function addAlbPhotos(inp){Array.from(inp.files).forEach(f=>readImg(f,1280,src=>{albPhotos.push(src);renderAlbPhotos();}));inp.value='';}
 
 // notes
-function renderNotes(who){const el=document.getElementById(who==='t'?'t-nt-list':'p-nt-list');if(!el)return;const notes=who==='t'?tNotes:pNotes;el.innerHTML=notes.map((n,i)=>`<div class="note-c" onclick="openNote(${i},'${who}')"><b>${H(n.title)}</b><p>${H(n.body)}</p></div>`).join('');}
+function renderNotes(who){const el=document.getElementById(who==='t'?'t-nt-list':'p-nt-list');if(!el)return;const notes=who==='t'?tNotes:pNotes;const cntEl=document.getElementById(who==='t'?'t-nt-cnt':'');if(cntEl)cntEl.textContent=notes.length+' 則';setHTML(el,notes.map((n,i)=>`<div class="note-c" onclick="openNote(${i},'${who}')"><b>${H(n.title)}</b><p>${H(n.body)}</p></div>`).join(''));}
 function addNote(who){noteEditWho=who;noteEditIdx=-1;document.getElementById('m-note-ttl').textContent='新增記事';document.getElementById('m-note-nm').value='';document.getElementById('m-note-body').value='';openM('m-note');}
 function openNote(i,who){noteEditWho=who;noteEditIdx=i;const notes=who==='t'?tNotes:pNotes;document.getElementById('m-note-ttl').textContent='編輯記事';document.getElementById('m-note-nm').value=notes[i].title;document.getElementById('m-note-body').value=notes[i].body;openM('m-note');}
 function saveNote(){const nm=document.getElementById('m-note-nm').value.trim();if(!nm){toast('請輸入標題');return;}const bd=document.getElementById('m-note-body').value;const notes=noteEditWho==='t'?tNotes:pNotes;if(noteEditIdx===-1)notes.unshift({title:nm,body:bd});else notes[noteEditIdx]={title:nm,body:bd};closeM('m-note');renderNotes(noteEditWho);toast('已儲存');}
@@ -1668,35 +1956,30 @@ function delNote(){if(noteEditIdx===-1){closeM('m-note');return;}skyConfirm('刪
 
 // ── TRACKING ──
 function renderTracking(){
-  const s=ptStats[selPtIdx]||{weekRate:0,rates:[0,0,0,0,0,0,0],vas:[0,0,0,0,0,0,0],logs:[],lastVas:0};
+  if(selPtIdx>=patients.length)selPtIdx=0;
+  const s=ptStats[selPtIdx];
   buildSel('ex-pt-sel',selPtIdx);
-  const pct=s.weekRate||0;
-  const offset=Math.round(314*(1-pct/100));
-  const arc=document.getElementById('ex-arc');if(arc)arc.setAttribute('stroke-dashoffset',offset);
+  // 執行率與 VAS 都由回報紀錄依日期推算（最近 7 天），不再使用固定的 7 格陣列
+  const days=daySeries(s,7),pct=avgRate(s,days),logs=sortedLogs(s).reverse();
+  const arc=document.getElementById('ex-arc');if(arc)arc.setAttribute('stroke-dashoffset',Math.round(314*(1-pct/100)));
   const rv=document.getElementById('ex-ring-val');if(rv)rv.textContent=pct+'%';
-  const sub=document.getElementById('ex-ring-sub');if(sub)sub.textContent=s.logs?.length?`已提交 ${s.logs.length} 筆回報`:'尚無資料';
+  const sub=document.getElementById('ex-ring-sub');if(sub)sub.textContent=logs.length?`已提交 ${logs.length} 筆回報`:'尚無資料';
   const vb=document.getElementById('ex-vas');
-  if(vb){
-    const maxV=Math.max(...s.vas,1);
-    vb.innerHTML=s.vas.map((v,i)=>`<div class="vb" data-v="${v||1}" style="height:${Math.round(v/maxV*100)||4}%;"><small>${WDAYS[i]}</small></div>`).join('');
-  }
+  if(vb)setHTML(vb,days.map(d=>{const v=d.log?(+d.log.vas||0):null;return`<div class="vb${v==null?' none':''}" data-v="${v==null?'':(v||1)}" style="height:${v==null?4:Math.max(4,v*10)}%;" title="${v==null?'未回報':'VAS '+v}"><small>${d.label}</small></div>`;}).join(''));
   const tb=document.getElementById('ex-tbody');
-  if(tb){
-    const logs=(s.logs||[]).slice().reverse();
-    if(!logs.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--ink3);padding:24px;">尚無回報記錄</td></tr>';return;}
-    tb.innerHTML=logs.map(l=>`<tr><td>${l.date}</td><td><div style="display:flex;align-items:center;gap:7px;"><div style="flex:1;height:6px;border-radius:3px;background:var(--border);overflow:hidden;"><div style="height:100%;width:${l.pct}%;background:${l.pct>=80?'var(--green)':l.pct>=50?'#F59E0B':'var(--red)'};border-radius:3px;"></div></div><span style="font-size:12px;font-weight:500;">${l.pct}%</span></div></td><td><span style="font-size:13px;font-weight:600;color:${l.vas<=3?'var(--green)':l.vas<=6?'#D97706':'var(--red)'};">${l.vas}</span></td><td style="color:var(--ink3);font-size:12px;white-space:nowrap;">${H(l.note||'—')}</td></tr>`).join('');
-  }
+  if(tb)setHTML(tb,logs.map(l=>{const pc=+l.pct||0,v=+l.vas||0;return`<tr><td>${H(l.date)}</td><td><div style="display:flex;align-items:center;gap:7px;"><div style="flex:1;height:6px;border-radius:3px;background:var(--border);overflow:hidden;"><div style="height:100%;width:${pc}%;background:${pc>=80?'var(--green)':pc>=50?'#F59E0B':'var(--red)'};border-radius:3px;"></div></div><span style="font-size:12px;font-weight:500;">${pc}%</span></div></td><td><span style="font-size:13px;font-weight:600;color:${v<=3?'var(--green)':v<=6?'#D97706':'var(--red)'};">${v}</span></td><td style="color:var(--ink3);font-size:12px;white-space:nowrap;">${H(l.note||'—')}</td></tr>`;}).join('')
+    ||'<tr><td colspan="4" style="text-align:center;color:var(--ink3);padding:24px;">尚無回報記錄</td></tr>');
 }
 function exportPdf(){
   const s=ptStats[selPtIdx];
   const p=patients[selPtIdx];
-  if(!s||!s.logs||!s.logs.length){toast('尚無資料可匯出');return;}
-  const logs=[...s.logs].reverse();
-  const rows=logs.map(l=>`<tr><td>${l.date}</td><td>${l.pct}%（${l.done}/${l.total}）</td><td style="color:${l.vas<=3?'#16A34A':l.vas<=6?'#D97706':'#DC2626'};font-weight:600;">${l.vas}</td><td>${l.note||'—'}</td></tr>`).join('');
+  if(!p||!s||!s.logs||!s.logs.length){toast('尚無資料可匯出');return;}
+  const logs=sortedLogs(s).reverse();
   const vasColor=v=>v<=3?'#16A34A':v<=6?'#D97706':'#DC2626';
-  const maxV=Math.max(...s.vas,1);
-  const vasBars=s.vas.map((v,i)=>`<div class="vb" style="height:${Math.round(v/maxV*100)||4}%;background:${vasColor(v)};"><small>${WDAYS[i]}</small></div>`).join('');
-  const html=`<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"/><title>運動追蹤報告 - ${p.name}</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,sans-serif;font-size:13px;color:#1F2937;padding:32px 40px;}h1{font-size:20px;font-weight:700;margin-bottom:4px;}.sub{font-size:12px;color:#6B7280;margin-bottom:24px;}.stats{display:flex;gap:16px;margin-bottom:24px;}.stat{flex:1;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;}.stat-lbl{font-size:11px;color:#9CA3AF;margin-bottom:4px;}.stat-val{font-size:22px;font-weight:700;}h2{font-size:14px;font-weight:600;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #E5E7EB;}table{width:100%;border-collapse:collapse;margin-bottom:24px;}th{text-align:left;font-size:11px;color:#9CA3AF;letter-spacing:.06em;text-transform:uppercase;padding:8px 12px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;}td{padding:10px 12px;border-bottom:1px solid #F3F4F6;font-size:13px;}tr:last-child td{border-bottom:none;}.vas-bar{display:flex;align-items:flex-end;gap:4px;height:80px;margin-bottom:32px;}.vb{flex:1;border-radius:3px 3px 2px 2px;position:relative;min-height:4px;}.vb small{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-size:9px;color:#6B7280;}.footer{margin-top:32px;font-size:11px;color:#9CA3AF;text-align:center;border-top:1px solid #E5E7EB;padding-top:12px;}@media print{body{padding:20px 28px;}@page{margin:10mm;}}</style></head><body><h1>運動追蹤報告</h1><div class="sub">個案：${p.name}　　匯出日期：${todayStr()}</div><div class="stats"><div class="stat"><div class="stat-lbl">本週達成率</div><div class="stat-val">${s.weekRate}%</div></div><div class="stat"><div class="stat-lbl">最近 VAS</div><div class="stat-val" style="color:${vasColor(s.lastVas)};">${s.lastVas}</div></div><div class="stat"><div class="stat-lbl">回報筆數</div><div class="stat-val">${s.logs.length}</div></div></div><h2>VAS 趨勢（近 7 天）</h2><div class="vas-bar">${vasBars}</div><h2 style="margin-top:20px;">每日明細</h2><table><thead><tr><th>日期</th><th>完成率</th><th>VAS</th><th>備註</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">由 sky 衛教平台產生</div></body></html>`;
+  const rows=logs.map(l=>`<tr><td>${H(l.date)}</td><td>${H(l.pct)}%（${H(l.done)}/${H(l.total)}）</td><td style="color:${vasColor(l.vas)};font-weight:600;">${H(l.vas)}</td><td>${H(l.note||'—')}</td></tr>`).join('');
+  const days=daySeries(s,7),wk=avgRate(s,days),lastVas=+logs[0].vas||0;
+  const vasBars=days.map(d=>`<div class="vb" style="height:${d.log?Math.max(4,(+d.log.vas||0)*10):4}%;background:${d.log?vasColor(d.log.vas):'#E5E7EB'};"><small>${d.label}</small></div>`).join('');
+  const html=`<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"/><title>運動追蹤報告 - ${H(p.name)}</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,sans-serif;font-size:13px;color:#1F2937;padding:32px 40px;}h1{font-size:20px;font-weight:700;margin-bottom:4px;}.sub{font-size:12px;color:#6B7280;margin-bottom:24px;}.stats{display:flex;gap:16px;margin-bottom:24px;}.stat{flex:1;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;}.stat-lbl{font-size:11px;color:#9CA3AF;margin-bottom:4px;}.stat-val{font-size:22px;font-weight:700;}h2{font-size:14px;font-weight:600;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #E5E7EB;}table{width:100%;border-collapse:collapse;margin-bottom:24px;}th{text-align:left;font-size:11px;color:#9CA3AF;letter-spacing:.06em;text-transform:uppercase;padding:8px 12px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;}td{padding:10px 12px;border-bottom:1px solid #F3F4F6;font-size:13px;}tr:last-child td{border-bottom:none;}.vas-bar{display:flex;align-items:flex-end;gap:4px;height:80px;margin-bottom:32px;}.vb{flex:1;border-radius:3px 3px 2px 2px;position:relative;min-height:4px;}.vb small{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-size:9px;color:#6B7280;}.footer{margin-top:32px;font-size:11px;color:#9CA3AF;text-align:center;border-top:1px solid #E5E7EB;padding-top:12px;}@media print{body{padding:20px 28px;}@page{margin:10mm;}}</style></head><body><h1>運動追蹤報告</h1><div class="sub">個案：${H(p.name)}　　匯出日期：${todayStr()}</div><div class="stats"><div class="stat"><div class="stat-lbl">本週達成率</div><div class="stat-val">${wk}%</div></div><div class="stat"><div class="stat-lbl">最近 VAS</div><div class="stat-val" style="color:${vasColor(lastVas)};">${lastVas}</div></div><div class="stat"><div class="stat-lbl">回報筆數</div><div class="stat-val">${s.logs.length}</div></div></div><h2>VAS 趨勢（近 7 天）</h2><div class="vas-bar">${vasBars}</div><h2 style="margin-top:20px;">每日明細</h2><table><thead><tr><th>日期</th><th>完成率</th><th>VAS</th><th>備註</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">由 sky 衛教平台產生</div></body></html>`;
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -1719,50 +2002,62 @@ function medCoverHTML(item,isVid,ri){
   if(item.coverSrc)return`<div class="media-cov" ${ca}><img src="${H(item.coverSrc)}"/>${isVid?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);">'+playIco+'</div>':''}</div>`;
   return`<div class="media-cov ${item.cv||''}" ${ca}>${isVid?playIco:pdfIco}</div>`;
 }
+// 篩選中的分類若已不存在（被刪除或改名），退回「全部」
+const catAlive=(c,arr)=>c==='all'||cats.some(x=>x.name===c)||arr.some(x=>x.cat===c);
 function renderVideos(filter='all'){
+  if(!catAlive(filter,videos))filter='all';
   curVidFilter=filter;
   const list=filter==='all'?videos:videos.filter(v=>v.cat===filter);
   const g=document.getElementById('vid-grid');if(!g)return;
-  g.innerHTML=list.map(v=>{
+  setHTML(g,list.map(v=>{
     const ri=videos.indexOf(v);
     const cp=getCatColor(v.cat);
     return`<div class="media-c">${medCoverHTML(v,true,ri)}<div class="media-body"><div style="display:flex;gap:4px;margin-bottom:5px;"><span style="background:${cp.bg};color:${cp.ink};display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;">${H(v.cat)}</span><span style="background:#F3F4F6;color:#374151;display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;">${H(v.sub)}</span></div><b>${H(v.title)}</b><p>${H(v.desc)}</p><div class="media-acts"><button class="btn pri sm" style="flex:1;justify-content:center;" onclick="openPush(${ri},'video')">推播</button><button class="btn sm" onclick="openMediaModal('video',${ri})">編輯</button><button class="btn sm danger" onclick="delVideo(${ri})">刪除</button></div></div></div>`;
-  }).join('');
+  }).join(''));
   renderVidFlt();
 }
-function delVideo(i){skyConfirm('刪除「'+videos[i].title+'」？',ok=>{if(!ok)return;videos.splice(i,1);patients.forEach(p=>{if(p.assignedVids)p.assignedVids=p.assignedVids.filter(vi=>vi!==i).map(vi=>vi>i?vi-1:vi);});renderVideos(curVidFilter);renderLearn();toast('已刪除');});}
+// 刪除影片／知識：個案「已推播」清單記的是序號，後面的序號要跟著往前移
+function removeMedia(type,i){
+  const isVid=type==='video',key=isVid?'assignedVids':'assignedKnows';
+  (isVid?videos:knows).splice(i,1);
+  patients.forEach(p=>{p[key]=(p[key]||[]).filter(x=>x!==i).map(x=>x>i?x-1:x);});
+  if(isVid)renderVideos(curVidFilter);else renderKnows(curKnFilter);
+  renderLearn();renderPHomeRec();toast('已刪除');
+}
+function delVideo(i){skyConfirm('刪除「'+videos[i].title+'」？',ok=>{if(ok)removeMedia('video',i);});}
 function renderVidFlt(){
   const allC=[...new Set([...getCatNames(),...videos.map(v=>v.cat).filter(Boolean)])];
-  document.getElementById('vid-filter').innerHTML=
+  setHTML(document.getElementById('vid-filter'),
     `<button class="btn ${curVidFilter==='all'?'ghost':''}" onclick="renderVideos('all')">全部</button>`+
     allC.map(c=>{
       const cp=getCatColor(c);const isOn=curVidFilter===c;
       return`<button class="btn" data-cat="${H(c)}" onclick="renderVideos(this.dataset.cat)" style="${isOn?`background:${cp.bg};color:${cp.ink};border-color:${cp.bg};`:''}">${H(c)}</button>`;
-    }).join('');
+    }).join(''));
 }
 function renderKnows(filter='all'){
+  if(!catAlive(filter,knows))filter='all';
   curKnFilter=filter;
   const list=filter==='all'?knows:knows.filter(k=>k.cat===filter);
   const g=document.getElementById('kn-grid');if(!g)return;
-  g.innerHTML=list.map(k=>{
+  setHTML(g,list.map(k=>{
     const ri=knows.indexOf(k);
     const cp=getCatColor(k.cat);
     return`<div class="media-c">${medCoverHTML(k,false,ri)}<div class="media-body"><div style="display:flex;gap:4px;margin-bottom:5px;"><span style="background:${cp.bg};color:${cp.ink};display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;">${H(k.cat)}</span></div><b>${H(k.title)}</b><p>${H(k.desc)}</p><div class="media-acts"><button class="btn pri sm" style="flex:1;justify-content:center;" onclick="openPush(${ri},'know')">推播</button><button class="btn sm" onclick="openMediaModal('know',${ri})">編輯</button><button class="btn sm danger" onclick="delKnow(${ri})">刪除</button></div></div></div>`;
-  }).join('');
+  }).join(''));
   renderKnFlt();
 }
-function delKnow(i){skyConfirm('刪除「'+knows[i].title+'」？',ok=>{if(!ok)return;knows.splice(i,1);patients.forEach(p=>{if(p.assignedKnows)p.assignedKnows=p.assignedKnows.filter(ki=>ki!==i).map(ki=>ki>i?ki-1:ki);});renderKnows(curKnFilter);renderLearn();toast('已刪除');});}
+function delKnow(i){skyConfirm('刪除「'+knows[i].title+'」？',ok=>{if(ok)removeMedia('know',i);});}
 function renderKnFlt(){
   const allC=[...new Set([...getCatNames(),...knows.map(k=>k.cat).filter(Boolean)])];
-  document.getElementById('kn-filter').innerHTML=
+  setHTML(document.getElementById('kn-filter'),
     `<button class="btn ${curKnFilter==='all'?'ghost':''}" onclick="renderKnows('all')">全部</button>`+
     allC.map(c=>{
       const cp=getCatColor(c);const isOn=curKnFilter===c;
       return`<button class="btn" data-cat="${H(c)}" onclick="renderKnows(this.dataset.cat)" style="${isOn?`background:${cp.bg};color:${cp.ink};border-color:${cp.bg};`:''}">${H(c)}</button>`;
-    }).join('');
+    }).join(''));
 }
 function openMediaModal(type,i){
-  mediaType=type;mediaEditIdx=i;pendingCoverSrc='';pendingPdfSrc='';pendingPdfName='';
+  mediaType=type;mediaEditIdx=i;pendingCoverSrc='';pendingPdfSrc='';pendingPdfName='';_pdfLoading=false;
   const isVid=type==='video';
   document.getElementById('m-med-ttl').textContent=i===-1?(isVid?'新增影片':'新增知識'):(isVid?'編輯影片':'編輯知識');
   document.getElementById('m-med-url-row').style.display=isVid?'':'none';
@@ -1786,43 +2081,87 @@ function openMediaModal(type,i){
   if(src?.sub&&mediaSubs.includes(src.sub))se.value=src.sub;
   openM('m-med');
 }
-function delCurMedia(){const arr=mediaType==='video'?videos:knows;skyConfirm('刪除「'+arr[mediaEditIdx]?.title+'」？',ok=>{if(!ok)return;arr.splice(mediaEditIdx,1);closeM('m-med');if(mediaType==='video')renderVideos(curVidFilter);else renderKnows(curKnFilter);renderLearn();toast('已刪除');});}
-function saveMedia(){const title=document.getElementById('m-med-title').value.trim();if(!title){toast('請輸入標題');return;}const obj={title,url:document.getElementById('m-med-url').value.trim(),cat:document.getElementById('m-med-cat').value,sub:document.getElementById('m-med-sub').value,desc:document.getElementById('m-med-desc').value.trim(),coverSrc:pendingCoverSrc,pdfSrc:pendingPdfSrc,pdfName:pendingPdfName,cv:['','c2','c3'][Math.floor(Math.random()*3)]};const arr=mediaType==='video'?videos:knows;if(mediaEditIdx===-1)arr.push(obj);else Object.assign(arr[mediaEditIdx],obj);pendingCoverSrc='';pendingPdfSrc='';pendingPdfName='';closeM('m-med');if(mediaType==='video')renderVideos(curVidFilter);else renderKnows(curKnFilter);renderLearn();toast('已儲存');}
-function loadPdf(inp){const f=inp.files[0];if(!f)return;pendingPdfName=f.name;document.getElementById('m-pdf-name').textContent='讀取中…';const r=new FileReader();r.onload=ev=>{pendingPdfSrc=ev.target.result;document.getElementById('m-pdf-name').innerHTML=ICO_OK+' '+H(f.name);};r.readAsDataURL(f);}
-function prevCover(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{pendingCoverSrc=ev.target.result;document.getElementById('m-cov-img').src=pendingCoverSrc;document.getElementById('m-cov-prev').style.display='block';document.getElementById('m-cov-name').textContent=f.name;};r.readAsDataURL(f);}
+function delCurMedia(){const arr=mediaType==='video'?videos:knows;skyConfirm('刪除「'+arr[mediaEditIdx]?.title+'」？',ok=>{if(!ok)return;closeM('m-med');removeMedia(mediaType,mediaEditIdx);});}
+function saveMedia(){
+  const title=document.getElementById('m-med-title').value.trim();if(!title){toast('請輸入標題');return;}
+  if(_pdfLoading){toast('PDF 讀取中，請稍候再儲存');return;}
+  const arr=mediaType==='video'?videos:knows,old=mediaEditIdx===-1?null:arr[mediaEditIdx];
+  const obj={title,url:normUrl(document.getElementById('m-med-url').value),cat:document.getElementById('m-med-cat').value,sub:document.getElementById('m-med-sub').value,desc:document.getElementById('m-med-desc').value.trim(),coverSrc:pendingCoverSrc,pdfSrc:pendingPdfSrc,pdfName:pendingPdfName,
+    cv:old?old.cv||'':['','c2','c3'][Math.floor(Math.random()*3)]}; // 編輯時沿用原本的封面底色
+  if(old)Object.assign(old,obj);else arr.push(obj);
+  pendingCoverSrc='';pendingPdfSrc='';pendingPdfName='';closeM('m-med');
+  if(mediaType==='video')renderVideos(curVidFilter);else renderKnows(curKnFilter);
+  renderLearn();renderPHomeRec();toast('已儲存');
+}
+const PDF_MAX=5*1024*1024; // PDF 無法壓縮，限制單檔大小以免塞滿雲端容量
+function loadPdf(inp){
+  const f=inp.files[0];inp.value='';if(!f)return;
+  if(f.size>PDF_MAX){toast('PDF 檔案過大（上限 5 MB），請先壓縮後再上傳');return;}
+  _pdfLoading=true;document.getElementById('m-pdf-name').textContent='讀取中…';
+  const r=new FileReader();
+  r.onload=ev=>{_pdfLoading=false;pendingPdfSrc=ev.target.result;pendingPdfName=f.name;document.getElementById('m-pdf-name').innerHTML=ICO_OK+' '+H(f.name);};
+  r.onerror=()=>{_pdfLoading=false;document.getElementById('m-pdf-name').textContent='點擊上傳 PDF';toast('讀取 PDF 失敗');};
+  r.readAsDataURL(f);
+}
+function prevCover(inp){const f=inp.files[0];inp.value='';readImg(f,960,src=>{pendingCoverSrc=src;document.getElementById('m-cov-img').src=src;document.getElementById('m-cov-prev').style.display='block';document.getElementById('m-cov-name').textContent=f.name;});}
 
 // push
 function openPush(idx,type){pushMediaIdx=idx;pushMediaType=type;const item=(type==='video'?videos:knows)[idx];pushMediaTitle=item?.title||'';document.getElementById('push-pt-list').innerHTML=patients.map((p,i)=>{const arr=type==='video'?p.assignedVids:p.assignedKnows;const already=arr.includes(idx);const tagsHtml=p.tags.map(ti=>{const pr=tPair(tags[ti]);return`<span style="background:${pr.bg};color:${pr.ink};font-size:10px;padding:1px 6px;border-radius:4px;font-weight:500;">${H(tags[ti]?.name||'')}</span>`;}).join('');return`<label style="display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;background:var(--bg);cursor:pointer;"><input type="checkbox" style="accent-color:var(--ink);width:14px;height:14px;flex-shrink:0;" data-pi="${i}" ${already?'checked':''}/>${avHTML(p,'width:26px;height:26px;font-size:10px;')}<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">${H(p.name)}</div>${tagsHtml?`<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;">${tagsHtml}</div>`:''}</div>${already?'<span style="font-size:10px;color:var(--ink3);flex-shrink:0;">已推播</span>':''}</label>`;}).join('');openM('m-push');}
-function doPush(){const checked=[...document.querySelectorAll('#push-pt-list input:checked')];if(!checked.length){toast('請選擇個案');return;}checked.forEach(c=>{const pi=parseInt(c.dataset.pi);const arr=pushMediaType==='video'?patients[pi].assignedVids:patients[pi].assignedKnows;if(!arr.includes(pushMediaIdx))arr.push(pushMediaIdx);});  closeM('m-push');renderLearn();renderPHomeRec();renderOv();toast('已推播《'+pushMediaTitle+'》');  }
+// 勾選＝推播給該個案；取消勾選＝收回推播
+function doPush(){
+  const key=pushMediaType==='video'?'assignedVids':'assignedKnows';
+  let added=0,removed=0;
+  document.querySelectorAll('#push-pt-list input[type=checkbox]').forEach(c=>{
+    const p=patients[parseInt(c.dataset.pi)];if(!p)return;
+    const arr=p[key]||(p[key]=[]),pos=arr.indexOf(pushMediaIdx);
+    if(c.checked&&pos<0){arr.push(pushMediaIdx);added++;}
+    else if(!c.checked&&pos>=0){arr.splice(pos,1);removed++;}
+  });
+  if(!added&&!removed){toast(document.querySelector('#push-pt-list input:checked')?'推播對象沒有變更':'請選擇個案');return;}
+  closeM('m-push');renderLearn();renderPHomeRec();renderOv();
+  toast(added?'已推播《'+pushMediaTitle+'》':'已收回《'+pushMediaTitle+'》的推播');
+}
 
 // ── TAGS ──
 function renderTagList(){
   const el=document.getElementById('tag-list-el');if(!el)return;
-  el.innerHTML=tags.map((t,i)=>{
+  setHTML(el,tags.map((t,i)=>{
     const p=tPair(t);
     return`<div class="tag-row"><div class="clrdot" style="background:${p.bg};border:1px solid rgba(0,0,0,.07);"></div><span style="background:${p.bg};color:${p.ink};display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;">${H(t.name)}</span><button class="btn xs" onclick="openTagModal(${i})" style="margin-left:auto;">編輯</button><button class="btn xs danger" onclick="delTag(${i})">刪除</button></div>`;
-  }).join('');
+  }).join(''));
 }
 function openTagModal(i){tagEditIdx=i;const t=i===-1?null:tags[i];document.getElementById('m-tag-ttl').textContent=i===-1?'新增標籤':'編輯標籤';document.getElementById('m-tag-nm').value=t?t.name:'';selTagClr=t?t.clr:'blue';customTagBg=selTagClr==='custom'?(t.bg||'#DBEAFE'):(PRESET[selTagClr]?.bg||'#DBEAFE');document.getElementById('m-tag-clr').value=customTagBg;document.querySelectorAll('#m-tag .clr-opt').forEach(o=>o.classList.toggle('on',o.dataset.clr===selTagClr));updTagPrev();openM('m-tag');}
 function pickClr(el){selTagClr=el.dataset.clr;customTagBg=PRESET[selTagClr]?.bg||'#DBEAFE';document.querySelectorAll('#m-tag .clr-opt').forEach(o=>o.classList.toggle('on',o===el));document.getElementById('m-tag-clr').value=customTagBg;updTagPrev();}
 function onCustomClr(hex){customTagBg=hex;selTagClr='custom';document.querySelectorAll('#m-tag .clr-opt').forEach(o=>o.classList.remove('on'));updTagPrev();}
 function updTagPrev(){const prev=document.getElementById('m-tag-prev');if(!prev)return;const nm=document.getElementById('m-tag-nm').value||'預覽';if(selTagClr==='custom'){prev.style.background=customTagBg;prev.style.color=autoInk(customTagBg);}else{const p=PRESET[selTagClr]||PRESET.blue;prev.style.background=p.bg;prev.style.color=p.ink;}prev.textContent=nm;}
 document.getElementById('m-tag-nm')?.addEventListener('input',updTagPrev);
-function saveTag(){const nm=document.getElementById('m-tag-nm').value.trim();if(!nm){toast('請輸入名稱');return;}const obj=selTagClr==='custom'?{name:nm,clr:'custom',bg:customTagBg,ink:autoInk(customTagBg)}:{name:nm,clr:selTagClr};if(tagEditIdx===-1)tags.push(obj);else tags[tagEditIdx]=obj;closeM('m-tag');renderTagList();renderPt();renderCL();toast('已儲存');}
+function saveTag(){const nm=document.getElementById('m-tag-nm').value.trim();if(!nm){toast('請輸入名稱');return;}if(tags.some((t,i)=>i!==tagEditIdx&&t.name===nm)){toast('已有同名的標籤');return;}const obj=selTagClr==='custom'?{name:nm,clr:'custom',bg:customTagBg,ink:autoInk(customTagBg)}:{name:nm,clr:selTagClr};if(tagEditIdx===-1)tags.push(obj);else tags[tagEditIdx]=obj;closeM('m-tag');renderTagList();renderPt();renderCL();toast('已儲存');}
 function delTag(i){skyConfirm('刪除「'+tags[i].name+'」？',ok=>{if(!ok)return;tags.splice(i,1);patients.forEach(p=>{p.tags=p.tags.filter(ti=>ti!==i).map(ti=>ti>i?ti-1:ti);});ptTagFilter=ptTagFilter.filter(ti=>ti!==i).map(ti=>ti>i?ti-1:ti);renderTagList();renderPt();renderCL();toast('已刪除');});}
 
 function renderCatList(){
   const el=document.getElementById('cat-list-el');if(!el)return;
-  el.innerHTML=cats.map((c,i)=>{
+  setHTML(el,cats.map((c,i)=>{
     const p=tPair(c);
     const subsHtml=c.subs.map((s,si)=>`<span class="sub-tag">${H(s)}<button onclick="delSub(${i},${si})">×</button></span>`).join('');
     return`<div class="cat-blk"><div class="cat-hd"><div class="clrdot" style="background:${p.bg};border:1px solid rgba(0,0,0,.07);"></div><b>${H(c.name)}</b><button class="btn xs" onclick="openCatModal(${i})" style="margin-left:auto;">編輯</button><button class="btn xs danger" onclick="delCat(${i})">刪除</button></div><div class="cat-bd">${subsHtml}<span class="sub-tag add-sub" onclick="addSub(${i})">+ 次主題</span></div></div>`;
-  }).join('');
+  }).join(''));
 }
 function openCatModal(i){catEditIdx=i;const c=i===-1?null:cats[i];document.getElementById('m-cat-ttl').textContent=i===-1?'新增分類':'編輯分類';document.getElementById('m-cat-nm').value=c?c.name:'';document.getElementById('m-cat-subs').value=c?c.subs.join('\n'):'';selCatClr=c?c.clr:'blue';customCatBg=selCatClr==='custom'?(c.bg||'#DBEAFE'):(PRESET[selCatClr]?.bg||'#DBEAFE');document.getElementById('m-cat-clr').value=customCatBg;document.querySelectorAll('#cat-clr-opts .clr-opt').forEach(o=>o.classList.toggle('on',o.dataset.clr===selCatClr));openM('m-cat');}
 function pickCatClr(el){selCatClr=el.dataset.clr;customCatBg=PRESET[selCatClr]?.bg||'#DBEAFE';document.querySelectorAll('#cat-clr-opts .clr-opt').forEach(o=>o.classList.toggle('on',o===el));document.getElementById('m-cat-clr').value=customCatBg;}
 function onCustomCatClr(hex){customCatBg=hex;selCatClr='custom';document.querySelectorAll('#cat-clr-opts .clr-opt').forEach(o=>o.classList.remove('on'));}
-function saveCat(){const nm=document.getElementById('m-cat-nm').value.trim();if(!nm){toast('請輸入名稱');return;}const subs=document.getElementById('m-cat-subs').value.split('\n').map(s=>s.trim()).filter(Boolean);const obj=selCatClr==='custom'?{name:nm,clr:'custom',bg:customCatBg,ink:autoInk(customCatBg),subs}:{name:nm,clr:selCatClr,subs};if(catEditIdx===-1)cats.push(obj);else cats[catEditIdx]=obj;closeM('m-cat');renderCatList();renderVideos(curVidFilter);renderKnows(curKnFilter);toast('已儲存');}
+function saveCat(){
+  const nm=document.getElementById('m-cat-nm').value.trim();if(!nm){toast('請輸入名稱');return;}
+  if(cats.some((c,i)=>i!==catEditIdx&&c.name===nm)){toast('已有同名的分類');return;}
+  const subs=document.getElementById('m-cat-subs').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const obj=selCatClr==='custom'?{name:nm,clr:'custom',bg:customCatBg,ink:autoInk(customCatBg),subs}:{name:nm,clr:selCatClr,subs};
+  if(catEditIdx===-1)cats.push(obj);
+  else{
+    // 影片／知識是用分類「名稱」歸類的，分類改名時要一起改，否則會變成沒有分類
+    const old=cats[catEditIdx].name;cats[catEditIdx]=obj;
+    if(old!==nm){[videos,knows].forEach(arr=>arr.forEach(x=>{if(x.cat===old)x.cat=nm;}));if(curVidFilter===old)curVidFilter=nm;if(curKnFilter===old)curKnFilter=nm;}
+  }
+  closeM('m-cat');renderCatList();renderVideos(curVidFilter);renderKnows(curKnFilter);toast('已儲存');
+}
 function delCat(i){skyConfirm('刪除「'+cats[i].name+'」？',ok=>{if(!ok)return;const nm=cats[i].name;videos.forEach(v=>{if(v.cat===nm){v.cat='';v.sub='';}});knows.forEach(k=>{if(k.cat===nm){k.cat='';k.sub='';}});cats.splice(i,1);renderCatList();renderVideos(curVidFilter);renderKnows(curKnFilter);renderLearn();toast('已刪除');});}
 function delSub(ci,si){skyConfirm('刪除「'+cats[ci].subs[si]+'」？',ok=>{if(!ok)return;cats[ci].subs.splice(si,1);renderCatList();});}
 function addSub(ci){skyPrompt('次主題名稱…',val=>{if(!val?.trim())return;cats[ci].subs.push(val.trim());renderCatList();toast('已新增');});}
@@ -1835,81 +2174,132 @@ function saveTherapist(){
   therapistState.name=nm;therapistState.title=ttl;therapistState.img=therapistImg;
   therapistState.acct=newAcct;
   if(newPwd)therapistState.pwd=newPwd;
+  applyBrandUI();syncSettingsInputs();
+  toast('已儲存');
+}
+// 把治療師名稱、頭像、平台標題與 Logo 套到畫面各處（不動設定頁的輸入欄位）
+function applyBrandUI(){
+  const t=frontState.title,nm=therapistState.name,ini=nm[0]||'?';
+  document.getElementById('front-title').textContent=t;
+  document.getElementById('front-sub').textContent=frontState.sub;
+  ['t-sb-name','p-sb-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});
+  ['front-logo','t-sb-logo','p-sb-logo'].forEach(id=>setLogoEl(document.getElementById(id),frontState.logoSrc));
+  const ws=document.querySelector('#p-app .view[data-pv="ph"] .pg-sub');if(ws)ws.textContent='歡迎使用 '+t;
+  document.title=t;
   document.getElementById('t-nm').textContent=nm;
-  document.getElementById('t-ttl').textContent=ttl;
-  setAv(document.getElementById('t-av'),therapistImg,nm[0]||'?');
-  setAv(document.getElementById('st-av'),therapistImg,nm[0]||'?');
-  setAv(document.getElementById('p-chat-t-av'),therapistImg,nm[0]||'?');
-  const pnm=document.getElementById('p-chat-t-nm');if(pnm)pnm.textContent=nm+' 治療師';
-  const acctEl=document.getElementById('st-acct');if(acctEl)acctEl.value=therapistState.acct;
-  const pwdEl=document.getElementById('st-pwd-new');if(pwdEl)pwdEl.value='';
-  renderMsgs();saveState();toast('已儲存');
+  document.getElementById('t-ttl').textContent=therapistState.title;
+  setAv(document.getElementById('t-av'),therapistState.img,ini);
+  setAv(document.getElementById('p-chat-t-av'),therapistState.img,ini);
+  document.getElementById('p-chat-t-nm').textContent=nm+' 治療師';
+}
+// 設定頁的輸入欄位回到目前已儲存的內容（進入設定頁、儲存後、匯入備份後）
+function syncSettingsInputs(){
+  document.getElementById('st-nm').value=therapistState.name;
+  document.getElementById('st-ttl').value=therapistState.title;
+  document.getElementById('st-acct').value=therapistState.acct;
+  document.getElementById('st-pwd-new').value='';
+  therapistImg=therapistState.img||'';pendingLogoSrc=null;
+  setAv(document.getElementById('st-av'),therapistImg,therapistState.name[0]||'?');
+  setLogoEl(document.getElementById('st-logo'),frontState.logoSrc);
+  syncFrontInputs();
 }
 function syncFrontInputs(){document.getElementById('st-f-title').value=frontState.title;document.getElementById('st-f-sub').value=frontState.sub;updFrontPrev();}
-function updFrontPrev(){const pv=document.getElementById('front-prev-card');if(!pv)return;const t=document.getElementById('st-f-title')?.value||frontState.title;const s=document.getElementById('st-f-sub')?.value||frontState.sub;const lh=frontState.logoSrc?`<img src="${H(frontState.logoSrc)}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;"/>`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:#fff;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';pv.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px;background:var(--bg);border-radius:9px;border:1px solid var(--border);"><div style="width:32px;height:32px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;">${lh}</div><div style="font-size:14px;font-weight:600;">${H(t)}</div><div style="font-size:11px;color:var(--ink3);text-align:center;">${H(s)}</div></div>`;}
-function applyFront(){const t=document.getElementById('st-f-title').value.trim()||frontState.title;const s=document.getElementById('st-f-sub').value.trim()||frontState.sub;frontState.title=t;frontState.sub=s;document.getElementById('front-title').textContent=t;document.getElementById('front-sub').textContent=s;['t-sb-name','p-sb-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});['front-logo','t-sb-logo','p-sb-logo','st-logo'].forEach(id=>setLogoEl(document.getElementById(id),frontState.logoSrc));document.title=t;updFrontPrev();toast('已套用');}
+function updFrontPrev(){const pv=document.getElementById('front-prev-card');if(!pv)return;const t=document.getElementById('st-f-title')?.value||frontState.title;const s=document.getElementById('st-f-sub')?.value||frontState.sub;const logo=pendingLogoSrc!==null?pendingLogoSrc:frontState.logoSrc;const lh=logo?`<img src="${H(logo)}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;"/>`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:#fff;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';pv.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px;background:var(--bg);border-radius:9px;border:1px solid var(--border);"><div style="width:32px;height:32px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;">${lh}</div><div style="font-size:14px;font-weight:600;">${H(t)}</div><div style="font-size:11px;color:var(--ink3);text-align:center;">${H(s)}</div></div>`;}
+function applyFront(){
+  frontState.title=document.getElementById('st-f-title').value.trim()||frontState.title;
+  frontState.sub=document.getElementById('st-f-sub').value.trim()||frontState.sub;
+  if(pendingLogoSrc!==null){frontState.logoSrc=pendingLogoSrc;pendingLogoSrc=null;}
+  applyBrandUI();setLogoEl(document.getElementById('st-logo'),frontState.logoSrc);updFrontPrev();toast('已套用');
+}
 
 // ── MEDICAL RECORDS ──
-function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
-function buildMrSel(id,cur){const s=document.getElementById(id);if(!s)return;s.innerHTML=patients.map((p,i)=>`<option value="${i}"${i===cur?' selected':''}>${H(p.name)}</option>`).join('');}
 function selMrPt(i){mrPtIdx=i;renderMedRecords();}
 function renderMrImgs(){const g=document.getElementById('m-mr-imgs');if(!g)return;g.innerHTML=pendingMrImgs.map((src,i)=>`<div style="position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;"><img src="${H(src)}" style="width:100%;height:100%;object-fit:cover;"/><button onclick="rmMrImg(${i})" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:11px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button></div>`).join('');}
 function rmMrImg(i){pendingMrImgs.splice(i,1);renderMrImgs();}
-function addMrImgs(inp){Array.from(inp.files).forEach(f=>{const r=new FileReader();r.onload=ev=>{pendingMrImgs.push(ev.target.result);renderMrImgs();};r.readAsDataURL(f);});inp.value='';}
+function addMrImgs(inp){Array.from(inp.files).forEach(f=>readImg(f,1600,src=>{pendingMrImgs.push(src);renderMrImgs();}));inp.value='';}
 function mrSoap(r){return[{l:'S',bg:'#2563EB',border:'#BFDBFE',bg2:'#EFF6FF',txt:r.s,n:'主觀 Subjective'},{l:'O',bg:'#059669',border:'#A7F3D0',bg2:'#ECFDF5',txt:r.o,n:'客觀 Objective'},{l:'A',bg:'#D97706',border:'#FDE68A',bg2:'#FFFBEB',txt:r.a,n:'評估 Assessment'},{l:'P',bg:'#DC2626',border:'#FECACA',bg2:'#FEF2F2',txt:r.p,n:'計劃 Plan'}].filter(it=>it.txt).map(it=>`<div style="display:grid;grid-template-columns:20px 1fr;gap:8px 10px;align-items:start;padding:10px 12px;border-radius:9px;border:1px solid ${it.border};background:${it.bg2};margin-bottom:6px;"><div style="width:20px;height:20px;border-radius:5px;background:${it.bg};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">${it.l}</div><div><div style="font-size:10px;font-weight:600;color:${it.bg};margin-bottom:3px;letter-spacing:.04em;">${it.n}</div><div class="soap-txt" style="color:#1F2937;">${H(it.txt)}</div></div></div>`).join('');}
-function renderMedRecords(){const g=document.getElementById('mr-list');if(!g)return;buildMrSel('mr-pt-sel',mrPtIdx);const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===mrPtIdx).sort((a,b)=>b.date.localeCompare(a.date));if(!recs.length){g.innerHTML='<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷</div>';return;}g.innerHTML=recs.map(r=>{const prev=[r.s,r.o,r.a,r.p].filter(Boolean).map(t=>t.slice(0,38)+(t.length>38?'…':'')).join(' · ');return`<div class="mr-card" data-idx="${r._i}"><div class="mr-hd" data-action="toggle"><div style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;pointer-events:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;pointer-events:none;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1;min-width:0;pointer-events:none;"><div style="font-weight:600;font-size:13.5px;">${H(r.date)}</div>${r.sent?'<div><span style="background:var(--green-bg);color:var(--green);font-size:10px;padding:1px 6px;border-radius:4px;">已傳送</span></div>':''}<div style="font-size:11.5px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${H(prev||'（無內容）')}</div></div><button type="button" class="btn sm pri" data-action="send">${r.sent?'重新傳送':'傳送給個案'}</button><button type="button" class="btn sm" data-action="edit">編輯</button><button type="button" class="btn sm danger" data-action="delete">刪除</button><svg style="width:14px;height:14px;color:var(--ink3);flex-shrink:0;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="mr-bd">${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g">'+r.imgs.map((src,si)=>`<img src="${H(src)}" data-ri="${r._i}" data-si="${si}" alt="附圖"/>`).join('')+'</div>':''}</div></div>`;}).join('');}
-function bindMrEvents(){const g=document.getElementById('mr-list');if(!g||g._bound)return;g._bound=true;g.addEventListener('click',ev=>{const act=ev.target.closest('[data-action]');if(!act)return;const card=act.closest('.mr-card');if(!card)return;const idx=parseInt(card.dataset.idx);const action=act.dataset.action;ev.stopPropagation();if(action==='toggle'){const bd=card.querySelector('.mr-bd');const chev=card.querySelector('svg:last-child');const open=bd.classList.toggle('open');if(chev)chev.style.transform=open?'rotate(180deg)':'';}else if(action==='edit')openMrModal(idx);else if(action==='delete')delMr(idx,false);else if(action==='send')sendMr(idx);});g.addEventListener('click',ev=>{const img=ev.target.closest('img[data-ri]');if(!img)return;viewMrImg(parseInt(img.dataset.ri),parseInt(img.dataset.si));});}
+function renderMedRecords(){const g=document.getElementById('mr-list');if(!g)return;if(mrPtIdx>=patients.length)mrPtIdx=0;buildSel('mr-pt-sel',mrPtIdx);const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===mrPtIdx).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+const open=[...g.querySelectorAll('.mr-bd.open')].map(b=>b.closest('.mr-card').dataset.idx); // 重畫後維持原本展開的病歷
+if(!setHTML(g,recs.map(r=>{const prev=[r.s,r.o,r.a,r.p].filter(Boolean).map(t=>t.slice(0,38)+(t.length>38?'…':'')).join(' · ');return`<div class="mr-card" data-idx="${r._i}"><div class="mr-hd" data-action="toggle"><div style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;pointer-events:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;pointer-events:none;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1;min-width:0;pointer-events:none;"><div style="font-weight:600;font-size:13.5px;">${H(r.date)}</div>${r.sent?'<div><span style="background:var(--green-bg);color:var(--green);font-size:10px;padding:1px 6px;border-radius:4px;">已傳送</span></div>':''}<div style="font-size:11.5px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${H(prev||'（無內容）')}</div></div><button type="button" class="btn sm pri" data-action="send">${r.sent?'重新傳送':'傳送給個案'}</button><button type="button" class="btn sm" data-action="edit">編輯</button><button type="button" class="btn sm danger" data-action="delete">刪除</button><svg style="width:14px;height:14px;color:var(--ink3);flex-shrink:0;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="mr-bd">${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g">'+r.imgs.map((src,si)=>`<img src="${H(src)}" data-ri="${r._i}" data-si="${si}" alt="附圖"/>`).join('')+'</div>':''}</div></div>`;}).join('')||'<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷</div>'))return;
+open.forEach(ix=>{const c=g.querySelector(`.mr-card[data-idx="${ix}"]`);if(!c)return;c.querySelector('.mr-bd').classList.add('open');const chev=c.querySelector('.mr-hd>svg');if(chev)chev.style.transform='rotate(180deg)';});}
+function bindMrEvents(){const g=document.getElementById('mr-list');if(!g||g._bound)return;g._bound=true;g.addEventListener('click',ev=>{const act=ev.target.closest('[data-action]');if(!act)return;const card=act.closest('.mr-card');if(!card)return;const idx=parseInt(card.dataset.idx);const action=act.dataset.action;ev.stopPropagation();if(action==='toggle'){const bd=card.querySelector('.mr-bd');const chev=card.querySelector('.mr-hd>svg');const open=bd.classList.toggle('open');if(chev)chev.style.transform=open?'rotate(180deg)':'';}else if(action==='edit')openMrModal(idx);else if(action==='delete')delMr(idx,false);else if(action==='send')sendMr(idx);});g.addEventListener('click',ev=>{const img=ev.target.closest('img[data-ri]');if(!img)return;viewMrImg(parseInt(img.dataset.ri),parseInt(img.dataset.si));});}
 function sendMr(i){const r=medRecords[i];if(!r)return;r.sent=true;renderMedRecords();if(r.ptIdx===PIDX)renderPMr();toast('已傳送給 '+patients[r.ptIdx]?.name);}
 function openMrNew(){openMrModal(-1);}
-function openMrModal(i){mrEditIdx=i;const r=i===-1?null:medRecords[i];pendingMrImgs=r?[...(r.imgs||[])]:[];document.getElementById('m-mr-ttl').textContent=i===-1?'新增病歷':'編輯病歷';document.getElementById('m-mr-date').value=r?r.date:todayStr();document.getElementById('m-mr-s').value=r?r.s:'';document.getElementById('m-mr-o').value=r?r.o:'';document.getElementById('m-mr-a').value=r?r.a:'';document.getElementById('m-mr-p').value=r?r.p:'';const del=document.getElementById('m-mr-del');if(del){del.style.display=i===-1?'none':'';del.onclick=()=>delMr(mrEditIdx,true);}buildMrSel('m-mr-pt',r!=null?r.ptIdx:mrPtIdx);renderMrImgs();openM('m-mr');}
-function saveMr(){const date=document.getElementById('m-mr-date').value;if(!date){toast('請選擇日期');return;}const s=document.getElementById('m-mr-s').value.trim();const o=document.getElementById('m-mr-o').value.trim();const a=document.getElementById('m-mr-a').value.trim();const p=document.getElementById('m-mr-p').value.trim();if(!s&&!o&&!a&&!p&&!pendingMrImgs.length){toast('請填寫 SOAP 內容');return;}const ptIdx=parseInt(document.getElementById('m-mr-pt').value)||0;const obj={ptIdx,date,s,o,a,p,imgs:[...pendingMrImgs],sent:false};if(mrEditIdx===-1)medRecords.push(obj);else Object.assign(medRecords[mrEditIdx],{ptIdx,date,s,o,a,p,imgs:[...pendingMrImgs]});closeM('m-mr');renderMedRecords();toast(mrEditIdx===-1?'已新增病歷':'已更新病歷');}
+function openMrModal(i){if(!patients.length){toast('請先新增個案');return;}mrEditIdx=i;const r=i===-1?null:medRecords[i];pendingMrImgs=r?[...(r.imgs||[])]:[];document.getElementById('m-mr-ttl').textContent=i===-1?'新增病歷':'編輯病歷';document.getElementById('m-mr-date').value=r?r.date:todayStr();document.getElementById('m-mr-s').value=r?r.s:'';document.getElementById('m-mr-o').value=r?r.o:'';document.getElementById('m-mr-a').value=r?r.a:'';document.getElementById('m-mr-p').value=r?r.p:'';const del=document.getElementById('m-mr-del');if(del){del.style.display=i===-1?'none':'';del.onclick=()=>delMr(mrEditIdx,true);}buildSel('m-mr-pt',r!=null?r.ptIdx:mrPtIdx);renderMrImgs();openM('m-mr');}
+function saveMr(){const date=document.getElementById('m-mr-date').value;if(!date){toast('請選擇日期');return;}const s=document.getElementById('m-mr-s').value.trim();const o=document.getElementById('m-mr-o').value.trim();const a=document.getElementById('m-mr-a').value.trim();const p=document.getElementById('m-mr-p').value.trim();if(!s&&!o&&!a&&!p&&!pendingMrImgs.length){toast('請填寫 SOAP 內容');return;}const ptIdx=parseInt(document.getElementById('m-mr-pt').value)||0;const obj={ptIdx,date,s,o,a,p,imgs:[...pendingMrImgs],sent:false};if(mrEditIdx===-1)medRecords.push(obj);else Object.assign(medRecords[mrEditIdx],{ptIdx,date,s,o,a,p,imgs:[...pendingMrImgs]});mrPtIdx=ptIdx;/* 清單切到這筆病歷所屬的個案，才看得到剛存的內容 */closeM('m-mr');renderMedRecords();renderPMr();toast(mrEditIdx===-1?'已新增病歷':'已更新病歷');}
 function delMr(i,fromModal){if(i==null||i<0||i>=medRecords.length)return;skyConfirm('確定刪除此筆病歷？',ok=>{if(!ok)return;medRecords.splice(i,1);if(fromModal)closeM('m-mr');renderMedRecords();toast('已刪除病歷');});}
-function viewMrImg(ri,si){const r=medRecords[ri];if(!r||!r.imgs[si])return;const bg=document.createElement('div');bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';const img=document.createElement('img');img.src=r.imgs[si];img.style.cssText='max-width:90vw;max-height:90vh;border-radius:10px;object-fit:contain;';bg.appendChild(img);bg.onclick=()=>document.body.removeChild(bg);document.body.appendChild(bg);}
-function renderPMr(){const g=document.getElementById('p-mr-list');if(!g)return;const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===PIDX&&r.sent).sort((a,b)=>b.date.localeCompare(a.date));if(!recs.length){g.innerHTML='<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷紀錄</div>';return;}g.innerHTML=recs.map(r=>`<div class="card" style="margin-bottom:10px;overflow:hidden;"><div class="card-b"><div style="font-size:11px;color:var(--ink3);margin-bottom:10px;">${H(r.date)}</div>${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g" style="margin-top:10px;">'+r.imgs.map((src,si)=>`<img src="${H(src)}" data-pri="${r._i}" data-psi="${si}" style="cursor:pointer;" alt="附圖"/>`).join('')+'</div>':''}</div></div>`).join('');if(!g._pmrBound){g._pmrBound=true;g.addEventListener('click',ev=>{const img=ev.target.closest('img[data-pri]');if(!img)return;viewMrImg(parseInt(img.dataset.pri),parseInt(img.dataset.psi));});}}
+function viewMrImg(ri,si){viewImg(medRecords[ri]?.imgs?.[si]);}
+function renderPMr(){const g=document.getElementById('p-mr-list');if(!g)return;const recs=medRecords.map((r,i)=>({...r,_i:i})).filter(r=>r.ptIdx===PIDX&&r.sent).sort((a,b)=>String(b.date).localeCompare(String(a.date)));setHTML(g,recs.map(r=>`<div class="card" style="margin-bottom:10px;overflow:hidden;"><div class="card-b"><div style="font-size:11px;color:var(--ink3);margin-bottom:10px;">${H(r.date)}</div>${mrSoap(r)}${r.imgs&&r.imgs.length?'<div class="mr-imgs-g" style="margin-top:10px;">'+r.imgs.map((src,si)=>`<img src="${H(src)}" data-pri="${r._i}" data-psi="${si}" style="cursor:pointer;" alt="附圖"/>`).join('')+'</div>':''}</div></div>`).join('')||'<div style="text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無病歷紀錄</div>');if(!g._pmrBound){g._pmrBound=true;g.addEventListener('click',ev=>{const img=ev.target.closest('img[data-pri]');if(!img)return;viewMrImg(parseInt(img.dataset.pri),parseInt(img.dataset.psi));});}}
 
 // ── PATIENT FUNCS ──
-function initDailyRpt(){const now=new Date();const days=['日','一','二','三','四','五','六'];const de=document.getElementById('rpt-date');if(de)de.textContent=`${now.getFullYear()} / ${pad(now.getMonth()+1)} / ${pad(now.getDate())} · 週${days[now.getDay()]}`;const p=patients[PIDX];const items=(p.assignedVids||[]).map(i=>videos[i]?.title).filter(Boolean);if(!items.length)items.push('今日復健運動');const el=document.getElementById('ex-list');if(el)el.innerHTML=items.map((nm,i)=>`<label style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;"><input type="checkbox" class="ex-cb" data-idx="${i}" style="accent-color:var(--ink);width:15px;height:15px;" onchange="onExChg()" ${rptDraft.exercises[i]?'checked':''}/><div><div style="font-size:13px;">${H(nm)}</div><div style="font-size:11px;color:var(--ink3);">${ICO_OK} 今日有執行</div></div></label>`).join('');const vi=document.getElementById('vas-inp');if(vi){vi.value=rptDraft.vas;setVas(rptDraft.vas);}const ni=document.getElementById('rpt-note');if(ni)ni.value=rptDraft.note;const se=document.getElementById('rpt-status');if(rptDraft.submitted){se.className='tag green';se.textContent='已提交';document.getElementById('rpt-summary').style.display='';document.getElementById('rpt-btns').style.display='none';lockRpt();}else{se.className='tag gray';se.textContent='尚未提交';document.getElementById('rpt-summary').style.display='none';document.getElementById('rpt-btns').style.display='flex';}}
-function onExChg(){document.querySelectorAll('.ex-cb').forEach(cb=>{rptDraft.exercises[cb.dataset.idx]=cb.checked;});}
-function setVas(v){const d=document.getElementById('vas-disp');if(d)d.textContent=v;rptDraft.vas=parseInt(v);}
-function saveDraft(){document.querySelectorAll('.ex-cb').forEach(cb=>{rptDraft.exercises[cb.dataset.idx]=cb.checked;});rptDraft.vas=parseInt(document.getElementById('vas-inp').value);rptDraft.note=document.getElementById('rpt-note').value;const se=document.getElementById('rpt-status');se.className='tag orange';se.textContent='草稿已儲存';toast('草稿已儲存');}
-function submitRpt(){document.querySelectorAll('.ex-cb').forEach(cb=>{rptDraft.exercises[cb.dataset.idx]=cb.checked;});rptDraft.vas=parseInt(document.getElementById('vas-inp').value);rptDraft.note=document.getElementById('rpt-note').value;rptDraft.submitted=true;const cbs=[...document.querySelectorAll('.ex-cb')];const done=cbs.filter(c=>c.checked).length;const total=cbs.length;const pct=total?Math.round(done/total*100):0;rptDraft.pct=pct;rptDraft.done=done;rptDraft.total=total;const se=document.getElementById('rpt-status');se.className='tag green';se.textContent='已提交';document.getElementById('rpt-summary').style.display='';document.getElementById('rpt-summary-txt').innerHTML=`完成率 <b>${pct}%</b>（${done}/${total}）&emsp;VAS <b>${rptDraft.vas}</b> 分`+(rptDraft.note?`<br/>備註：${H(rptDraft.note)}`:'');document.getElementById('rpt-btns').style.display='none';lockRpt();syncHomeStats();  // 同步到治療師後台統計
-const today=todayStr();const s=ptStats[PIDX]||(ptStats[PIDX]={weekRate:0,trend:'+0%',rates:[0,0,0,0,0,0,0],vas:[0,0,0,0,0,0,0],logs:[],lastVas:0});s.lastVas=rptDraft.vas;// 更新 logs（同日覆蓋）
-const li=s.logs.findIndex(l=>l.date===today);const exNames=[...document.querySelectorAll('.ex-cb')].map((cb,i)=>{const nm=document.querySelector(`[data-pv="dr"] .ex-cb[data-idx="${i}"]`);return nm?.closest('label')?.querySelector('div div')?.textContent||'運動 '+(i+1);});const log={date:today,pct,done,total,vas:rptDraft.vas,note:rptDraft.note};if(li>=0)s.logs[li]=log;else s.logs.push(log);// 更新本週 rates / vas（今日對應 index 6）
-s.rates[6]=pct;s.vas[6]=rptDraft.vas;s.weekRate=pct;patients[PIDX].unread=(patients[PIDX].unread||0)+1;updUnread();
-  addNotif(patients[PIDX].name+' 提交每日回報（完成率 '+pct+'%・VAS '+rptDraft.vas+'）','📋',PIDX);
+// 依目前的回報草稿畫出表單（登入、換頁、換日、雲端同步後都會呼叫，畫面一律以草稿內容為準）
+function initDailyRpt(){
+  const now=new Date(),days=['日','一','二','三','四','五','六'];
+  const de=document.getElementById('rpt-date');if(de)de.textContent=`${now.getFullYear()} / ${pad(now.getMonth()+1)} / ${pad(now.getDate())} · 週${days[now.getDay()]}`;
+  const p=patients[PIDX];if(!p)return;
+  const d=rptDraft;
+  const items=(p.assignedVids||[]).map(i=>videos[i]?.title).filter(Boolean);if(!items.length)items.push('今日復健運動');
+  const el=document.getElementById('ex-list');
+  if(el)setHTML(el,items.map((nm,i)=>`<label style="display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;"><input type="checkbox" class="ex-cb" data-idx="${i}" style="accent-color:var(--ink);width:15px;height:15px;" onchange="onExChg()" ${d.exercises[i]?'checked':''}/><div><div style="font-size:13px;">${H(nm)}</div><div style="font-size:11px;color:var(--ink3);">${ICO_OK} 今日有執行</div></div></label>`).join(''));
+  const vi=document.getElementById('vas-inp');if(vi){vi.value=d.vas||0;document.getElementById('vas-disp').textContent=d.vas||0;}
+  const ni=document.getElementById('rpt-note');if(ni&&ni.value!==(d.note||''))ni.value=d.note||'';
+  // 已提交就鎖定表單；尚未提交一定要解鎖（否則換一位個案登入時，表單會停留在上一位的鎖定狀態）
+  document.querySelectorAll('#rpt-form input,#rpt-form textarea').forEach(x=>{x.disabled=!!d.submitted;});
+  document.getElementById('rpt-summary').style.display=d.submitted?'':'none';
+  document.getElementById('rpt-btns').style.display=d.submitted?'none':'flex';
+  const se=document.getElementById('rpt-status');
+  if(d.submitted){
+    se.className='tag green';se.textContent='已提交';
+    document.getElementById('rpt-summary-txt').innerHTML=`完成率 <b>${H(d.pct??0)}%</b>（${H(d.done??0)}/${H(d.total??0)}）&emsp;VAS <b>${H(d.vas)}</b> 分`+(d.note?`<br/>備註：${H(d.note)}`:'');
+  }else if(d.saved){se.className='tag orange';se.textContent='草稿已儲存';}
+  else{se.className='tag gray';se.textContent='尚未提交';}
+}
+function readRptForm(){const d=rptDraft;document.querySelectorAll('.ex-cb').forEach(cb=>{d.exercises[cb.dataset.idx]=cb.checked;});d.vas=parseInt(document.getElementById('vas-inp').value)||0;d.note=document.getElementById('rpt-note').value;return d;}
+function onExChg(){readRptForm().saved=false;}
+function setVas(v){const d=document.getElementById('vas-disp');if(d)d.textContent=v;rptDraft.vas=parseInt(v)||0;rptDraft.saved=false;}
+function onRptNote(v){rptDraft.note=v;rptDraft.saved=false;}
+function saveDraft(){readRptForm().saved=true;initDailyRpt();syncNow(false,true);toast('草稿已儲存');}
+function submitRpt(){
+  const p=patients[PIDX];if(!p)return;
+  const d=readRptForm(),cbs=[...document.querySelectorAll('.ex-cb')];
+  const done=cbs.filter(c=>c.checked).length,total=cbs.length,pct=total?Math.round(done/total*100):0;
+  Object.assign(d,{submitted:true,saved:false,pct,done,total});
+  // 寫入回報紀錄（同一天重複提交會覆蓋）；治療師端的統計圖表都由這份紀錄依日期推算
+  const s=ptStats[PIDX]||(ptStats[PIDX]=newStat());
+  const log={date:d.date,pct,done,total,vas:d.vas,note:d.note};
+  const li=s.logs.findIndex(l=>l.date===log.date);
+  if(li>=0)s.logs[li]=log;else s.logs.push(log);
+  s.lastVas=d.vas;
+  p.unread=(p.unread||0)+1;
+  addNotif(p.name+' 提交每日回報（完成率 '+pct+'%・VAS '+d.vas+'）','📋',PIDX);
   // 自動發送回報訊息給治療師
-  const now=new Date();
-  const noteStr=rptDraft.note?'\n備註：'+rptDraft.note:'';
-  const autoMsg='📋 每日回報已提交\n完成率：'+pct+'%（'+done+'/'+total+' 項）\nVAS 疼痛：'+rptDraft.vas+' 分'+noteStr;
-  getMsgs(PIDX).push({who:'them',t:pad(now.getHours())+':'+pad(now.getMinutes()),txt:autoMsg,auto:true});
-  if(activeCI===PIDX)renderMsgs();
-  renderOv();renderTracking();toast('已提交，並自動通知治療師','check');}
-function lockRpt(){document.querySelectorAll('#rpt-form input,#rpt-form textarea').forEach(el=>el.disabled=true);}
-function resetRpt(){Object.keys(rptDraft.exercises).forEach(k=>delete rptDraft.exercises[k]);rptDraft.vas=0;rptDraft.note='';rptDraft.submitted=false;document.getElementById('rpt-summary').style.display='none';document.getElementById('rpt-btns').style.display='flex';document.getElementById('rpt-status').className='tag gray';document.getElementById('rpt-status').textContent='尚未提交';document.querySelectorAll('#rpt-form input,#rpt-form textarea').forEach(el=>el.disabled=false);initDailyRpt();}
+  getMsgs(PIDX).push({id:uid(),ts:Date.now(),who:'them',t:fmtNow(),txt:'📋 每日回報已提交\n完成率：'+pct+'%（'+done+'/'+total+' 項）\nVAS 疼痛：'+d.vas+' 分'+(d.note?'\n備註：'+d.note:''),auto:true});
+  initDailyRpt();syncHomeStats();renderPMsgs();renderMsgs();updUnread();renderOv();renderTracking();
+  toast('已提交，並自動通知治療師','check');
+}
+function resetRpt(){const d=rptDraft;Object.assign(d,{exercises:{},vas:0,note:'',submitted:false,saved:false});delete d.pct;delete d.done;delete d.total;initDailyRpt();syncHomeStats();}
 
 function filterLearn(btn,type){document.querySelectorAll('[data-lf]').forEach(b=>b.className='btn');btn.className='btn ghost';renderLearn(type);}
-function renderLearn(f='all'){
+function renderLearn(f=curLearnFilter){
+  curLearnFilter=f;
   const p=patients[PIDX];
+  const g=document.getElementById('lrn-grid');if(!g||!p)return;
   const vids=(p.assignedVids||[]).map(i=>(videos[i]?{...videos[i],_t:'vid',_ri:i}:null)).filter(Boolean);
   const knws=(p.assignedKnows||[]).map(i=>(knows[i]?{...knows[i],_t:'pdf',_ri:i}:null)).filter(Boolean);
   const list=f==='all'?[...vids,...knws]:f==='vid'?vids:knws;
-  const g=document.getElementById('lrn-grid');if(!g)return;
-  if(!list.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無推播內容</div>';return;}
-  g.innerHTML=list.map(a=>{
+  setHTML(g,list.map(a=>{
     const cp=getCatColor(a.cat);
     return`<div class="media-c">${medCoverHTML(a,a._t==='vid',a._ri)}<div class="media-body"><div style="display:flex;gap:4px;margin-bottom:5px;"><span style="background:${a._t==='vid'?'var(--blue-bg)':'#F3F4F6'};color:${a._t==='vid'?'var(--blue-dark)':'#374151'};display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;">${a._t==='vid'?'影片':'PDF'}</span></div><b>${H(a.title)}</b><p>${H(a.desc)}</p><div class="media-acts"><button class="btn pri sm" style="flex:1;justify-content:center;" data-type="${a._t}" data-ri="${a._ri}" onclick="openViewModal(this.dataset.type,parseInt(this.dataset.ri))">查看</button></div></div></div>`;
-  }).join('');
+  }).join('')||'<div style="grid-column:1/-1;text-align:center;padding:44px 0;color:var(--ink3);font-size:13px;">尚無推播內容</div>');
 }
 
 function syncHomeStats(){
-  // 連續天數（submitted 即算今日完成，簡單以 1 呈現）
-  const streak = rptDraft.submitted ? 1 : 0;
-  const pct = rptDraft.submitted ? (rptDraft.pct??0) : 0;
-  const vas = rptDraft.submitted ? rptDraft.vas : null;
+  // 連續天數、本月達成率、VAS 趨勢都由回報紀錄推算
+  const st=ptStats[PIDX],logs=sortedLogs(st),last=logs[logs.length-1],prev=logs[logs.length-2];
   const heroStats = document.querySelectorAll('.hero-stats div');
-  if(heroStats[0]) heroStats[0].querySelector('b').textContent = streak;
-  if(heroStats[1]) heroStats[1].querySelector('b').textContent = pct + '%';
-  if(heroStats[2]) heroStats[2].querySelector('b').textContent = vas !== null ? vas + ' 分' : '—';
+  if(heroStats[0]) heroStats[0].querySelector('b').textContent = streakDays(st);
+  if(heroStats[1]) heroStats[1].querySelector('b').textContent = avgRate(st,daySeries(st,new Date().getDate())) + '%';
+  if(heroStats[2]) heroStats[2].querySelector('b').textContent = last ? last.vas + ' 分' + (prev ? (last.vas<prev.vas?' ↓':last.vas>prev.vas?' ↑':' →') : '') : '—';
 
   // 今日待辦：若已提交，改為已完成樣式
   const todoBtn = document.querySelector('#p-app [data-pv="ph"] .btn.sm.pri');
@@ -1928,204 +2318,261 @@ function syncHomeStats(){
 
 function renderPHomeRec(){
   const p=patients[PIDX];
+  const g=document.getElementById('p-home-lrn');if(!g||!p)return;
   const vids=(p.assignedVids||[]).map(i=>videos[i]?{...videos[i],_t:'vid',_ri:i}:null).filter(Boolean);
   const knws=(p.assignedKnows||[]).map(i=>knows[i]?{...knows[i],_t:'pdf',_ri:i}:null).filter(Boolean);
   const list=[...vids,...knws].slice(0,2);
-  const g=document.getElementById('p-home-lrn');if(!g)return;
-  if(!list.length){g.innerHTML='<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--ink3);">尚無推播內容</div>';return;}
-  g.innerHTML=list.map((a,idx)=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;${idx<list.length-1?'border-bottom:1px solid var(--border);':''}cursor:pointer;" onclick="openViewModal('${a._t}',${a._ri})"><div style="width:34px;height:34px;border-radius:8px;background:${a._t==='vid'?'var(--ink)':'#F0F0F0'};color:${a._t==='vid'?'#fff':'var(--ink)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${a._t==='vid'?'<svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'}</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${H(a.title)}</div><div style="font-size:11px;color:var(--ink3);">${a._t==='vid'?'影片':'PDF'}</div></div></div>`).join('');
+  setHTML(g,list.map((a,idx)=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;${idx<list.length-1?'border-bottom:1px solid var(--border);':''}cursor:pointer;" onclick="openViewModal('${a._t}',${a._ri})"><div style="width:34px;height:34px;border-radius:8px;background:${a._t==='vid'?'var(--ink)':'#F0F0F0'};color:${a._t==='vid'?'#fff':'var(--ink)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${a._t==='vid'?'<svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'}</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${H(a.title)}</div><div style="font-size:11px;color:var(--ink3);">${a._t==='vid'?'影片':'PDF'}</div></div></div>`).join('')||'<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--ink3);">尚無推播內容</div>');
 }
 
-function openViewModal(type,ri){const isVid=type==='vid'||type==='video';const item=isVid?videos[ri]:knows[ri];if(!item){toast('找不到內容');return;}document.getElementById('m-view-ttl').textContent=item.title;const covH=item.coverSrc?`<div style="border-radius:9px;overflow:hidden;aspect-ratio:16/9;margin-bottom:14px;"><img src="${H(item.coverSrc)}" style="width:100%;height:100%;object-fit:cover;display:block;"/></div>`:'';const descH=item.desc?`<p style="font-size:13.5px;color:var(--ink2);line-height:1.65;margin:10px 0 0;">${H(item.desc)}</p>`:'';let actH='';if(isVid){actH=item.url?`<button class="btn pri" id="play-btn">▶ 播放影片</button>`:'<button class="btn" disabled style="opacity:.45;">尚未設定連結</button>';}else{actH=item.pdfSrc?`<button class="btn pri" id="dl-btn" data-ri="${ri}">⬇ 下載 PDF</button>`:'<button class="btn" disabled style="opacity:.45;">尚未上傳 PDF</button>';}document.getElementById('m-view-body').innerHTML=covH+descH+`<div style="margin-top:14px;">${actH}</div>`;if(isVid&&item.url){setTimeout(()=>{const btn=document.getElementById('play-btn');if(btn)btn.onclick=()=>{const u=(item.url||'').trim();if(/^\s*(javascript|data|vbscript):/i.test(u)){toast('連結格式不正確');}else{window.open(u,'_blank','noopener');}closeM('m-view');};},0);}if(!isVid&&item.pdfSrc){setTimeout(()=>{const btn=document.getElementById('dl-btn');if(btn)btn.onclick=()=>dlPdf(ri);},0);}openM('m-view');}
-function dlPdf(ri){const item=knows[ri];if(!item?.pdfSrc)return;try{const b64=item.pdfSrc.split(',')[1];const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);const blob=new Blob([arr],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(item.pdfName||item.title||'doc')+'.pdf';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000);toast('PDF 下載中…');}catch(e){window.open(item.pdfSrc,'_blank');}}
+function openViewModal(type,ri){const isVid=type==='vid'||type==='video';const item=isVid?videos[ri]:knows[ri];if(!item){toast('找不到內容');return;}document.getElementById('m-view-ttl').textContent=item.title;const covH=item.coverSrc?`<div style="border-radius:9px;overflow:hidden;aspect-ratio:16/9;margin-bottom:14px;"><img src="${H(item.coverSrc)}" style="width:100%;height:100%;object-fit:cover;display:block;"/></div>`:'';const descH=item.desc?`<p style="font-size:13.5px;color:var(--ink2);line-height:1.65;margin:10px 0 0;">${H(item.desc)}</p>`:'';let actH='';if(isVid){actH=item.url?`<button class="btn pri" id="play-btn">▶ 播放影片</button>`:'<button class="btn" disabled style="opacity:.45;">尚未設定連結</button>';}else{actH=item.pdfSrc?`<button class="btn pri" id="dl-btn" data-ri="${ri}">⬇ 下載 PDF</button>`:'<button class="btn" disabled style="opacity:.45;">尚未上傳 PDF</button>';}document.getElementById('m-view-body').innerHTML=covH+descH+`<div style="margin-top:14px;">${actH}</div>`;if(isVid&&item.url){setTimeout(()=>{const btn=document.getElementById('play-btn');if(btn)btn.onclick=()=>{const u=normUrl(item.url);if(!/^https?:\/\//i.test(u)){toast('連結格式不正確');}else{window.open(u,'_blank','noopener');}closeM('m-view');};},0);}if(!isVid&&item.pdfSrc){setTimeout(()=>{const btn=document.getElementById('dl-btn');if(btn)btn.onclick=()=>dlPdf(ri);},0);}openM('m-view');}
+function dlPdf(ri){const item=knows[ri];if(!item?.pdfSrc)return;try{const b64=item.pdfSrc.split(',')[1];const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);const blob=new Blob([arr],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(item.pdfName||item.title||'doc').replace(/\.pdf$/i,'')+'.pdf';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000);toast('PDF 下載中…');}catch(e){window.open(item.pdfSrc,'_blank');}}
 
-function applyPtAv(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{pendingPtAvImg=ev.target.result;setAv(document.getElementById('p-av-disp'),pendingPtAvImg,patientSelf.initials);};r.readAsDataURL(f);}
+function applyPtAv(inp){const f=inp.files[0];inp.value='';readImg(f,256,src=>{pendingPtAvImg=src;setAv(document.getElementById('p-av-disp'),src,patientSelf.initials);},true);}
 function savePtAccount(){
-  const nm=document.getElementById('p-nm').value.trim()||patientSelf.name;
-  const newAcct=document.getElementById('p-acct')?.value.trim();
-  const newPwd=document.getElementById('p-pwd-new')?.value.trim();
-  const finalImg=pendingPtAvImg!==null?pendingPtAvImg:patientSelf.img;
+  const p=patients[PIDX];if(!p)return;
+  const nm=document.getElementById('p-nm').value.trim()||p.name;
+  const newAcct=document.getElementById('p-acct').value.trim();
+  const newPwd=document.getElementById('p-pwd-new').value.trim();
   // 帳號重複檢查
-  if(newAcct){
-    const dup=patients.findIndex((p,i)=>i!==PIDX&&p.acct===newAcct);
-    if(dup!==-1){toast('⚠️ 此帳號已被使用，請換一個');return;}
-  }
-  patientSelf.name=nm;patientSelf.initials=nm[0]||'?';patientSelf.img=finalImg;
-  patientImg=finalImg;pendingPtAvImg=null;
-  if(patients[PIDX]){
-    patients[PIDX].name=nm;patients[PIDX].av=nm[0]||'?';patients[PIDX].imgSrc=finalImg;
-    if(newAcct)patients[PIDX].acct=newAcct;
-    if(newPwd)patients[PIDX].pwd=newPwd;
-  }
-  setAv(document.getElementById('p-sb-av'),finalImg,nm[0]||'?');
-  const sn=document.getElementById('p-sb-nm');if(sn)sn.textContent=nm;
-  setAv(document.getElementById('p-av-disp'),finalImg,nm[0]||'?');
-  const gr=document.getElementById('p-greet');if(gr)gr.textContent='嗨，'+nm+' 👋';
-  // 清空欄位
-  const pa=document.getElementById('p-acct');if(pa)pa.value='';
-  const pp=document.getElementById('p-pwd-new');if(pp)pp.value='';
-  renderCL();syncChatHdr();renderMsgs();renderPt();renderOv();saveState();toast('已儲存');
+  if(newAcct&&patients.some((x,i)=>i!==PIDX&&x.acct===newAcct)){toast('⚠️ 此帳號已被使用，請換一個');return;}
+  p.name=nm;p.av=nm[0]||'?';
+  if(pendingPtAvImg!==null)p.imgSrc=pendingPtAvImg;
+  if(newAcct)p.acct=newAcct;
+  if(newPwd)p.pwd=newPwd;
+  pendingPtAvImg=null;
+  syncPatientUI();goP('pac'); // 側欄、問候語與本頁欄位都更新成儲存後的內容
+  syncChatHdr();renderPt();renderOv();toast('已儲存');
 }
 
-// ── CLOUDFLARE 雲端儲存（同源 Worker /api/state → KV）──
+// ── 雲端同步（同源 Worker /api/state → KV）──
 // 靜態頁面與 API 由同一個 Cloudflare Worker 提供，狀態 JSON 存於 KV（key: sky_state_v1）。
+// 治療師與個案各用各的裝置，所以不能「整份覆蓋」：
+//   1. 沒有變更就不寫入；寫入時附上自己手上的版本，雲端若已有別人的新版，就先取回、合併再寫。
+//   2. 定時（以及切回頁面、登入時）向雲端確認有沒有新版，有就合併進來並更新畫面。
+//   3. 每份資料都記下它是從哪些版本改來的（_sync.hist），合併時才找得到雙方共同的舊版本。
 const API_STATE='/api/state';
-let _lastSaved='',_saveTimer=null;
+const HIST_MAX=200;      // 版本來歷最多保留幾筆
+const PUSH_GAP=4000;     // 兩次上傳至少間隔（KV 同一筆資料每秒限寫一次，免費方案另有每日寫入上限）
+const DRAFT_WAIT=20000;  // 只改了「每日回報草稿」時，停手這麼久才上傳，節省寫入次數
+let _ver='0';                    // 目前雲端版本（'0'＝尚無版本號的舊資料，或雲端還沒有資料）
+let _baseVer='0',_baseJson='';   // 最近一次從雲端取回的版本與內容（合併時的共同基準）
+let _pushed=[];                  // 取回之後自己上傳過的版本 [{ver,json}]，新的在前
+let _hist=[];                    // 目前這份資料的版本來歷（含 _ver），新的在前
+let _syncP=null,_again=false,_wantPull=false,_flush=false,_needPull=false;
+let _touched=true,_lastCheck=0,_recheckAt=Infinity,_lastPoll=0,_lastPush=0,_lastAct=Date.now();
+let _pushFails=0,_nextPush=0,_tooBig='';
+window._cloudReady=false;
 
-async function fbGet(){
-  try{
-    const r=await fetch(API_STATE,{cache:'no-store'});
-    if(r.status===404)return null;
-    if(!r.ok){console.warn('fbGet HTTP error',r.status);return null;}
-    const t=await r.text();
-    return t||null;
-  }catch(e){console.warn('fbGet error',e);return null;}
-}
-async function fbSet(value){
-  if(!window._cloudReady){console.warn('阻止：雲端尚未就緒，不儲存');return;}
-  try{
-    const r=await fetch(API_STATE,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body:value
-    });
-    if(!r.ok)console.warn('fbSet HTTP error',r.status);
-    else console.log('fbSet OK');
-  }catch(e){console.warn('fbSet error',e);}
-}
-
-function snapshotState(){
-  return{
-    patients,tags,cats,mediaSubs,videos,knows,medRecords,notifications,
-    msgMap,annMap,tAlbumsMap,tNotesMap,pAlbumsMap,pNotesMap,
-    ptStats,rptDraftMap,frontState,therapistState,patientSelf
-  };
-}
-let _cloudReady=false;
-function saveState(){
-  if(!window._cloudReady)return;
-  if(_saveTimer)clearTimeout(_saveTimer);
-  _saveTimer=setTimeout(async()=>{
-    let json;
-    try{json=JSON.stringify(snapshotState());}catch(e){return;}
-    if(json===_lastSaved)return;
-    _lastSaved=json;
-    await fbSet(json);
-  },1500);
-}
-function _copyInto(target,src){if(!src||typeof src!=='object')return;Object.keys(target).forEach(k=>delete target[k]);Object.keys(src).forEach(k=>{target[k]=src[k];});}
-function _replaceArr(target,src){if(!Array.isArray(src))return;target.length=0;src.forEach(x=>target.push(x));}
-async function loadState(){
-  const raw = await fbGet();
-  if(!raw){console.warn('雲端無資料或讀取失敗');return false;}
-  let d;try{d=JSON.parse(raw);}catch(e){console.warn('解析失敗',e);return false;}
-  if(!d||typeof d!=='object')return false;
-  if(Array.isArray(d.patients))patients=d.patients;
-  if(Array.isArray(d.tags))tags=d.tags;
-  if(Array.isArray(d.cats))cats=d.cats;
-  if(Array.isArray(d.mediaSubs))mediaSubs=d.mediaSubs;
-  if(Array.isArray(d.videos))videos=d.videos;
-  if(Array.isArray(d.knows))knows=d.knows;
-  if(Array.isArray(d.medRecords))medRecords=d.medRecords;
-  if(Array.isArray(d.notifications))notifications=d.notifications;
-  if(d.msgMap&&typeof d.msgMap==='object')msgMap=d.msgMap;
-  if(d.annMap&&typeof d.annMap==='object')annMap=d.annMap;
-  _copyInto(tAlbumsMap,d.tAlbumsMap);
-  _copyInto(tNotesMap,d.tNotesMap);
-  _copyInto(pAlbumsMap,d.pAlbumsMap);
-  _copyInto(pNotesMap,d.pNotesMap);
+function liveState(){return{patients,tags,cats,mediaSubs,videos,knows,medRecords,notifications,msgMap,annMap,tAlbumsMap,tNotesMap,pAlbumsMap,pNotesMap,ptStats,rptDraftMap,frontState,therapistState};}
+function snapshotState(){return canonState(liveState());}
+const serverJson=()=>_pushed.length?_pushed[0].json:_baseJson; // 我們認為雲端目前的內容
+function _copyInto(target,src){if(target===src)return;Object.keys(target).forEach(k=>delete target[k]);Object.keys(src||{}).forEach(k=>{target[k]=src[k];});}
+function _replaceArr(target,src){if(target===src)return;const a=[...(src||[])];target.length=0;a.forEach(x=>target.push(x));}
+// 把一份完整資料套用到程式的全域狀態
+function applyStateData(d){
+  prepState(d);
+  patients=d.patients;tags=d.tags;cats=d.cats;mediaSubs=d.mediaSubs;videos=d.videos;knows=d.knows;
+  medRecords=d.medRecords;notifications=d.notifications;msgMap=d.msgMap;annMap=d.annMap;
+  _copyInto(tAlbumsMap,d.tAlbumsMap);_copyInto(tNotesMap,d.tNotesMap);_copyInto(pAlbumsMap,d.pAlbumsMap);_copyInto(pNotesMap,d.pNotesMap);_copyInto(rptDraftMap,d.rptDraftMap);
   _replaceArr(ptStats,d.ptStats);
-  if(d.rptDraftMap)Object.assign(rptDraftMap,d.rptDraftMap);
-  else if(d.rptDraft)rptDraftMap[0]=d.rptDraft; // 舊版資料相容
-  if(d.frontState)Object.assign(frontState,d.frontState);
-  if(!frontState.logoSrc)frontState.logoSrc='logo.png';
-  if(d.therapistState)Object.assign(therapistState,d.therapistState);
-  if(!therapistState.acct)therapistState.acct='test';
-  if(!therapistState.pwd)therapistState.pwd='test';
-  patients.forEach(p=>{if(!p.pwd)p.pwd=p.acct;if(!p.acct)p.acct='patient';});
-  if(d.patientSelf)Object.assign(patientSelf,d.patientSelf);
+  _copyInto(frontState,d.frontState);_copyInto(therapistState,d.therapistState);
   therapistImg=therapistState.img||'';
-  patientImg=patientSelf.img||'';
-  console.log('雲端資料載入成功');
+}
+
+async function apiGet(have){
+  try{
+    const r=await fetch(API_STATE,{cache:'no-store',headers:have&&have!=='0'?{'X-Sky-Have':have}:{}});
+    if(r.status===204)return{st:'same'};
+    if(r.status===404)return{st:'empty'};
+    if(!r.ok)return{st:'error',code:r.status};
+    const ver=r.headers.get('X-Sky-Version')||'0';
+    // 偶爾會讀到尚未更新的舊快取（版本已在我們的來歷裡）→ 視同沒有新資料
+    if(have&&ver!=='0'&&ver!==_ver&&_hist.includes(ver)){try{r.body&&r.body.cancel();}catch(e){}return{st:'same'};}
+    return{st:'ok',ver,text:await r.text()};
+  }catch(e){return{st:'error'};}
+}
+async function apiPut(body,newVer){
+  try{
+    const r=await fetch(API_STATE,{method:'PUT',headers:{'Content-Type':'application/json','X-Sky-Base':_ver,'X-Sky-Version':newVer},body,keepalive:body.length<20000});
+    if(r.ok){
+      // 一定要收到 Worker 的明確回覆才算成功（有些網路會用自己的頁面回 200）；ok:false＝雲端已有別人的新版本
+      const j=await r.json().catch(()=>null);
+      return{st:j&&j.ok===true?'ok':j&&j.conflict?'conflict':'error'};
+    }
+    return{st:r.status===412?'conflict':r.status===413?'toobig':'error',code:r.status};
+  }catch(e){return{st:'error'};}
+}
+function parseRemote(text){
+  let d;try{d=JSON.parse(text);}catch(e){return null;}
+  if(!isObj(d)||!Array.isArray(d.patients))return null;
+  const hist=d._sync&&Array.isArray(d._sync.hist)?d._sync.hist.filter(x=>typeof x==='string'):[];
+  delete d._sync;
+  return{d:prepState(d),hist};
+}
+// 開啟頁面時的第一次載入：成功之前不開放儲存
+async function firstLoad(){
+  for(let n=0;;n++){
+    const res=await apiGet('');
+    if(res.st==='empty'){_ver=_baseVer='0';_hist=[];_baseJson='';return;} // 雲端尚無資料 → 稍後以目前的預設資料建立
+    const p=res.st==='ok'?parseRemote(res.text):null;
+    if(p){
+      applyStateData(p.d);
+      _ver=_baseVer=res.ver;_hist=[res.ver,...p.hist].slice(0,HIST_MAX);_pushed=[];
+      _baseJson=JSON.stringify(snapshotState());
+      return;
+    }
+    // 讀取失敗或內容無法辨識：絕不能當成「沒有資料」而用預設資料蓋掉雲端，只能等待重試
+    toast(res.st==='ok'?'⚠️ 雲端資料格式異常，已暫停儲存以免覆蓋':'⚠️ 無法連線到雲端，重試中…');
+    await new Promise(r=>setTimeout(r,Math.min(15000,2000*(n+1))));
+  }
+}
+// 取回雲端新版並合併進本機。回傳 false＝讀取失敗
+async function pullRemote(){
+  const res=await apiGet(_ver);
+  if(res.st==='error')return false;
+  _lastPoll=Date.now();
+  if(res.st==='same')return true;
+  if(res.st==='empty'){_ver=_baseVer='0';_baseJson='';_pushed=[];_hist=[];_touched=true;return true;} // 雲端被清空 → 以本機資料重建
+  const p=parseRemote(res.text);if(!p)return false;
+  const anc=new Set([res.ver,...p.hist]);            // 雲端這一版的來歷
+  const cur=JSON.stringify(snapshotState());
+  const rJson=JSON.stringify(canonState(p.d));
+  const keep={a:patients[activeCI]?.id,s:patients[selPtIdx]?.id,m:patients[mrPtIdx]?.id};
+  const seen=_pushed.find(x=>anc.has(x.ver));        // 對方是從我們哪一次上傳的內容改來的
+  if(cur===serverJson()&&(!_pushed.length||seen===_pushed[0])){
+    applyStateData(p.d);                             // 本機沒有未上傳的變更 → 直接採用雲端版本
+    _hist=[...anc].slice(0,HIST_MAX);
+  }else{
+    // 以雙方共同的舊版本做三方合併；對方若不是從我們看過的版本改來的，只接收它新增的內容
+    const additive=!seen&&!anc.has(_baseVer);
+    applyStateData(mergeStates(JSON.parse((seen?seen.json:_baseJson)||'{}'),JSON.parse(cur),p.d,additive));
+    _hist=[...new Set([...anc,..._hist])].slice(0,HIST_MAX);
+    _touched=true;
+  }
+  _ver=_baseVer=res.ver;_baseJson=rJson;_pushed=[];
+  afterRemoteApply(keep);
   return true;
 }
-function applyRestoredUI(){
-  // 治療師身分
-  const tnm=document.getElementById('t-nm');if(tnm)tnm.textContent=therapistState.name;
-  const tttl=document.getElementById('t-ttl');if(tttl)tttl.textContent=therapistState.title;
-  setAv(document.getElementById('t-av'),therapistState.img,(therapistState.name[0]||'?'));
-  setAv(document.getElementById('st-av'),therapistState.img,(therapistState.name[0]||'?'));
-  setAv(document.getElementById('p-chat-t-av'),therapistState.img,(therapistState.name[0]||'?'));
-  const pcn=document.getElementById('p-chat-t-nm');if(pcn)pcn.textContent=therapistState.name+' 治療師';
-  const stnm=document.getElementById('st-nm');if(stnm)stnm.value=therapistState.name;
-  const stttl=document.getElementById('st-ttl');if(stttl)stttl.value=therapistState.title;
-  const stacct=document.getElementById('st-acct');if(stacct)stacct.value=therapistState.acct;
-  const stpwd=document.getElementById('st-pwd-new');if(stpwd)stpwd.value='';
-  // 前台外觀
-  const ft=document.getElementById('front-title');if(ft)ft.textContent=frontState.title;
-  const fsub=document.getElementById('front-sub');if(fsub)fsub.textContent=frontState.sub;
-  ['t-sb-name','p-sb-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=frontState.title;});
-  ['front-logo','t-sb-logo','p-sb-logo','st-logo'].forEach(id=>setLogoEl(document.getElementById(id),frontState.logoSrc));
-  document.title=frontState.title;
-  syncFrontInputs();
-  // 個案身分
-  syncPatientUI();
+// 套用雲端資料後：個案可能被排序或刪除，依 id 找回原本選取的對象，再重畫畫面
+function afterRemoteApply(keep){
+  const at=id=>Math.max(0,patients.findIndex(p=>p.id===id));
+  activeCI=at(keep.a);selPtIdx=at(keep.s);mrPtIdx=at(keep.m);
+  ptTagFilter=ptTagFilter.filter(i=>i<tags.length);
+  if(LOGGED&&ROLE==='patient'){
+    const i=patients.findIndex(p=>p.id===myPid);
+    if(i<0){logout();renderAll();toast('此帳號已被移除，請聯絡治療師');return;}
+    PIDX=i;
+  }else if(PIDX>=patients.length)PIDX=0;
+  renderAll();markSeen();
 }
-// 自動儲存：定時 + 進入背景 / 關閉前
-setInterval(saveState,8000);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
-window.addEventListener('pagehide',saveState);
-window.addEventListener('beforeunload',saveState);
+// 視窗或右鍵選單開著時先不套用雲端更新，以免操作到一半資料被換掉
+const uiBusy=()=>!!document.querySelector('.mbg.on,#ctx-menu.on');
+// 多久向雲端確認一次：操作中較頻繁，閒置越久越少（節省免費方案的讀取額度）
+function pollEvery(){const idle=Date.now()-_lastAct;return!LOGGED?60000:idle<120000?8000:idle<600000?20000:60000;}
+// 與雲端的差異是否只有「每日回報草稿」（個案填表過程不必每按一下就上傳）
+function draftOnly(cur){
+  const srv=serverJson();if(!srv||_ver==='0')return false;
+  const cut=j=>{const a=j.lastIndexOf('"rptDraftMap":'),b=j.indexOf(',"frontState":',a);return a<0||b<0?null:j.slice(0,a)+j.slice(b);};
+  const x=cut(cur);return x!==null&&x===cut(srv);
+}
+async function syncLoop(){
+  for(let round=0;round<6;round++){
+    // 1) 取回雲端新版（上傳被拒、有人要求、或到了確認時間）
+    if((_needPull||_wantPull||Date.now()-_lastPoll>=pollEvery())&&!uiBusy()){
+      _wantPull=false;
+      if(!await pullRemote())return;
+      _needPull=false;
+    }
+    if(_needPull)return; // 上傳被拒但視窗開著不能合併，等關閉後再處理
+    // 2) 本機有變更就上傳
+    const now=Date.now();
+    if(now<_nextPush)return;
+    if(!(_flush||_touched||now>=_recheckAt||now-_lastCheck>12000||_ver==='0'))return;
+    _touched=false;_lastCheck=now;_recheckAt=Infinity;
+    const cur=JSON.stringify(snapshotState());
+    if((cur===serverJson()&&_ver!=='0')||cur===_tooBig)return;
+    if(!_flush){
+      const wait=draftOnly(cur)?_lastAct+DRAFT_WAIT-now:_lastPush+PUSH_GAP-now;
+      if(wait>0){_recheckAt=now+wait;return;}
+    }
+    const ver=uid();
+    const res=await apiPut(cur.slice(0,-1)+',"_sync":'+JSON.stringify({hist:_hist.slice(0,HIST_MAX)})+'}',ver);
+    if(res.st==='ok'){
+      // 保留最近幾次上傳的內容當合併基準；資料很大時只留最新一份以節省記憶體
+      _pushed.unshift({ver,json:cur});
+      let size=0;_pushed=_pushed.filter((x,i)=>i===0||(i<8&&(size+=x.json.length)<6e6));
+      _ver=ver;_hist=[ver,..._hist].slice(0,HIST_MAX);_lastPush=Date.now();
+      if(_pushFails>=3)toast('雲端同步已恢復','check');
+      _pushFails=0;_nextPush=0;_tooBig='';
+      return;
+    }
+    _touched=true;
+    if(res.st==='conflict'){_needPull=true;continue;} // 雲端已有別人的新版本 → 取回合併後再上傳
+    if(res.st==='toobig'){_tooBig=cur;toast('⚠️ 資料量超過雲端上限（約 24 MB），請刪除部分照片或 PDF');return;}
+    _pushFails++;_nextPush=Date.now()+Math.min(30000,2000*_pushFails);
+    if(_pushFails===3)toast('⚠️ 雲端儲存失敗，系統會自動重試，請確認網路連線');
+    return;
+  }
+}
+// pull：順便向雲端確認有沒有新版；flush：有變更就立刻上傳，不等待
+function syncNow(pull,flush){
+  if(pull)_wantPull=true;
+  if(flush)_flush=true;
+  if(!window._cloudReady)return Promise.resolve();
+  if(_syncP){if(pull||flush)_again=true;return _syncP;}
+  _syncP=syncLoop().catch(e=>console.warn('sync error',e)).then(()=>{_syncP=null;if(_again){_again=false;return syncNow();}_flush=false;});
+  return _syncP;
+}
+['pointerdown','click','keydown','input','change'].forEach(t=>document.addEventListener(t,()=>{_touched=true;_lastAct=Date.now();},{capture:true,passive:true}));
+setInterval(()=>{if(!document.hidden)syncNow();},1500);
+// 切回頁面／視窗取得焦點／恢復連線時馬上確認一次（剛確認過就不重複）
+const softPull=()=>{if(Date.now()-_lastPoll>2500)syncNow(true);};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)syncNow(false,true);else{_lastAct=Date.now();softPull();}});
+window.addEventListener('pagehide',()=>syncNow(false,true));
+window.addEventListener('focus',softPull);
+window.addEventListener('online',softPull);
+window.addEventListener('beforeunload',e=>{
+  if(!window._cloudReady)return;
+  const cur=JSON.stringify(snapshotState());
+  if(cur===serverJson())return;
+  syncNow(false,true);
+  if(!draftOnly(cur)){e.preventDefault();e.returnValue='';} // 還有變更沒上傳完 → 請瀏覽器提醒使用者先別離開
+});
+
+// 依目前資料重畫整個畫面（各清單只有內容不同時才會真的更新）
+function renderAll(){
+  applyBrandUI();
+  renderPt();renderCL();syncChatHdr();renderMsgs();renderAnn('t-ann','t-ann-cnt',false,activeCI);
+  renderAlbums('t');renderNotes('t');
+  renderVideos(curVidFilter);renderKnows(curKnFilter);renderTagList();renderCatList();
+  if(document.getElementById('tag-fp')?.classList.contains('on'))renderTagFpOpts();
+  renderOv();renderTracking();renderMedRecords();renderNotifPanel();updUnread();
+  if(patients[PIDX]){syncPatientUI();renderPMsgs();renderPAnn();renderAlbums('p');renderNotes('p');renderLearn();renderPHomeRec();renderPMr();initDailyRpt();syncHomeStats();}
+  updPtUnread();
+}
 
 // ── INIT ──
-document.getElementById('login').classList.add('on');
-setLogoEl(document.getElementById('front-logo'),frontState.logoSrc);
 let pressT,pressCx=0,pressCy=0;
-window._cloudReady=false;
+document.getElementById('login').classList.add('on');
+// 手機版：在治療師聊天標頭加上返回鍵（對話 → 聯絡人清單）
+(function(){
+  const hdr=document.querySelector('#t-app .chat-hdr');
+  if(!hdr||hdr.querySelector('.chat-back'))return;
+  const b=document.createElement('button');
+  b.className='chat-back';b.type='button';b.onclick=chatBack;
+  b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+  hdr.insertBefore(b,hdr.firstChild);
+})();
+syncSettingsInputs();renderAll(); // 先以預設資料畫出畫面
 (async()=>{
   toast('載入雲端資料中…');
-  const ok=await loadState();
-  applyRestoredUI();
-  renderPt();
-  renderCL();
-  renderMsgs();
-  renderPMsgs();
-  renderAlbums('t');
-  renderNotes('t');
-  renderVideos();
-  renderKnows();
-  renderTagList();
-  renderCatList();
-  renderLearn();
-  renderPHomeRec();
-  renderOv();
-  updUnread();
-  renderAnn('t-ann','t-ann-cnt',false,activeCI);
-  renderPAnn();
-  updFrontPrev();
-  initDailyRpt();
-  _cloudReady=true;
-  window._cloudReady=true;
+  await firstLoad();
+  try{syncSettingsInputs();renderAll();}catch(e){console.error(e);}
+  window._cloudReady=true; // 資料已載入就要開放儲存；即使畫面某處出錯也不能卡住，否則之後的修改永遠存不進雲端
   toast('雲端資料載入完成','check');
+  syncNow();
 })();
-renderPt();
-renderCL();
-renderMsgs();
-renderPMsgs();
-renderAlbums('t');
-renderNotes('t');
-renderVideos();
-renderKnows();
-renderTagList();
-renderCatList();
-renderLearn();
-renderPHomeRec();
-renderOv();
-updUnread();
-renderAnn('t-ann','t-ann-cnt',false,activeCI);
-renderPAnn();
-updFrontPrev();
-initDailyRpt();
 
 // ── 備份匯出 / 匯入 ──
 function exportBackup(){
@@ -2142,66 +2589,29 @@ function exportBackup(){
 }
 function triggerImport(){document.getElementById('import-file-inp').click();}
 function importBackup(inp){
-  const f=inp.files[0];if(!f)return;
+  const f=inp.files[0];inp.value='';if(!f)return;
   const r=new FileReader();
   r.onload=ev=>{
     let d;try{d=JSON.parse(ev.target.result);}catch(e){toast('❌ 檔案格式錯誤');return;}
-    if(!d||!Array.isArray(d.patients)){toast('❌ 不是有效的備份檔');return;}
+    if(!isObj(d)||!Array.isArray(d.patients)){toast('❌ 不是有效的備份檔');return;}
     skyConfirm('匯入備份將覆蓋目前所有資料，確定繼續？',ok=>{
       if(!ok)return;
-      if(Array.isArray(d.patients))patients=d.patients;
-      if(Array.isArray(d.tags))tags=d.tags;
-      if(Array.isArray(d.cats))cats=d.cats;
-      if(Array.isArray(d.mediaSubs))mediaSubs=d.mediaSubs;
-      if(Array.isArray(d.videos))videos=d.videos;
-      if(Array.isArray(d.knows))knows=d.knows;
-      if(Array.isArray(d.medRecords))medRecords=d.medRecords;
-      if(Array.isArray(d.notifications))notifications=d.notifications;
-      if(d.msgMap)msgMap=d.msgMap;
-      if(d.annMap)annMap=d.annMap;
-      _copyInto(tAlbumsMap,d.tAlbumsMap);
-      _copyInto(tNotesMap,d.tNotesMap);
-      _copyInto(pAlbumsMap,d.pAlbumsMap);
-      _copyInto(pNotesMap,d.pNotesMap);
-      _replaceArr(ptStats,d.ptStats);
-      if(d.rptDraft)Object.assign(rptDraft,d.rptDraft);
-      if(d.frontState)Object.assign(frontState,d.frontState);
-      if(d.therapistState)Object.assign(therapistState,d.therapistState);
-      if(d.patientSelf)Object.assign(patientSelf,d.patientSelf);
-      therapistImg=therapistState.img||'';
-      patientImg=patientSelf.img||'';
-      applyRestoredUI();
-      renderPt();renderCL();renderMsgs();renderPMsgs();
-      renderVideos();renderKnows();renderTagList();renderCatList();
-      renderLearn();renderPHomeRec();renderOv();updUnread();
-      renderAnn('t-ann','t-ann-cnt',false,activeCI);renderPAnn();
-      updFrontPrev();initDailyRpt();
-      saveState();
+      delete d._sync;
+      // 舊備份缺少的區塊沿用目前資料
+      const cur=liveState();
+      ['tags','cats','mediaSubs','videos','knows','medRecords','notifications','frontState','therapistState'].forEach(k=>{if(d[k]==null)d[k]=cur[k];});
+      // 匯入的個案一律視為新個案（重新給 id），以免和雲端上現有的個案資料混在一起
+      d.patients.forEach((p,i)=>{if(isObj(p))p.id='p'+uid()+i;});
+      applyStateData(d);
+      activeCI=selPtIdx=mrPtIdx=0;if(PIDX>=patients.length)PIDX=0;
+      syncSettingsInputs();renderAll();
       toast('備份匯入成功','check');
-    });
+    },'匯入備份','確認匯入');
   };
   r.readAsText(f);
-  inp.value='';
 }
 
-// ── iOS 底部分頁列 / 更多選單 / 聊天返回 ──
-(function(){
-  const _doLogin=doLogin,_logout=logout,_selectContact=selectContact,_goT=goT,_updUnread=updUnread;
-  logout=function(){_logout();document.body.className='';closeMore();closePMore();};
-  selectContact=function(i){_selectContact(i);document.querySelector('#t-app .chat-wrap')?.classList.add('show-chat');};
-  goT=function(v){_goT(v);if(v==='ch')document.querySelector('#t-app .chat-wrap')?.classList.remove('show-chat');};
-  updUnread=function(){_updUnread();const t=patients.reduce((s,p)=>s+(p.unread||0),0);const mb=document.getElementById('mt-unread');if(mb){mb.textContent=t;mb.style.display=t?'':'none';}};
-  // 初始化個案端未讀
-  updPtUnread();
-  // 在治療師聊天標頭注入返回鍵
-  const hdr=document.querySelector('#t-app .chat-hdr');
-  if(hdr&&!hdr.querySelector('.chat-back')){
-    const b=document.createElement('button');
-    b.className='chat-back';b.type='button';b.onclick=chatBack;
-    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
-    hdr.insertBefore(b,hdr.firstChild);
-  }
-})();
+// ── 手機版：更多選單 / 聊天返回 ──
 function openMore(){document.getElementById('t-more-bg').classList.add('on');}
 function closeMore(ev){if(ev&&ev.target!==document.getElementById('t-more-bg'))return;document.getElementById('t-more-bg').classList.remove('on');}
 function goMore(v){document.getElementById('t-more-bg').classList.remove('on');goT(v);}
