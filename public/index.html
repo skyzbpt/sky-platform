@@ -64,6 +64,7 @@ input,textarea,select{font-family:inherit;color:var(--ink);font-size:14px;}
 .l-submit{width:100%;padding:12px;background:var(--blue);color:#fff;border-radius:var(--r);font-size:14px;font-weight:500;margin-top:8px;transition:opacity .2s;}
 .l-submit:hover{opacity:.85;}
 .l-foot{text-align:center;font-size:11px;color:var(--ink3);margin-top:16px;}
+.l-note{font-size:12.5px;line-height:1.65;color:var(--blue-dark);background:var(--blue-bg);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;margin-bottom:14px;}
 
 /* APP */
 .app{display:grid;grid-template-columns:216px 1fr;height:100vh;height:100dvh;overflow:hidden;transition:grid-template-columns .22s cubic-bezier(.4,0,.2,1);}
@@ -612,6 +613,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
       <div class="l-tab on" onclick="pickRole('therapist')">治療師</div>
       <div class="l-tab" onclick="pickRole('patient')">個案</div>
     </div>
+    <div class="l-note" id="l-note" style="display:none;"></div>
     <div class="fld"><label>帳號</label><div class="fld-w"><input type="text" id="l-acct" placeholder="帳號" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/></div></div>
     <div class="fld"><label>密碼</label>
       <div class="fld-w">
@@ -831,7 +833,8 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
               <div class="fg"><label>名稱</label><input type="text" id="st-nm" value="測試"/></div>
               <div class="fg"><label>職稱</label><input type="text" id="st-ttl" value="物理治療師"/></div>
               <div class="fg"><label>帳號</label><input type="text" id="st-acct"/></div>
-              <div class="fg"><label>新密碼</label><input type="password" id="st-pwd-new" placeholder="留空不更改"/></div>
+              <div class="fg"><label>新密碼</label><input type="password" id="st-pwd-new" placeholder="留空不更改（至少 6 個字元）" autocomplete="new-password"/></div>
+              <div class="fg"><label>目前密碼（更改帳號或密碼時需要）</label><input type="password" id="st-pwd-cur" autocomplete="current-password"/></div>
               <div style="display:flex;justify-content:flex-end;"><button class="btn pri" onclick="saveTherapist()">儲存</button></div>
             </div></div>
           <div class="card"><div class="card-h"><h3>前台外觀</h3></div>
@@ -844,7 +847,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
             </div></div>
           <div class="card"><div class="card-h"><h3>資料備份</h3></div>
             <div class="card-b" style="display:flex;flex-direction:column;gap:13px;">
-              <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;">匯出目前所有資料（個案、對話、病歷、衛教內容）成備份檔；匯入備份會覆蓋目前所有資料。</div>
+              <div style="font-size:12.5px;color:var(--ink3);line-height:1.6;">匯出目前所有資料（個案、對話、病歷、衛教內容）成備份檔；匯入備份會覆蓋目前所有資料。備份檔不含密碼，請妥善保管。</div>
               <div style="display:flex;gap:7px;flex-wrap:wrap;"><button class="btn" onclick="exportBackup()">匯出備份</button><button class="btn" onclick="triggerImport()">匯入備份</button></div>
             </div></div>
         </div>
@@ -990,7 +993,8 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
         <div class="fg"><label>頭像</label><div class="av-row"><div class="av lg" id="p-av-disp">測</div><label class="btn" for="p-av-inp" style="cursor:pointer;">更換<input type="file" id="p-av-inp" accept="image/*" style="position:absolute;width:0;height:0;opacity:0;" onchange="applyPtAv(this)"/></label></div></div>
         <div class="fg"><label>名稱</label><input type="text" id="p-nm" value="測試"/></div>
         <div class="fg"><label>帳號</label><input type="text" id="p-acct" placeholder="留空不更改"/></div>
-        <div class="fg"><label>新密碼</label><input type="password" id="p-pwd-new" placeholder="留空不更改"/></div>
+        <div class="fg"><label>新密碼</label><input type="password" id="p-pwd-new" placeholder="留空不更改（至少 6 個字元）" autocomplete="new-password"/></div>
+        <div class="fg"><label>目前密碼（更改帳號或密碼時需要）</label><input type="password" id="p-pwd-cur" autocomplete="current-password"/></div>
         <div style="display:flex;justify-content:flex-end;"><button class="btn pri" onclick="savePtAccount()">儲存</button></div>
       </div></div></div>
     </div>
@@ -1004,7 +1008,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
   <div class="mb" style="display:flex;flex-direction:column;gap:13px;">
     <div class="fg" style="margin:0;"><label>頭像</label><div class="av-row"><div class="av lg" id="m-av">?</div><label class="btn" for="m-av-inp" style="cursor:pointer;">選擇<input type="file" id="m-av-inp" accept="image/*" style="position:absolute;width:0;height:0;opacity:0;" onchange="prevAv(this,'m-av','ptmodal')"/></label></div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;"><div class="fg" style="margin:0;"><label>姓名</label><input type="text" id="m-pt-nm"/></div><div class="fg" style="margin:0;"><label>性別</label><select id="m-pt-sex"><option>女</option><option>男</option><option>其他</option></select></div></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;"><div class="fg" style="margin:0;"><label>帳號</label><input type="text" id="m-pt-acct"/></div><div class="fg" style="margin:0;"><label>密碼</label><input type="password" id="m-pt-pwd"/></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;"><div class="fg" style="margin:0;"><label>帳號</label><input type="text" id="m-pt-acct"/></div><div class="fg" style="margin:0;"><label>密碼</label><input type="password" id="m-pt-pwd" autocomplete="new-password"/></div></div>
     <div class="fg" style="margin:0;"><label>標籤</label><div style="display:flex;flex-wrap:wrap;gap:5px;padding:7px;border:1px solid var(--border);border-radius:7px;background:var(--bg);min-height:36px;margin-bottom:7px;" id="m-pt-tags"></div><div style="display:flex;flex-wrap:wrap;gap:5px;" id="m-pt-tag-opts"></div></div>
     <div class="fg" style="margin:0;"><label>備註</label><textarea rows="3" id="m-pt-note"></textarea></div>
   </div>
@@ -1096,6 +1100,8 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
 
 <div class="mbg" id="m-img-prev"><div class="modal sm"><div class="mh"><h3>傳送圖片</h3><button class="ibt" onclick="cancelImg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="mb" style="text-align:center;"><img id="m-img-prev-el" style="max-width:100%;max-height:48vh;border-radius:8px;display:block;margin:0 auto;"/><small id="m-img-prev-name" style="display:block;margin-top:7px;font-size:12px;color:var(--ink3);"></small></div><div class="mf"><button class="btn" onclick="cancelImg()">取消</button><button class="btn pri" onclick="confirmImg()">傳送</button></div></div></div>
 
+<div class="mbg" id="m-upg"><div class="modal sm"><div class="mh"><h3>資料升級</h3></div><div class="mb"><p id="m-upg-msg" style="font-size:13.5px;color:var(--ink2);line-height:1.7;white-space:pre-line;"></p></div><div class="mf" id="m-upg-btns"><button class="btn" id="m-upg-no">稍後再說</button><button class="btn pri" id="m-upg-go">開始升級</button></div></div></div>
+
 <div class="mbg" id="m-confirm"><div class="modal sm"><div class="mh"><h3 id="m-confirm-ttl">確認</h3></div><div class="mb"><p id="m-confirm-msg" style="font-size:13.5px;color:var(--ink2);line-height:1.6;"></p></div><div class="mf"><button class="btn" onclick="closeM('m-confirm');_confCb(false)">取消</button><button class="btn" id="m-confirm-ok" style="background:var(--red);color:#fff;border-color:var(--red);" onclick="closeM('m-confirm');_confCb(true)">確認刪除</button></div></div></div>
 
 <div class="mbg" id="m-prompt"><div class="modal sm"><div class="mh"><h3 id="m-prompt-ttl">輸入</h3></div><div class="mb"><input type="text" id="m-prompt-inp" style="width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:7px;background:var(--bg);font-size:14px;" onkeydown="if(event.key==='Enter'){closeM('m-prompt');_promptCb(this.value);}"/></div><div class="mf"><button class="btn" onclick="closeM('m-prompt');_promptCb(null)">取消</button><button class="btn pri" onclick="closeM('m-prompt');_promptCb(document.getElementById('m-prompt-inp').value)">確認</button></div></div></div>
@@ -1175,7 +1181,7 @@ const ICO_OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 function toast(msg,icon){const t=document.getElementById('toast');t.innerHTML='';if(icon&&TOAST_ICONS[icon]){const ic=document.createElement('span');ic.className='toast-ico';ic.innerHTML=TOAST_ICONS[icon];t.appendChild(ic);}const sp=document.createElement('span');sp.textContent=msg;t.appendChild(sp);t.classList.add('show');clearTimeout(t._tt);t._tt=setTimeout(()=>t.classList.remove('show'),2200);}
 function openM(id){document.getElementById(id).classList.add('on');}
 function closeM(id){document.getElementById(id).classList.remove('on');}
-document.querySelectorAll('.mbg').forEach(b=>b.addEventListener('click',ev=>{if(ev.target===b)b.classList.remove('on');}));
+document.querySelectorAll('.mbg').forEach(b=>b.addEventListener('click',ev=>{if(ev.target===b&&b.id!=='m-upg')b.classList.remove('on');}));
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function fmtNow(){const n=new Date();return pad(n.getHours())+':'+pad(n.getMinutes());}
 function dstr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
@@ -1216,6 +1222,8 @@ function viewImg(src){if(!src)return;const bg=document.createElement('div');bg.s
 // ── 資料格式與合併（純函式，不碰畫面與全域狀態）──
 function newStat(){return{weekRate:0,trend:'+0%',rates:[0,0,0,0,0,0,0],vas:[0,0,0,0,0,0,0],logs:[],lastVas:0};}
 const isObj=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
+const arr=v=>Array.isArray(v)?v:[];
+const str=(v,max)=>typeof v==='string'?(max&&v.length>max?v.slice(0,max):v):'';
 // 與 key 順序無關的序列化，用來比較兩份資料是否相同
 function stable(x){
   if(x===null||typeof x!=='object')return x===undefined?'null':JSON.stringify(x);
@@ -1224,16 +1232,17 @@ function stable(x){
 }
 const eq=(a,b)=>a===b||stable(a)===stable(b);
 
-// 補齊欄位；確保每位個案都有不重複的 id（舊資料依位置給固定 id，各裝置算出來會一致）
+// 補齊欄位；確保每位個案都有不重複的 id（舊資料依位置給固定 id，各裝置算出來會一致）。
+// 帳號密碼不在這份資料裡：密碼只存在伺服器（雜湊），這裡的 acct 只是顯示用。
 function prepState(d){
-  if(!Array.isArray(d.patients))d.patients=[];
+  d.patients=arr(d.patients).map(p=>isObj(p)?p:{});
   const used=new Set();
-  d.patients.forEach(p=>{if(p.id&&!used.has(p.id))used.add(p.id);else p.id='';});
+  d.patients.forEach(p=>{if(typeof p.id==='string'&&p.id&&!used.has(p.id))used.add(p.id);else p.id='';});
   d.patients.forEach((p,i)=>{
     if(!p.id){let k=i;while(used.has('L'+k))k++;p.id='L'+k;used.add(p.id);}
-    if(p.name==null)p.name='';
-    if(!p.acct)p.acct='patient';
-    if(!p.pwd)p.pwd=p.acct;
+    if(typeof p.name!=='string')p.name=p.name==null?'':String(p.name);
+    if(typeof p.acct!=='string')p.acct=p.acct==null?'':String(p.acct);
+    delete p.pwd;
     if(!p.av)p.av=p.name[0]||'?';
     ['tags','assignedVids','assignedKnows'].forEach(k=>{if(!Array.isArray(p[k]))p[k]=[];});
     if(typeof p.unread!=='number')p.unread=0;
@@ -1247,24 +1256,29 @@ function prepState(d){
   d.ptStats=d.patients.map((_,i)=>{const s=isObj(st[i])?st[i]:newStat();if(!Array.isArray(s.logs))s.logs=[];return s;});
   d.frontState=Object.assign({title:'sky 衛教平台',sub:'Physiotherapy Platform',logoSrc:'logo.png'},isObj(d.frontState)?d.frontState:{});
   delete d.frontState._savedLogo;
+  ['title','sub','logoSrc'].forEach(k=>{if(typeof d.frontState[k]!=='string')d.frontState[k]='';});
   if(!d.frontState.logoSrc)d.frontState.logoSrc='logo.png';
-  d.therapistState=Object.assign({name:'測試',title:'物理治療師',initials:'測',img:'',acct:'test',pwd:'test'},isObj(d.therapistState)?d.therapistState:{});
-  ['acct','pwd'].forEach(k=>{if(!d.therapistState[k])d.therapistState[k]='test';});
+  d.therapistState=Object.assign({name:'測試',title:'物理治療師',initials:'測',img:'',acct:''},isObj(d.therapistState)?d.therapistState:{});
+  delete d.therapistState.pwd;
+  ['name','title','initials','img','acct'].forEach(k=>{if(typeof d.therapistState[k]!=='string')d.therapistState[k]='';});
+  d.ntf=Object.assign({clr:0,read:0},isObj(d.ntf)?d.ntf:{});
   return d;
 }
-// 存檔用的標準格式：略過空陣列與空白草稿，「只看不改」就不會被當成有變更
+// 匯出備份用的標準格式：略過空陣列與空白草稿
 function canonState(s){
   const n=s.patients.length;
   const cm=m=>{const o={};Object.keys(m||{}).forEach(k=>{if(+k<n&&Array.isArray(m[k])&&m[k].length)o[k]=m[k];});return o;};
   const rd={};
-  Object.keys(s.rptDraftMap||{}).forEach(k=>{const d=s.rptDraftMap[k];if(+k<n&&d&&(d.submitted||d.saved||d.note||d.vas||Object.values(d.exercises||{}).some(Boolean)))rd[k]=d;});
+  Object.keys(s.rptDraftMap||{}).forEach(k=>{const d=s.rptDraftMap[k];if(+k<n&&keepRpt(d))rd[k]=d;});
   return{patients:s.patients,tags:s.tags,cats:s.cats,mediaSubs:s.mediaSubs,videos:s.videos,knows:s.knows,
-    medRecords:s.medRecords,notifications:s.notifications,
+    medRecords:s.medRecords,ntf:s.ntf,
     msgMap:cm(s.msgMap),annMap:cm(s.annMap),tAlbumsMap:cm(s.tAlbumsMap),tNotesMap:cm(s.tNotesMap),pAlbumsMap:cm(s.pAlbumsMap),pNotesMap:cm(s.pNotesMap),
     ptStats:s.patients.map((_,i)=>(s.ptStats||[])[i]||newStat()),rptDraftMap:rd,frontState:s.frontState,therapistState:s.therapistState};
 }
+// 每日回報草稿有沒有內容（空白草稿不存，「只看不改」就不會被當成有變更）
+const keepRpt=d=>!!d&&!!(d.submitted||d.saved||d.note||d.vas||Object.values(d.exercises||{}).some(Boolean));
 
-// 合併時把「以個案序號為 key」的資料改成「以個案 id 為 key」，個案被排序或刪除也不會對錯人
+// 把「以個案序號為 key」的資料改成「以個案 id 為 key」，個案被排序或刪除也不會對錯人
 const msgKey=m=>m&&m.id?'i:'+m.id:'c:'+stable(m);
 function toNorm(s){
   const order=s.patients.map(p=>p.id),per={};
@@ -1277,7 +1291,6 @@ function toNorm(s){
   });
   return{order,per,
     mr:s.medRecords.filter(r=>order[r.ptIdx]!=null).map(r=>{const{ptIdx,...x}=r;return{...x,_pid:order[ptIdx]};}),
-    notifs:s.notifications.map(n=>{const{ci,...x}=n;return{...x,_pid:ci!=null&&order[ci]!=null?order[ci]:null};}),
     tags:s.tags,cats:s.cats,mediaSubs:s.mediaSubs,videos:s.videos,knows:s.knows,frontState:s.frontState,therapistState:s.therapistState};
 }
 function fromNorm(n){
@@ -1298,22 +1311,13 @@ function fromNorm(n){
     s.ptStats.push(e.st||newStat());
   });
   (n.mr||[]).forEach(r=>{const{_pid,...x}=r;if(pos[_pid]!=null)s.medRecords.push({ptIdx:pos[_pid],...x});});
-  (n.notifs||[]).forEach(v=>{const{_pid,...x}=v;s.notifications.push({...x,ci:_pid!=null&&pos[_pid]!=null?pos[_pid]:null});});
   return s;
 }
 
 // 三方合併：base＝雙方共同的舊版本、l＝本機、r＝雲端。只有一方改過就採用那一方；
 // 雙方都改過時，物件逐欄合併、清單取聯集，真的衝突才以本機為準。
 // o.add＝雲端版本來歷不明（不是從我們看過的版本改來的）：只接收它「新增」的內容，不採信它的刪除與覆寫。
-const KEYED={msgs:msgKey,logs:x=>'d:'+(x&&x.date),notifs:n=>stable([n.msg,n.t,n._pid])};
-function mergeCount(b,l,r){ // 未讀數：一方增加、另一方歸零可以同時成立
-  b=+b||0;l=+l||0;r=+r||0;
-  const dl=l-b,dr=r-b;
-  if(dl<0&&dr<0)return Math.min(l,r);
-  if(dl<0)return Math.max(0,l+Math.max(0,dr));
-  if(dr<0)return Math.max(0,r+dl);
-  return b+dl+dr;
-}
+const KEYED={msgs:msgKey,logs:x=>'d:'+(x&&x.date)};
 function merge3(b,l,r,o,k){
   if(eq(l,r)||eq(b,r))return l;
   if(eq(b,l)&&!o.add)return r;
@@ -1328,7 +1332,6 @@ function merge3(b,l,r,o,k){
     return out;
   }
   if(Array.isArray(l)&&Array.isArray(r))return mergeArr(Array.isArray(b)?b:[],l,r,o,k);
-  if((k==='unread'||k==='ptUnread')&&!o.add)return mergeCount(b,l,r);
   return l;
 }
 function mergeArr(b,l,r,o,k){
@@ -1360,11 +1363,227 @@ function mergePer(b,l,r,o){
   });
   return out;
 }
-function mergeStates(base,local,remote,additive){
-  const B=toNorm(prepState(base)),L=toNorm(prepState(local)),R=toNorm(prepState(remote)),o={add:!!additive};
-  const n={order:(!additive&&eq(B.order,L.order))?R.order:L.order,per:mergePer(B.per,L.per,R.per,o)};
-  ['mr','notifs','tags','cats','mediaSubs','videos','knows','frontState','therapistState'].forEach(k=>{n[k]=merge3(B[k],L[k],R[k],o,k);});
-  return fromNorm(n);
+
+// ── 文件 ⇄ 畫面資料 ──
+// 雲端上的資料分成三種文件（說明見 src/worker.js 開頭）：
+//   M＝治療師主文件、T[id]＝治療師給該個案的內容、P[id]＝該個案自己的內容。
+// 畫面與各項功能仍然使用原本那一整份資料（下面稱為 F）；split 把 F 拆成文件、join 把文件組回 F。
+// 兩者必須互為反函式（組回來再拆一次要得到一模一樣的文件），否則會被誤判成「有變更」而不斷上傳。
+const safeId=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{1,40}$/.test(v)?v:'';
+const IMG_RE=/^data:image\/(?:png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=]+$/;
+const safeImg=v=>typeof v==='string'&&v.length<6e6&&IMG_RE.test(v)?v:'';
+const int=(v,lo,hi)=>{v=Math.round(+v);return v>=lo?Math.min(v,hi):lo;};
+const DATE_RE=/^\d{4}-\d{2}-\d{2}$/;
+// 「看到哪裡」的記號：對方最後一則已看過的訊息
+const sanMark=s=>isObj(s)&&safeId(s.id)?{id:s.id,ts:int(s.ts,0,9e15)}:null;
+const seenMark=list=>{const m=list[list.length-1];return m?{id:m.id,ts:m.ts||0}:null;};
+// 記號之後還有幾則（＝未讀數）；記號指的訊息若已被刪除，改用時間判斷
+function countAfter(list,mark){
+  if(!mark)return list.length;
+  const i=list.findIndex(m=>m.id===mark.id);
+  return i>=0?list.length-1-i:list.filter(m=>(m.ts||0)>mark.ts).length;
+}
+// 把雙方的訊息依時間排成一串（各自原本的先後順序不變）
+function mergeByTs(a,b){
+  const out=[];let i=0,j=0;
+  while(i<a.length||j<b.length){
+    if(j>=b.length||(i<a.length&&(a[i].ts||0)<=(b[j].ts||0)))out.push(a[i++]);else out.push(b[j++]);
+  }
+  return out;
+}
+
+// 個案文件：內容是個案寫的，一律視為不可信——逐欄檢查型別、長度與格式，不合格的丟掉。
+// （治療師端會把這些內容放進畫面；沒有消毒的話，有心人可以藉此在治療師的瀏覽器執行程式）
+function sanMsg(m,i){
+  if(!isObj(m))return null;
+  const o={id:safeId(m.id)||'x'+i,ts:int(m.ts,0,9e15),who:'them',t:/^\d{1,2}:\d{2}$/.test(m.t)?m.t:''};
+  if(m.type==='img'){const s=safeImg(m.src);if(!s)return null;o.type='img';o.src=s;}
+  else o.txt=str(m.txt,5000);
+  if(m.auto===true)o.auto=true;
+  return o;
+}
+function sanLog(l){
+  if(!isObj(l)||!DATE_RE.test(l.date))return null;
+  return{date:l.date,pct:int(l.pct,0,100),done:int(l.done,0,999),total:int(l.total,0,999),vas:int(l.vas,0,10),note:str(l.note,2000)};
+}
+function sanRpt(r){
+  if(!isObj(r))return null;
+  const ex={};
+  if(isObj(r.exercises))Object.keys(r.exercises).slice(0,200).forEach(k=>{if(/^\d{1,3}$/.test(k)&&r.exercises[k])ex[k]=true;});
+  const o={date:DATE_RE.test(r.date)?r.date:'',exercises:ex,vas:int(r.vas,0,10),note:str(r.note,2000),submitted:!!r.submitted,saved:!!r.saved};
+  if(o.submitted){o.pct=int(r.pct,0,100);o.done=int(r.done,0,999);o.total=int(r.total,0,999);}
+  return keepRpt(o)?o:null;
+}
+function canonP(d){
+  d=isObj(d)?d:{};
+  const prof=isObj(d.prof)?d.prof:{},st=isObj(d.st)?d.st:{},ids=new Set(),dates=new Set();
+  return{v:2,
+    prof:{name:str(prof.name,60),imgSrc:safeImg(prof.imgSrc),acct:str(prof.acct,64)},
+    msgs:arr(d.msgs).map(sanMsg).filter(m=>m&&!ids.has(m.id)&&ids.add(m.id)),
+    hid:[...new Set(arr(d.hid).map(safeId).filter(Boolean))].slice(0,5000),
+    seen:sanMark(d.seen),
+    pAlb:arr(d.pAlb).filter(isObj).slice(0,200).map(a=>({title:str(a.title,80),photos:arr(a.photos).map(safeImg).filter(Boolean)})),
+    pNt:arr(d.pNt).filter(isObj).slice(0,500).map(n=>({title:str(n.title,120),body:str(n.body,20000)})),
+    rpt:sanRpt(d.rpt),
+    st:{logs:arr(st.logs).map(sanLog).filter(l=>l&&!dates.has(l.date)&&dates.add(l.date)),lastVas:int(st.lastVas,0,10)}};
+}
+// 治療師寫的文件只整理形狀（內容可信）
+function canonT(d){
+  d=isObj(d)?d:{};
+  const c=isObj(d.chat)?d.chat:{},p=isObj(d.pub)?d.pub:{},th=isObj(p.th)?p.th:{};
+  return{v:2,
+    chat:{msgs:arr(c.msgs).filter(isObj),anns:arr(c.anns).filter(isObj),seen:sanMark(c.seen)},
+    pub:{mr:arr(p.mr).filter(isObj),vids:arr(p.vids).filter(isObj),knows:arr(p.knows).filter(isObj),th:{name:str(th.name),title:str(th.title),img:str(th.img)}}};
+}
+function canonM(d){
+  d=isObj(d)?d:{};
+  const src=isObj(d.per)?d.per:{},order=[],per={};
+  const add=id=>{if(safeId(id)&&isObj(src[id])&&!order.includes(id))order.push(id);};
+  arr(d.order).forEach(add);Object.keys(src).forEach(add);
+  order.forEach(id=>{const e=src[id];per[id]={sex:str(e.sex),tags:arr(e.tags),note:str(e.note),vids:arr(e.vids),knows:arr(e.knows),tAlb:arr(e.tAlb),tNt:arr(e.tNt)};});
+  const ts=isObj(d.therapistState)?d.therapistState:{},fs=isObj(d.frontState)?d.frontState:{},nt=isObj(d.ntf)?d.ntf:{};
+  return{v:2,order,per,mr:arr(d.mr).filter(r=>isObj(r)&&per[r._pid]),
+    tags:arr(d.tags),cats:arr(d.cats),mediaSubs:arr(d.mediaSubs),videos:arr(d.videos),knows:arr(d.knows),
+    frontState:{title:str(fs.title),sub:str(fs.sub),logoSrc:str(fs.logoSrc)},
+    therapistState:{name:str(ts.name),title:str(ts.title),initials:str(ts.initials),img:str(ts.img)},
+    ntf:{clr:+nt.clr||0,read:+nt.read||0}};
+}
+const pubVid=v=>({title:str(v.title),cat:str(v.cat),sub:str(v.sub),desc:str(v.desc),cv:str(v.cv),url:str(v.url),coverSrc:str(v.coverSrc)});
+// PDF 不放進個案的文件（太大），改放雜湊，個案要看時再向伺服器下載
+const pubKnow=k=>({title:str(k.title),cat:str(k.cat),sub:str(k.sub),desc:str(k.desc),cv:str(k.cv),coverSrc:str(k.coverSrc),pdfName:str(k.pdfName),pdfRef:k.pdfSrc?str(k.pdfHash):''});
+
+// 治療師端：整份資料 → 各文件
+function splitState(F){
+  const n=toNorm(F),t={},p={},per={};
+  const th={name:F.therapistState.name,title:F.therapistState.title,img:F.therapistState.img};
+  n.order.forEach(pid=>{
+    const e=n.per[pid],pt=e.p,mine=[],theirs=[];
+    e.msgs.forEach(x=>(x.who==='them'?theirs:mine).push(x));
+    per[pid]={sex:pt.sex,tags:pt.tags,note:pt.note,vids:pt.assignedVids,knows:pt.assignedKnows,tAlb:e.tAlb,tNt:e.tNt};
+    t[pid]=canonT({
+      // 未讀歸零＝個案的訊息全部看過了，把記號移到最後一則
+      chat:{msgs:mine,anns:e.anns,seen:pt.unread?pt._seen:(seenMark(theirs)||pt._seen)},
+      pub:{mr:n.mr.filter(r=>r._pid===pid&&r.sent).map(r=>{const{_pid,sent,...x}=r;return x;}),
+        vids:arr(pt.assignedVids).map(i=>F.videos[i]).filter(Boolean).map(pubVid),
+        knows:arr(pt.assignedKnows).map(i=>F.knows[i]).filter(Boolean).map(pubKnow),th}});
+    p[pid]=canonP({prof:{name:pt.name,imgSrc:pt.imgSrc,acct:pt.acct},msgs:theirs,hid:pt._hid,seen:pt._pseen,pAlb:e.pAlb,pNt:e.pNt,rpt:e.rpt,st:e.st});
+  });
+  const m=canonM({order:n.order,per,mr:n.mr,tags:F.tags,cats:F.cats,mediaSubs:F.mediaSubs,videos:F.videos,knows:F.knows,frontState:F.frontState,therapistState:F.therapistState,ntf:F.ntf});
+  return{m,t,p};
+}
+// 治療師端：各文件 → 整份資料（acct＝治療師自己的登入帳號，僅供設定頁顯示）
+function joinState(D,acct){
+  const m=canonM(D.m),per={};
+  m.order.forEach(pid=>{
+    const mp=m.per[pid],T=canonT(D.t&&D.t[pid]),P=canonP(D.p&&D.p[pid]),hid=new Set(P.hid);
+    const mine=T.chat.msgs,theirs=P.msgs;
+    per[pid]={
+      p:{id:pid,name:P.prof.name,sex:mp.sex,acct:P.prof.acct,av:P.prof.name[0]||'?',imgSrc:P.prof.imgSrc,tags:mp.tags,note:mp.note,
+        unread:countAfter(theirs,T.chat.seen),ptUnread:countAfter(mine.filter(x=>!hid.has(x.id)),P.seen),
+        assignedVids:mp.vids,assignedKnows:mp.knows,_seen:T.chat.seen,_pseen:P.seen,_hid:P.hid},
+      msgs:mergeByTs(mine,theirs),anns:T.chat.anns,tAlb:mp.tAlb,tNt:mp.tNt,pAlb:P.pAlb,pNt:P.pNt,rpt:P.rpt,st:Object.assign(newStat(),P.st)};
+  });
+  const F=fromNorm({order:m.order,per,mr:m.mr,tags:m.tags,cats:m.cats,mediaSubs:m.mediaSubs,videos:m.videos,knows:m.knows,
+    frontState:m.frontState,therapistState:{...m.therapistState,acct:acct||''}});
+  F.ntf=m.ntf;
+  return F;
+}
+// 個案端：治療師給的文件 T＋自己的文件 P → 畫面資料（只有自己一位個案）
+function joinPatient(T,P,pid,brand){
+  T=canonT(T);P=canonP(P);
+  const hid=new Set(P.hid),mine=T.chat.msgs.filter(x=>!hid.has(x.id)); // 個案自己刪掉的治療師訊息不顯示
+  const per={[pid]:{
+    p:{id:pid,name:P.prof.name,sex:'',acct:P.prof.acct,av:P.prof.name[0]||'?',imgSrc:P.prof.imgSrc,tags:[],note:'',unread:0,
+      ptUnread:countAfter(mine,P.seen),assignedVids:T.pub.vids.map((_,i)=>i),assignedKnows:T.pub.knows.map((_,i)=>i),_pseen:P.seen,_hid:P.hid},
+    msgs:mergeByTs(mine,P.msgs),anns:T.chat.anns,tAlb:[],tNt:[],pAlb:P.pAlb,pNt:P.pNt,rpt:P.rpt,st:Object.assign(newStat(),P.st)}};
+  const F=fromNorm({order:[pid],per,mr:T.pub.mr.map(r=>({...r,sent:true,_pid:pid})),tags:[],cats:[],mediaSubs:[],videos:T.pub.vids,knows:T.pub.knows,
+    frontState:{...(brand||{})},therapistState:{...T.pub.th}});
+  F.ntf={clr:0,read:0};
+  return F;
+}
+// 個案端：畫面資料 → 自己的文件。T 必須是「組出目前畫面時用的那一份」治療師文件：
+// 畫面上沒有、但 T 裡有的治療師訊息＝個案自己刪掉的（只在個案端隱藏，治療師那邊仍保留）。
+function splitPatient(F,T){
+  T=canonT(T);
+  const n=toNorm(F),e=n.per[n.order[0]],pt=e.p,theirs=[],have=new Set();
+  e.msgs.forEach(x=>{if(x.who==='them')theirs.push(x);else have.add(x.id);});
+  const shown=T.chat.msgs.filter(x=>have.has(x.id));
+  return canonP({prof:{name:pt.name,imgSrc:pt.imgSrc,acct:pt.acct},msgs:theirs,
+    hid:T.chat.msgs.filter(x=>!have.has(x.id)).map(x=>x.id),
+    seen:pt.ptUnread?pt._pseen:(seenMark(shown)||pt._pseen),pAlb:e.pAlb,pNt:e.pNt,rpt:e.rpt,st:e.st});
+}
+
+// 各文件的三方合併
+function mergeMark(b,l,r){
+  if(eq(l,r)||eq(b,r))return l;
+  if(eq(b,l))return r;
+  return((r&&r.ts)||0)>((l&&l.ts)||0)?r:l;
+}
+function mergeM(b,l,r,add){
+  b=canonM(b);l=canonM(l);r=canonM(r);
+  const o={add:!!add},out={order:(!add&&eq(b.order,l.order))?r.order:l.order,per:mergePer(b.per,l.per,r.per,o)};
+  ['mr','tags','cats','mediaSubs','videos','knows','frontState','therapistState'].forEach(k=>{out[k]=merge3(b[k],l[k],r[k],o,k);});
+  out.ntf={clr:Math.max(l.ntf.clr,r.ntf.clr),read:Math.max(l.ntf.read,r.ntf.read)};
+  return canonM(out); // 被刪除個案的病歷與排序一併清掉
+}
+function mergeT(b,l,r,add){
+  b=canonT(b);l=canonT(l);r=canonT(r);
+  const o={add:!!add};
+  // 「已傳送的病歷、推播的衛教」是由主文件算出來的，直接以本機為準
+  return canonT({chat:{msgs:merge3(b.chat.msgs,l.chat.msgs,r.chat.msgs,o,'msgs'),anns:merge3(b.chat.anns,l.chat.anns,r.chat.anns,o,'anns'),
+    seen:mergeMark(b.chat.seen,l.chat.seen,r.chat.seen)},pub:l.pub});
+}
+function mergeP(b,l,r,add){
+  b=canonP(b);l=canonP(l);r=canonP(r);
+  const out=merge3({...b,seen:0},{...l,seen:0},{...r,seen:0},{add:!!add});
+  out.seen=mergeMark(b.seen,l.seen,r.seen);
+  return canonP(out);
+}
+
+// 通知不另外儲存，直接由個案傳來的訊息推算（最近 30 則）。
+// 已讀＝該則訊息已在對話中看過，或按過「全部已讀」；「清除」之前的不再列出。
+function deriveNotifs(F){
+  const nt=F.ntf||{},out=[];
+  F.patients.forEach((p,ci)=>{
+    const theirs=(F.msgMap[ci]||[]).filter(m=>m.who==='them'),seenTo=theirs.length-(p.unread||0);
+    theirs.forEach((m,k)=>{
+      const ts=m.ts||0;
+      if(ts<=(nt.clr||0))return;
+      let msg,icon='💬';
+      if(m.auto){
+        const a=/完成率：(\d+)%/.exec(m.txt||''),b=/VAS 疼痛：(\d+)/.exec(m.txt||'');
+        msg=p.name+' 提交每日回報'+(a&&b?'（完成率 '+a[1]+'%・VAS '+b[1]+'）':'');icon='📋';
+      }else if(m.type==='img')msg=p.name+' 傳送了一張圖片';
+      else{const t=m.txt||'';msg=p.name+' 傳送訊息：'+t.slice(0,28)+(t.length>28?'…':'');}
+      out.push({msg,icon,t:m.t||'',read:k<seenTo||ts<=(nt.read||0),ci,_ts:ts});
+    });
+  });
+  out.sort((a,b)=>b._ts-a._ts);
+  return out.slice(0,30).map(({_ts,...x})=>x);
+}
+
+// 舊資料（或舊備份檔）轉成新格式前的整理：
+//   每則訊息都要有 id 與遞增的時間戳（拆成雙方各一份、再組回來時，順序才會和原本一樣）；
+//   未讀「數量」換成「看到哪一則」的記號。
+function normLegacy(d){
+  prepState(d);
+  d.patients.forEach((p,i)=>{
+    let msgs=arr(d.msgMap[i]);
+    if(!msgs.every(isObj)){msgs=msgs.filter(isObj);delete d.annMap[i];}
+    const ids=new Set();let prev=0;
+    msgs.forEach((m,k)=>{
+      m.who=m.who==='them'?'them':'me';
+      if(!safeId(m.id)||ids.has(m.id)){let id='L'+k;while(ids.has(id))id+='x';m.id=id;}
+      ids.add(m.id);
+      m.ts=Math.max(Math.round(+m.ts)||0,prev+1);prev=m.ts;
+    });
+    if(msgs.length)d.msgMap[i]=msgs;else delete d.msgMap[i];
+    const mark=(list,unread)=>{const m=list[list.length-1-Math.max(0,Math.round(+unread)||0)];return m?{id:m.id,ts:m.ts}:null;};
+    if(!sanMark(p._seen))p._seen=mark(msgs.filter(m=>m.who==='them'),p.unread);
+    if(!sanMark(p._pseen))p._pseen=mark(msgs.filter(m=>m.who==='me'),p.ptUnread);
+    if(!Array.isArray(p._hid))p._hid=[];
+  });
+  return d;
 }
 // ── 資料合併結束 ──
 
@@ -1397,7 +1616,7 @@ function tPair(t){if(!t)return PRESET.blue;if(t.clr==='custom')return{bg:t.bg||'
 function tStyle(t){const p=tPair(t);return`background:${p.bg};color:${p.ink};`;}
 function autoInk(hex){hex=hex.replace('#','');const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);const l=(0.299*r+0.587*g+0.114*b)/255;return l>0.6?'#'+[r,g,b].map(v=>Math.round(v*0.35).toString(16).padStart(2,'0')).join(''):'#fff';}
 
-const therapistState={name:'測試',title:'物理治療師',initials:'測',img:'',acct:'test',pwd:'test'};
+const therapistState={name:'測試',title:'物理治療師',initials:'測',img:'',acct:''};
 const patientSelf={name:'測試',initials:'測',img:''};
 let PIDX=0;
 
@@ -1414,10 +1633,8 @@ let cats=[
 // 次分類
 let mediaSubs=['入門','進階','一般'];
 
-// 個案（僅保留一位預設）
-let patients=[
-  {id:'L0',name:'測試',sex:'女',acct:'test',pwd:'test',av:'測',imgSrc:'',tags:[],note:'',unread:0,assignedVids:[],assignedKnows:[]}
-];
+// 個案（登入後才從雲端載入；頁面本身不含任何個案資料與帳密）
+let patients=[];
 
 let videos=[
   {title:'肩關節旋轉肌訓練',cat:'肩部復健',sub:'入門',desc:'適合術後初期個案的輕度復健。',cv:'',url:'',coverSrc:''},
@@ -1469,9 +1686,10 @@ function getRptDraft(){
 }
 Object.defineProperty(window,'rptDraft',{get:()=>getRptDraft(),configurable:true});
 const frontState={title:'sky 衛教平台',sub:'Physiotherapy Platform',logoSrc:'logo.png'};
+const ntf={clr:0,read:0}; // 通知的「清除」與「全部已讀」時間點
 
 // 每位個案的回報統計（與 patients 同序）
-const ptStats=[newStat()];
+const ptStats=[];
 
 // 最近 n 天（含今日）每天的回報：[{date,label,log}]，由回報紀錄依日期推算
 function daySeries(st,n){
@@ -1508,50 +1726,168 @@ function toggleSb(appId){
 }
 
 // ── AUTH ──
+// 帳號密碼由伺服器驗證（密碼只存雜湊），通過後才拿得到資料；頁面本身不含任何個案資料。
 function pickRole(r){ROLE=r;document.querySelectorAll('.l-tab').forEach((t,i)=>t.classList.toggle('on',(r==='therapist'&&i===0)||(r==='patient'&&i===1)));}
 function togglePwd(){const i=document.getElementById('l-pwd');pwdOn=!pwdOn;i.type=pwdOn?'text':'password';document.getElementById('eye-ic').innerHTML=pwdOn?'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/>':'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';}
-let _loggingIn=false;
+let _loggingIn=false,_setup=false;
+const PWD_MIN=6;
+const LOGIN_ERR={login:'帳號或密碼錯誤',rate:'嘗試次數過多，請稍候一分鐘再試',weak:'密碼至少 '+PWD_MIN+' 個字元',bad:'帳號或密碼格式不正確',
+  setup:'這是全新的系統，請先設定治療師的帳號與密碼',upgrading:'系統升級中：請治療師先登入完成升級，稍後再試',preview:'這是預覽網址，無法在這裡升級資料，請改用正式網址登入'};
+// 取得公開資訊：登入頁的標題與 Logo、系統目前的狀態
+async function loadPublic(){
+  try{
+    const r=await fetch(API+'/public',{cache:'no-store'});
+    const d=r.ok?await r.json():null;
+    if(isObj(d)){
+      MODE=d.mode||'ready';PREVIEW=!!d.preview;
+      if(isObj(d.brand)){
+        _brand={title:str(d.brand.title)||'sky 衛教平台',sub:str(d.brand.sub)||'Physiotherapy Platform',logoSrc:str(d.brand.logoSrc)||'logo.png'};
+        _pubSent=JSON.stringify(_brand);
+        if(!LOGGED){_copyInto(frontState,{..._brand});applyBrandUI();}
+      }
+    }
+  }catch(e){}
+  renderLoginNote();
+}
+function renderLoginNote(){
+  const el=document.getElementById('l-note'),btn=document.querySelector('.l-submit');
+  _setup=MODE==='setup';
+  let msg='';
+  if(_setup){msg='首次使用：請設定治療師的帳號與密碼（密碼至少 '+PWD_MIN+' 個字元），之後以這組帳密登入。';pickRole('therapist');}
+  else if(MODE==='legacy')msg=PREVIEW?'這是預覽網址，無法在這裡升級資料。請改用正式網址登入。':'系統已更新，資料需要升級一次。請治療師先登入完成升級，個案之後即可照常登入。';
+  else if(MODE==='migrating')msg='資料升級尚未完成，請治療師登入後繼續。';
+  el.textContent=msg;el.style.display=msg?'':'none';
+  if(!_loggingIn)btn.textContent=_setup?'建立治療師帳號':'登入';
+}
 async function doLogin(){
   const acct=(document.getElementById('l-acct').value||'').trim();
   const pwd=document.getElementById('l-pwd').value||'';
   if(!acct||!pwd){toast('請輸入帳號與密碼');return;}
-  if(!window._cloudReady){toast('雲端資料載入中，請稍候再試');return;}
+  if(_setup&&ROLE==='therapist'&&pwd.length<PWD_MIN){toast(LOGIN_ERR.weak);return;}
   if(_loggingIn)return;
-  // 先向雲端拿最新資料再驗證（頁面可能已開著很久，帳號或訊息早就更新過）
   _loggingIn=true;
-  const btn=document.querySelector('.l-submit');btn.textContent='登入中…';
-  try{await Promise.race([syncNow(true),new Promise(r=>setTimeout(r,4000))]);}catch(e){}
-  btn.textContent='登入';_loggingIn=false;
-  if(ROLE==='therapist'){
-    if(acct!==therapistState.acct||pwd!==therapistState.pwd){
-      toast('帳號或密碼錯誤');document.getElementById('l-pwd').value='';return;
+  const btn=document.querySelector('.l-submit');btn.textContent=_setup?'建立中…':'登入中…';
+  try{
+    const r=await fetch(API+'/login',{method:'POST',cache:'no-store',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Sky-Req':'1'},
+      body:JSON.stringify({role:ROLE,acct,pwd,...(_setup&&ROLE==='therapist'?{setup:true}:{})})});
+    const d=await r.json().catch(()=>null);
+    if(r.ok&&d&&d.ok){
+      document.getElementById('l-pwd').value='';
+      await enterApp(d);
+    }else{
+      const code=d&&d.error;
+      if(code==='setup'||code==='upgrading'||code==='preview')await loadPublic();
+      toast(LOGIN_ERR[code]||(r.status===401?LOGIN_ERR.login:'登入失敗，請稍後再試'));
+      if(r.status===401)document.getElementById('l-pwd').value='';
     }
-  }else{
-    const idx=patients.findIndex(p=>p.acct===acct&&p.pwd===pwd);
-    if(idx===-1){
-      toast('帳號或密碼錯誤');document.getElementById('l-pwd').value='';return;
-    }
-    PIDX=idx;myPid=patients[idx].id;
-  }
-  LOGGED=true;_lastAct=Date.now();
-  document.getElementById('l-pwd').value='';
+  }catch(e){if(!(e instanceof AuthLost)){console.error(e);toast('⚠️ 無法連線到雲端，請稍後再試');}}
+  _loggingIn=false;renderLoginNote();
+}
+// 登入成功（或重新整理頁面時通行證仍有效）：載入資料、進入畫面
+async function enterApp(s){
+  SESSION={role:s.role==='p'?'p':'t',pid:s.pid||'',acct:s.acct||''};
+  ROLE=SESSION.role==='t'?'therapist':'patient';
+  if(s.mig==='pending'&&!(await runUpgrade())){await logout();return;}
+  toast('載入雲端資料中…');
+  if(!(await firstLoad())){if(SESSION){SESSION=null;toast('⚠️ 無法載入資料，請檢查網路後再登入');}return;}
+  if(!SESSION)return; // 載入途中通行證失效
+  LOGGED=true;_lastAct=Date.now();PIDX=0;myPid=SESSION.pid||null;
   document.getElementById('login').classList.remove('on');
   document.getElementById(ROLE==='therapist'?'t-app':'p-app').classList.add('on');
   document.body.className=(ROLE==='therapist')?'role-t':'role-p';
-  // 一律從首頁開始並重畫全部內容，不殘留上一位使用者的畫面
+  // 一律從首頁開始並重畫全部內容
   curLearnFilter='all';document.querySelectorAll('[data-lf]').forEach(b=>{b.className=b.dataset.lf==='all'?'btn ghost':'btn';});
-  renderAll();
+  try{syncSettingsInputs();renderAll();}catch(e){console.error(e);}
   if(ROLE==='therapist')goT('ov');else goP('ph');
+  toast('雲端資料載入完成','check');
+  syncNow();
 }
-function logout(){
-  LOGGED=false;myPid=null;
-  ['t-app','p-app'].forEach(id=>document.getElementById(id).classList.remove('on'));
-  document.getElementById('login').classList.add('on');
-  document.body.className='';
-  closeDrop();closeCtx();closeAllPanels();
-  document.querySelectorAll('.mbg.on,.more-sheet-bg.on').forEach(m=>m.classList.remove('on'));
-  ['t','p'].forEach(closeChatOv);
-  syncNow(false,true); // 登出前把尚未上傳的變更送出
+async function logout(){
+  if(_leaving)return;
+  _leaving=true;
+  // 登出前把尚未上傳的變更送出
+  if(LOGGED){try{await Promise.race([syncNow(false,true),sleep(4000)]);}catch(e){}}
+  try{await fetch(API+'/logout',{method:'POST',credentials:'same-origin',headers:{'X-Sky-Req':'1'}});}catch(e){}
+  leave('');
+}
+
+// ── 舊資料升級（只會在升級後第一次以治療師登入時出現一次）──
+// 舊資料把帳密（明碼）和全部個案的內容放在同一包、任何人都讀得到。這裡把它拆成新格式：
+// 帳號由伺服器逐一改存雜湊；內容由伺服器塗掉密碼後交給這個頁面拆開、再傳回去分開存放。
+// 全部完成、確認新資料都在之後，伺服器才會移除舊的那一包；中途失敗舊資料不受影響，可以重來。
+function upgradeAsk(text,goLabel){
+  return new Promise(res=>{
+    const btns=document.getElementById('m-upg-btns'),go=document.getElementById('m-upg-go'),no=document.getElementById('m-upg-no');
+    document.getElementById('m-upg-msg').textContent=text;
+    go.textContent=goLabel;btns.style.display='';
+    go.onclick=()=>{btns.style.display='none';res(true);};
+    no.onclick=()=>{closeM('m-upg');res(false);};
+    openM('m-upg');
+  });
+}
+async function runUpgrade(){
+  const say=t=>{document.getElementById('m-upg-msg').textContent=t;};
+  let ask='系統已加上登入保護，現有資料需要升級成新格式（只需一次，約數秒到一分鐘）。\n\n'+
+    '・升級後，密碼改以無法還原的方式保存，個案只讀得到自己的資料。\n'+
+    '・完成之前原本的資料不會被更動，中途失敗可以重來。\n'+
+    '・升級後，舊版頁面將無法再讀寫資料。\n\n'+
+    '目前網址：'+location.host+'\n請確認這是正式網址，並在升級期間不要關閉這個頁面。';
+  for(let again=false;;again=true){
+    if(!(await upgradeAsk(ask,again?'再試一次':'開始升級')))return false;
+    try{
+      // 1) 帳號：伺服器逐一把個案的明碼密碼改存成雜湊
+      let i=0,info;
+      do{
+        const r=await apiJson('/migrate/accounts',{i});
+        if(!r.ok||!isObj(r.data))throw new Error(r.status===503?'kv':'accounts');
+        info=r.data;i=info.i;
+        say('步驟 1／3：建立帳號（'+Math.min(i,info.total)+'／'+info.total+'）…');
+      }while(i<info.total);
+      if(!info.gone){
+        // 2) 取回舊資料（密碼已被伺服器塗掉），在這個頁面裡拆成新格式
+        say('步驟 2／3：整理資料…');
+        const r=await api('/legacy');
+        if(!r.ok)throw new Error('legacy');
+        const d=JSON.parse(await r.text());
+        if(!isObj(d))throw new Error('format');
+        delete d._sync;
+        d.patients=arr(d.patients).map((p,k)=>Object.assign(isObj(p)?p:{},{id:info.ids[k]}));
+        d.patients.forEach(p=>{if(!p.acct)p.acct='patient';}); // 與伺服器建立帳號時的預設值一致
+        normLegacy(d);
+        await hashPdfs(d.knows);
+        const D=splitState(d),jobs=[];
+        D.m.order.forEach(id=>{jobs.push(['p',id,D.p[id]],['t',id,D.t[id]]);});
+        // 3) 上傳（主文件最後；全部成功才算數）
+        let n=0;const total=jobs.length+1;
+        say('步驟 3／3：上傳資料（0／'+total+'）…');
+        const put=async([kind,id,doc])=>{
+          const res=await chanPut({path:'/doc/'+kind+(id?'/'+id:''),ver:'0'},JSON.stringify(doc),uid(),true);
+          if(res.st!=='ok')throw new Error(res.st==='toobig'?'toobig':res.code===503?'kv':'upload');
+          say('步驟 3／3：上傳資料（'+(++n)+'／'+total+'）…');
+        };
+        await pool(jobs,4,put);
+        for(const k of d.knows){
+          if(!k.pdfSrc||!k.pdfHash||!d.patients.some(p=>p.assignedKnows.includes(d.knows.indexOf(k))))continue;
+          const b=await api('/blob/'+k.pdfHash,{method:'PUT',headers:{'Content-Type':'text/plain'},body:k.pdfSrc});
+          if(!b.ok)throw new Error('upload');
+        }
+        const brand=JSON.stringify({title:d.frontState.title,sub:d.frontState.sub,logoSrc:d.frontState.logoSrc});
+        if(!(await api('/public',{method:'PUT',headers:{'Content-Type':'application/json'},body:brand})).ok)throw new Error('upload');
+        await put(['m','',D.m]);
+      }
+      say('即將完成…');
+      const f=await apiJson('/migrate/finish',{});
+      if(!f.ok)throw new Error(f.status===503?'kv':'finish');
+      closeM('m-upg');
+      toast('資料升級完成','check');
+      return true;
+    }catch(e){
+      if(e instanceof AuthLost)throw e;
+      console.error('upgrade failed',e);
+      const why=e.message==='kv'?'雲端暫時無法寫入（可能已達今日的寫入上限，台灣時間早上 8 點後會恢復）。':e.message==='toobig'?'有一份資料超過雲端上限（約 24 MB）。':'連線中斷或伺服器沒有回應。';
+      ask='升級沒有完成：'+why+'\n\n原本的資料沒有被更動，可以再試一次。';
+    }
+  }
 }
 
 // ── NAV ──
@@ -1581,7 +1917,7 @@ function goP(v){
   if(v==='pc'){const p=patients[PIDX];if(p)p.ptUnread=0;updPtUnread();renderPMsgs();renderPAnn();}
   if(v==='lrn')renderLearn();
   if(v==='ph'){renderPHomeRec();syncHomeStats();}
-  if(v==='pac'){pendingPtAvImg=null;document.getElementById('p-nm').value=patientSelf.name;setAv(document.getElementById('p-av-disp'),patientSelf.img,patientSelf.initials);document.getElementById('p-acct').value='';document.getElementById('p-pwd-new').value='';}
+  if(v==='pac'){pendingPtAvImg=null;document.getElementById('p-nm').value=patientSelf.name;setAv(document.getElementById('p-av-disp'),patientSelf.img,patientSelf.initials);document.getElementById('p-acct').value='';document.getElementById('p-pwd-new').value='';document.getElementById('p-pwd-cur').value='';}
 }
 function toggleDrop(id){document.querySelectorAll('.udrop').forEach(d=>{if(d.id!==id)d.classList.remove('on');});document.getElementById(id).classList.toggle('on');}
 function closeDrop(){document.querySelectorAll('.udrop').forEach(d=>d.classList.remove('on'));}
@@ -1619,7 +1955,7 @@ function renderPt(){
           <button class="ibt" style="width:22px;height:22px;${i===patients.length-1?'opacity:.25;cursor:default;':''}" onclick="movePt(${i},1)" ${i===patients.length-1?'disabled':''} title="下移"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><polyline points="6 9 12 15 18 9"/></svg></button>
         </div>
         ${avHTML(p,'width:28px;height:28px;font-size:11px;')}
-        <div><div style="font-weight:500;font-size:13px;">${H(p.name)}</div><div style="font-size:11px;color:var(--ink3);">${H(p.acct)}</div></div>
+        <div><div style="font-weight:500;font-size:13px;">${H(p.name)}</div><div style="font-size:11px;color:var(--ink3);">${p.acct?H(p.acct):'<span style="color:var(--red);">尚未設定帳號密碼</span>'}</div></div>
       </div></td>
       <td style="font-size:13px;">${H(p.sex)}</td>
       <td>${p.tags.map(ti=>`<span style="${tStyle(tags[ti])}display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;margin-right:3px;">${H(tags[ti]?.name||'')}</span>`).join('')}</td>
@@ -1648,50 +1984,79 @@ function movePt(i,dir){
   });
   const sw=v=>v===i?to:v===to?i:v;
   medRecords.forEach(r=>{r.ptIdx=sw(r.ptIdx);});
-  notifications.forEach(n=>{if(n.ci!=null)n.ci=sw(n.ci);});
-  activeCI=sw(activeCI);selPtIdx=sw(selPtIdx);mrPtIdx=sw(mrPtIdx);PIDX=sw(PIDX);
-  renderPt();renderCL();renderOv();renderNotifPanel();
+  activeCI=sw(activeCI);selPtIdx=sw(selPtIdx);mrPtIdx=sw(mrPtIdx);
+  renderPt();renderCL();renderOv();refreshNotifs();
 }
 
 function toggleTagFilter(){document.getElementById('tag-fp').classList.toggle('on');renderTagFpOpts();}
 function renderTagFpOpts(){const el=document.getElementById('tag-fp-opts');if(!el)return;el.innerHTML='<button class="btn xs" style="'+(ptTagFilter.length===0?'background:var(--ink);color:#fff;border-color:var(--ink);':'')+'" onclick="clearPtTagFilter()">全部</button>'+tags.map((t,i)=>{const p=tPair(t);return'<button class="btn xs" style="'+(ptTagFilter.includes(i)?'outline:2px solid var(--blue);':'')+'" onclick="togglePtTF('+i+')"><span style="background:'+p.bg+';color:'+p.ink+';display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;">'+H(t.name)+'</span></button>';}).join('');}
 function togglePtTF(i){const pos=ptTagFilter.indexOf(i);if(pos>-1)ptTagFilter.splice(pos,1);else ptTagFilter.push(i);renderTagFpOpts();renderPt();}
 function clearPtTagFilter(){ptTagFilter=[];renderTagFpOpts();renderPt();}
-function openPtModal(i){editPtIdx=i;pendingPtImg='';document.getElementById('m-pt-ttl').textContent=i===-1?'新增個案':'編輯個案';const p=i===-1?null:patients[i];setAv(document.getElementById('m-av'),p?.imgSrc||'',p?p.av:'?');document.getElementById('m-pt-nm').value=p?p.name:'';document.getElementById('m-pt-sex').value=p?p.sex:'女';document.getElementById('m-pt-acct').value=p?p.acct:'';document.getElementById('m-pt-pwd').value='';document.getElementById('m-pt-note').value=p?p.note:'';renderPtTagOpts(p?p.tags:[]);openM('m-pt');}
+function openPtModal(i){editPtIdx=i;pendingPtImg='';document.getElementById('m-pt-ttl').textContent=i===-1?'新增個案':'編輯個案';const p=i===-1?null:patients[i];setAv(document.getElementById('m-av'),p?.imgSrc||'',p?p.av:'?');document.getElementById('m-pt-nm').value=p?p.name:'';document.getElementById('m-pt-sex').value=p?p.sex:'女';document.getElementById('m-pt-acct').value=p?p.acct:'';document.getElementById('m-pt-pwd').value='';document.getElementById('m-pt-pwd').placeholder=p&&p.acct?'留空不更改':'至少 '+PWD_MIN+' 個字元';document.getElementById('m-pt-note').value=p?p.note:'';renderPtTagOpts(p?p.tags:[]);openM('m-pt');}
 function renderPtTagOpts(sel){
   document.getElementById('m-pt-tags').innerHTML=sel.map(ti=>{const p=tPair(tags[ti]);return`<span style="background:${p.bg};color:${p.ink};display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;">${H(tags[ti]?.name||'')}</span>`;}).join('')||'<span style="font-size:12px;color:var(--ink3);">未選擇</span>';
   document.getElementById('m-pt-tag-opts').innerHTML=tags.map((t,i)=>{const p=tPair(t);return`<button onclick="togglePtTag(${i})" style="background:${p.bg};color:${p.ink};border-radius:5px;padding:3px 9px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid transparent;${sel.includes(i)?'outline:2px solid var(--blue);':''}">${H(t.name)}</button>`;}).join('');
   document.getElementById('m-pt-tag-opts').dataset.sel=JSON.stringify(sel);
 }
 function togglePtTag(i){let sel=JSON.parse(document.getElementById('m-pt-tag-opts').dataset.sel||'[]');const pos=sel.indexOf(i);if(pos>-1)sel.splice(pos,1);else sel.push(i);renderPtTagOpts(sel);}
-function savePt(){
+// 帳號相關操作（建立、改帳號、改密碼、刪除）都要經過伺服器；密碼只在伺服器以雜湊保存，不會出現在同步的資料裡。
+// 失敗時顯示原因並回傳 null。
+const ACCT_ERR={dup:'⚠️ 此帳號已被使用，請換一個',weak:'密碼至少 '+PWD_MIN+' 個字元',cur:'目前密碼不正確',needpwd:'此個案尚未設定密碼，請一併輸入密碼',
+  rate:'嘗試次數過多，請稍候一分鐘再試',bad:'帳號格式不正確（最多 64 個字元）',kv:'⚠️ 雲端暫時無法寫入，請稍後再試',forbidden:'沒有權限執行這個操作'};
+async function acctCall(body,quiet){
+  try{
+    const r=await apiJson('/account',body);
+    if(r.ok&&r.data)return r.data;
+    if(!quiet)toast(ACCT_ERR[r.data&&r.data.error]||'⚠️ 儲存失敗，請稍後再試');
+  }catch(e){if(e instanceof AuthLost)throw e;if(!quiet)toast('⚠️ 無法連線到雲端，請稍後再試');}
+  return null;
+}
+let _busyPt=false;
+async function savePt(){
+  if(_busyPt)return;
   const nm=document.getElementById('m-pt-nm').value.trim();if(!nm){toast('請輸入姓名');return;}
-  const acct=document.getElementById('m-pt-acct').value.trim()||'patient.new';
+  const acct=document.getElementById('m-pt-acct').value.trim();if(!acct){toast('請輸入帳號');return;}
   if(nm===acct){toast('⚠️ 姓名與帳號不得相同');return;}
-  // 帳號不可重複，否則後建立的個案永遠登入不了自己的頁面
+  // 帳號不可重複，否則後建立的個案永遠登入不了自己的頁面（伺服器也會再檢查一次）
   if(patients.some((p,i)=>i!==editPtIdx&&p.acct===acct)){toast('⚠️ 帳號「'+acct+'」已被使用，請換一個');return;}
   const newPwd=document.getElementById('m-pt-pwd').value;
-  if(editPtIdx===-1&&!newPwd){toast('新增個案須設定密碼');return;}
-  const old=editPtIdx===-1?null:patients[editPtIdx];
-  const p={name:nm,sex:document.getElementById('m-pt-sex').value,acct,pwd:newPwd||old?.pwd||'',av:nm[0]||'?',imgSrc:pendingPtImg||old?.imgSrc||'',
+  const isNew=editPtIdx===-1,old=isNew?null:patients[editPtIdx];
+  if(isNew&&!newPwd){toast('新增個案須設定密碼');return;}
+  if(newPwd&&newPwd.length<PWD_MIN){toast(ACCT_ERR.weak);return;}
+  const pid=isNew?'p'+uid():old.id;
+  if(isNew||acct!==old.acct||newPwd){
+    _busyPt=true;
+    const r=await acctCall({op:'set',pid,acct,...(newPwd?{pwd:newPwd}:{})});
+    _busyPt=false;
+    if(!r)return;
+  }
+  const p={name:nm,sex:document.getElementById('m-pt-sex').value,acct,av:nm[0]||'?',imgSrc:pendingPtImg||old?.imgSrc||'',
     tags:JSON.parse(document.getElementById('m-pt-tag-opts').dataset.sel||'[]'),note:document.getElementById('m-pt-note').value.trim()};
   if(old)Object.assign(old,p); // 編輯時保留未讀數、已推播內容等其他欄位
-  else{patients.push(Object.assign({id:'p'+uid()},p,{unread:0,assignedVids:[],assignedKnows:[]}));ptStats.push(newStat());}
-  if(editPtIdx===PIDX)syncPatientUI();
-  pendingPtImg='';closeM('m-pt');renderPt();renderCL();syncChatHdr();renderOv();toast(editPtIdx===-1?'已新增個案':'已更新個案');
+  else{
+    patients.push(Object.assign({id:pid},p,{unread:0,assignedVids:[],assignedKnows:[]}));ptStats.push(newStat());
+    chanOf('t',pid,'new');chanOf('p',pid,'new'); // 這位個案的兩份文件由本機建立
+  }
+  pendingPtImg='';closeM('m-pt');renderPt();renderCL();syncChatHdr();renderOv();toast(isNew?'已新增個案':'已更新個案');
+  _touched=true;
 }
 function deletePt(i){
   const p=patients[i];if(!p)return;
-  skyConfirm('確定刪除「'+p.name+'」？此個案的對話、病歷與回報紀錄會一併刪除。',ok=>{
+  skyConfirm('確定刪除「'+p.name+'」？此個案的帳號、對話、病歷與回報紀錄會一併刪除。',async ok=>{
     if(!ok)return;
+    const pid=p.id;
+    // 先由伺服器移除帳號與該個案的文件（個案立刻無法登入），成功後才從名單拿掉
+    if(!(await acctCall({op:'delete',pid})))return;
+    i=patients.findIndex(x=>x.id===pid);if(i<0)return;
     const n=patients.length;
     patients.splice(i,1);ptStats.splice(i,1);
     ptMaps().forEach(map=>{for(let k=i;k<n;k++){if(map[k+1]!==undefined)map[k]=map[k+1];else delete map[k];}});
     medRecords=medRecords.filter(r=>r.ptIdx!==i);medRecords.forEach(r=>{if(r.ptIdx>i)r.ptIdx--;});
-    notifications=notifications.filter(x=>x.ci!==i);notifications.forEach(x=>{if(x.ci>i)x.ci--;});
     const fix=v=>v>i?v-1:Math.min(v,Math.max(0,patients.length-1));
-    selPtIdx=fix(selPtIdx);mrPtIdx=fix(mrPtIdx);activeCI=fix(activeCI);PIDX=fix(PIDX);
-    renderAll();toast('已刪除個案');
+    selPtIdx=fix(selPtIdx);mrPtIdx=fix(mrPtIdx);activeCI=fix(activeCI);
+    delete chans['t:'+pid];delete chans['p:'+pid];
+    refreshNotifs();renderAll();toast('已刪除個案');
+    _touched=true;
   });
 }
 function syncPatientUI(){const p=patients[PIDX];if(!p)return;patientSelf.name=p.name;patientSelf.initials=p.av||p.name[0]||'?';patientSelf.img=p.imgSrc||'';setAv(document.getElementById('p-sb-av'),patientSelf.img,patientSelf.initials);const sn=document.getElementById('p-sb-nm');if(sn)sn.textContent=patientSelf.name;const gr=document.getElementById('p-greet');if(gr)gr.textContent='嗨，'+patientSelf.name+' 👋🏻';renderCL();}
@@ -1706,13 +2071,13 @@ function renderOv(){
   const sg=document.getElementById('ov-stats');if(!sg)return;
   const days=daySeries(st,7),todayLog=days[6].log,wk=avgRate(st,days),un=p?(p.unread||0):0;
   setHTML(sg,
-    mkStat('今日執行率',todayLog?(todayLog.pct+'%'):'—',todayLog?`${todayLog.done}/${todayLog.total} 項`:'尚無資料',true)+
-    mkStat('今日 VAS',todayLog?(todayLog.vas+' 分'):'—',todayLog?(todayLog.vas<=3?'輕微':todayLog.vas<=6?'中等':'嚴重'):'尚無資料',todayLog?todayLog.vas<=5:true)+
+    mkStat('今日執行率',todayLog?(H(todayLog.pct)+'%'):'—',todayLog?`${H(todayLog.done)}/${H(todayLog.total)} 項`:'尚無資料',true)+
+    mkStat('今日 VAS',todayLog?(H(todayLog.vas)+' 分'):'—',todayLog?(todayLog.vas<=3?'輕微':todayLog.vas<=6?'中等':'嚴重'):'尚無資料',todayLog?todayLog.vas<=5:true)+
     mkStat('本週達成率',wk+'%','近 7 天平均',wk>=60)+
     mkStat('未讀訊息',un+'',un?'待回覆':'無待回覆',!un));
   const ct=document.getElementById('ov-chart-ttl');if(ct)ct.textContent=(p?p.name+' · ':'')+'本週執行率';
   const chart=document.getElementById('ov-chart');
-  if(chart)setHTML(chart,days.map((d,i)=>{const r=d.log?d.log.pct:0;return`<div class="bar" style="height:${r}%;background:${i===6?'var(--blue)':'var(--ink)'};opacity:${i===6?1:.7};"><span>${d.log?r+'%':'—'}</span><small>${d.label}</small></div>`;}).join(''));
+  if(chart)setHTML(chart,days.map((d,i)=>{const r=d.log?(+d.log.pct||0):0;return`<div class="bar" style="height:${r}%;background:${i===6?'var(--blue)':'var(--ink)'};opacity:${i===6?1:.7};"><span>${d.log?r+'%':'—'}</span><small>${d.label}</small></div>`;}).join(''));
   const acts=document.getElementById('ov-acts');
   if(acts){
     const logs=sortedLogs(st).slice(-4).reverse();
@@ -1727,7 +2092,7 @@ function renderCL(){const el=document.getElementById('cl-items');if(!el)return;c
 function filterCL(v){clFilter=v.trim();renderCL();}
 function selectContact(i){
   if(!patients[i])return;
-  activeCI=i;patients[i].unread=0;
+  activeCI=i;patients[i].unread=0;refreshNotifs();
   renderCL();syncChatHdr();renderMsgs();renderAnn('t-ann','t-ann-cnt',false,activeCI);
   renderAlbums('t');renderNotes('t'); // 相簿／記事面板跟著切換到這位個案
   updUnread();renderOv();
@@ -1741,7 +2106,7 @@ function markSeen(){
   if(ROLE==='therapist'){
     const p=patients[activeCI];
     const open=document.querySelector('#t-app .view.on')?.dataset.tv==='ch'&&(window.innerWidth>740||document.querySelector('#t-app .chat-wrap')?.classList.contains('show-chat'));
-    if(p&&p.unread&&open){p.unread=0;renderCL();updUnread();renderOv();}
+    if(p&&p.unread&&open){p.unread=0;refreshNotifs();renderCL();updUnread();renderOv();}
   }else{
     const p=patients[PIDX];
     if(p&&p.ptUnread&&document.querySelector('#p-app .view.on')?.dataset.pv==='pc'){p.ptUnread=0;updPtUnread();}
@@ -1750,11 +2115,8 @@ function markSeen(){
 
 // ── NOTIFICATIONS ──
 let notifications=[];
-function addNotif(msg,icon='💬',ci=null){
-  notifications.unshift({msg,icon,t:fmtNow(),read:false,ci});
-  if(notifications.length>30)notifications.pop();
-  renderNotifPanel();
-}
+// 通知不另外儲存，由個案傳來的訊息推算（見 deriveNotifs）；未讀數或已讀位置變動後重算一次
+function refreshNotifs(){notifications=LOGGED&&ROLE==='therapist'?deriveNotifs(liveState()):[];renderNotifPanel();}
 function renderNotifPanel(){
   const panel=document.getElementById('notif-panel');if(!panel)return;
   const unread=notifications.filter(n=>!n.read).length;
@@ -1773,10 +2135,12 @@ function openNotif(i){
     selectContact(n.ci);
   }
   document.getElementById('notif-panel')?.classList.remove('on');
-  renderNotifPanel();
+  refreshNotifs();
 }
-function clearNotifs(){notifications=[];renderNotifPanel();}
-function markAllRead(){notifications.forEach(n=>n.read=true);renderNotifPanel();}
+// 個案裝置的時鐘可能比較快：取「現在」與「已收到的最新訊息時間」中較晚的當作時間點
+const ntfNow=()=>Object.values(msgMap).reduce((m,list)=>(list||[]).reduce((a,x)=>Math.max(a,x.ts||0),m),Date.now());
+function clearNotifs(){ntf.clr=ntfNow();refreshNotifs();}
+function markAllRead(){ntf.read=ntfNow();refreshNotifs();}
 
 // 公告
 function renderAnn(stripId,cntId,readOnly,ci){
@@ -1842,19 +2206,18 @@ function paintMsgs(bdId,msgs,flip){
 }
 function renderMsgs(){paintMsgs('c-body',getMsgs(activeCI),false);}
 function renderPMsgs(){paintMsgs('p-c-body',getMsgs(PIDX),true);}
-// 新訊息都帶 id 與時間戳，多裝置合併時才能準確辨識每一則
+// 新訊息都帶 id 與時間戳，多裝置合併時才能準確辨識每一則。
+// 雙方的訊息分開存放、顯示時依時間戳排成一串，所以新訊息的時間戳一定要排在目前看得到的訊息之後（雙方裝置的時鐘不必一致）
+function nextTs(ci){return getMsgs(ci).reduce((m,x)=>Math.max(m,(x.ts||0)+1),Date.now());}
 function sendMsg(){
   const inp=document.getElementById('ch-inp');const txt=inp.value.trim();const p=patients[activeCI];if(!txt||!p)return;
-  getMsgs(activeCI).push({id:uid(),ts:Date.now(),who:'me',t:fmtNow(),txt});
-  p.ptUnread=(p.ptUnread||0)+1; // 個案端未讀
-  inp.value='';renderMsgs();renderPMsgs();updPtUnread();
+  getMsgs(activeCI).push({id:uid(),ts:nextTs(activeCI),who:'me',t:fmtNow(),txt});
+  inp.value='';renderMsgs();
 }
 function sendPtMsg(){
   const inp=document.getElementById('p-ch-inp');const txt=inp.value.trim();const p=patients[PIDX];if(!txt||!p)return;
-  getMsgs(PIDX).push({id:uid(),ts:Date.now(),who:'them',t:fmtNow(),txt});
-  p.unread=(p.unread||0)+1; // 治療師端未讀
-  addNotif(p.name+' 傳送訊息：'+txt.slice(0,28)+(txt.length>28?'…':''),'💬',PIDX);
-  inp.value='';renderPMsgs();renderMsgs();updUnread();
+  getMsgs(PIDX).push({id:uid(),ts:nextTs(PIDX),who:'them',t:fmtNow(),txt}); // 治療師端的未讀數與通知由這則訊息推算
+  inp.value='';renderPMsgs();
 }
 
 // 個案端未讀角標（手機分頁列＋側邊欄）
@@ -1870,7 +2233,7 @@ function clearChat(){
     const p=patients[ci];if(p){p.unread=0;p.ptUnread=0;}
     renderMsgs();renderPMsgs();
     renderAnn('t-ann','t-ann-cnt',false,activeCI);renderPAnn();
-    renderCL();updUnread();updPtUnread();renderOv();
+    renderCL();updUnread();updPtUnread();renderOv();refreshNotifs();
     toast('已清除');
   },'清除對話','確認清除');
 }
@@ -1884,10 +2247,8 @@ function confirmImg(){
   const fromT=_pendingImg.side==='t',ci=fromT?activeCI:PIDX,p=patients[ci],src=_pendingImg.src;
   _pendingImg=null;closeM('m-img-prev');
   if(!p)return;
-  getMsgs(ci).push({id:uid(),ts:Date.now(),who:fromT?'me':'them',t:fmtNow(),type:'img',src});
-  if(fromT)p.ptUnread=(p.ptUnread||0)+1;
-  else{p.unread=(p.unread||0)+1;addNotif(p.name+' 傳送了一張圖片','💬',ci);}
-  renderMsgs();renderPMsgs();updUnread();updPtUnread();
+  getMsgs(ci).push({id:uid(),ts:nextTs(ci),who:fromT?'me':'them',t:fmtNow(),type:'img',src});
+  renderMsgs();renderPMsgs();
 }
 function scrollToMsg(idx){const bdId=ROLE==='therapist'?'c-body':'p-c-body';const bd=document.getElementById(bdId);if(!bd)return;const t=bd.querySelector(`[data-idx="${idx}"]`);if(t){t.scrollIntoView({behavior:'smooth',block:'center'});t.style.transition='background .3s';t.style.background='rgba(37,99,235,.12)';setTimeout(()=>t.style.background='',1600);}}
 
@@ -1914,7 +2275,7 @@ function searchMsgs(kw){
   const msgs=getMsgs(ci);
   const res=msgs.map((m,i)=>({m,i})).filter(({m})=>m.txt&&m.txt.includes(tk));
   document.getElementById('ms-cnt').textContent=res.length+' 筆';
-  document.getElementById('ms-results').innerHTML=res.map(({m,i})=>`<div onclick="scrollToMsg(${i});closeM('m-msearch');" style="padding:9px 11px;border-radius:7px;background:var(--bg);cursor:pointer;margin-bottom:4px;" onmouseover="this.style.background='#EBEBEB'" onmouseout="this.style.background='var(--bg)'"><div style="font-size:11px;color:var(--ink3);margin-bottom:2px;">${m.t}</div><div style="font-size:13px;">${H(m.txt||'').split(H(tk)).join(`<mark style="background:#FEF08A;">${H(tk)}</mark>`)}</div></div>`).join('')||`<div style="text-align:center;padding:20px 0;color:var(--ink3);font-size:13px;">找不到「${H(tk)}」</div>`;
+  document.getElementById('ms-results').innerHTML=res.map(({m,i})=>`<div onclick="scrollToMsg(${i});closeM('m-msearch');" style="padding:9px 11px;border-radius:7px;background:var(--bg);cursor:pointer;margin-bottom:4px;" onmouseover="this.style.background='#EBEBEB'" onmouseout="this.style.background='var(--bg)'"><div style="font-size:11px;color:var(--ink3);margin-bottom:2px;">${H(m.t)}</div><div style="font-size:13px;">${H(m.txt||'').split(H(tk)).join(`<mark style="background:#FEF08A;">${H(tk)}</mark>`)}</div></div>`).join('')||`<div style="text-align:center;padding:20px 0;color:var(--ink3);font-size:13px;">找不到「${H(tk)}」</div>`;
 }
 function openTagEdit(){openPtModal(activeCI);}
 
@@ -2019,10 +2380,17 @@ function renderVideos(filter='all'){
 // 刪除影片／知識：個案「已推播」清單記的是序號，後面的序號要跟著往前移
 function removeMedia(type,i){
   const isVid=type==='video',key=isVid?'assignedVids':'assignedKnows';
-  (isVid?videos:knows).splice(i,1);
+  const gone=(isVid?videos:knows).splice(i,1)[0];
   patients.forEach(p=>{p[key]=(p[key]||[]).filter(x=>x!==i).map(x=>x>i?x-1:x);});
+  if(!isVid&&gone)dropBlob(gone.pdfHash);
   if(isVid)renderVideos(curVidFilter);else renderKnows(curKnFilter);
   renderLearn();renderPHomeRec();toast('已刪除');
+}
+// 這份 PDF 已經沒有任何衛教知識在用 → 從雲端移除（失敗也無妨，只是多佔一點空間）
+function dropBlob(hash){
+  if(!hash||knows.some(k=>k.pdfHash===hash))return;
+  _blobOk.delete(hash);
+  api('/blob/'+hash,{method:'DELETE'}).catch(()=>{});
 }
 function delVideo(i){skyConfirm('刪除「'+videos[i].title+'」？',ok=>{if(ok)removeMedia('video',i);});}
 function renderVidFlt(){
@@ -2088,7 +2456,11 @@ function saveMedia(){
   const arr=mediaType==='video'?videos:knows,old=mediaEditIdx===-1?null:arr[mediaEditIdx];
   const obj={title,url:normUrl(document.getElementById('m-med-url').value),cat:document.getElementById('m-med-cat').value,sub:document.getElementById('m-med-sub').value,desc:document.getElementById('m-med-desc').value.trim(),coverSrc:pendingCoverSrc,pdfSrc:pendingPdfSrc,pdfName:pendingPdfName,
     cv:old?old.cv||'':['','c2','c3'][Math.floor(Math.random()*3)]}; // 編輯時沿用原本的封面底色
+  const oldHash=old&&old.pdfSrc!==obj.pdfSrc?old.pdfHash:'';
+  if(oldHash)delete old.pdfHash; // PDF 換過了，雜湊要重算
   if(old)Object.assign(old,obj);else arr.push(obj);
+  dropBlob(oldHash);
+  hashPdfs(knows).then(ch=>{if(ch)_touched=true;});
   pendingCoverSrc='';pendingPdfSrc='';pendingPdfName='';closeM('m-med');
   if(mediaType==='video')renderVideos(curVidFilter);else renderKnows(curKnFilter);
   renderLearn();renderPHomeRec();toast('已儲存');
@@ -2167,15 +2539,28 @@ function delSub(ci,si){skyConfirm('刪除「'+cats[ci].subs[si]+'」？',ok=>{if
 function addSub(ci){skyPrompt('次主題名稱…',val=>{if(!val?.trim())return;cats[ci].subs.push(val.trim());renderCatList();toast('已新增');});}
 
 // ── SETTINGS ──
-function saveTherapist(){
+// 更改自己的帳號或密碼：要先輸入目前密碼，由伺服器驗證後更新（其他裝置上的登入會立刻失效）。回傳新的帳號；失敗回傳 null
+async function changeOwnAccount(acctId,pwdId,curId){
+  const newAcct=document.getElementById(acctId).value.trim(),newPwd=document.getElementById(pwdId).value.trim(),cur=document.getElementById(curId).value;
+  const acctChanged=!!newAcct&&newAcct!==SESSION.acct;
+  if(!acctChanged&&!newPwd)return SESSION.acct;
+  if(!cur){toast('更改帳號或密碼前，請先輸入目前密碼');return null;}
+  if(newPwd&&newPwd.length<PWD_MIN){toast(ACCT_ERR.weak);return null;}
+  const r=await acctCall({op:'self',cur,...(acctChanged?{acct:newAcct}:{}),...(newPwd?{pwd:newPwd}:{})});
+  if(!r)return null;
+  SESSION.acct=r.acct;
+  return r.acct;
+}
+async function saveTherapist(){
   const nm=document.getElementById('st-nm').value.trim()||therapistState.name;
   const ttl=document.getElementById('st-ttl').value.trim()||therapistState.title;
-  const newAcct=document.getElementById('st-acct')?.value.trim()||therapistState.acct;  const newPwd=document.getElementById('st-pwd-new')?.value.trim();
+  const acct=await changeOwnAccount('st-acct','st-pwd-new','st-pwd-cur');
+  if(acct===null)return;
+  therapistState.acct=acct;
   therapistState.name=nm;therapistState.title=ttl;therapistState.img=therapistImg;
-  therapistState.acct=newAcct;
-  if(newPwd)therapistState.pwd=newPwd;
   applyBrandUI();syncSettingsInputs();
   toast('已儲存');
+  _touched=true;
 }
 // 把治療師名稱、頭像、平台標題與 Logo 套到畫面各處（不動設定頁的輸入欄位）
 function applyBrandUI(){
@@ -2197,7 +2582,7 @@ function syncSettingsInputs(){
   document.getElementById('st-nm').value=therapistState.name;
   document.getElementById('st-ttl').value=therapistState.title;
   document.getElementById('st-acct').value=therapistState.acct;
-  document.getElementById('st-pwd-new').value='';
+  document.getElementById('st-pwd-new').value='';document.getElementById('st-pwd-cur').value='';
   therapistImg=therapistState.img||'';pendingLogoSrc=null;
   setAv(document.getElementById('st-av'),therapistImg,therapistState.name[0]||'?');
   setLogoEl(document.getElementById('st-logo'),frontState.logoSrc);
@@ -2272,11 +2657,10 @@ function submitRpt(){
   const li=s.logs.findIndex(l=>l.date===log.date);
   if(li>=0)s.logs[li]=log;else s.logs.push(log);
   s.lastVas=d.vas;
-  p.unread=(p.unread||0)+1;
-  addNotif(p.name+' 提交每日回報（完成率 '+pct+'%・VAS '+d.vas+'）','📋',PIDX);
-  // 自動發送回報訊息給治療師
-  getMsgs(PIDX).push({id:uid(),ts:Date.now(),who:'them',t:fmtNow(),txt:'📋 每日回報已提交\n完成率：'+pct+'%（'+done+'/'+total+' 項）\nVAS 疼痛：'+d.vas+' 分'+(d.note?'\n備註：'+d.note:''),auto:true});
-  initDailyRpt();syncHomeStats();renderPMsgs();renderMsgs();updUnread();renderOv();renderTracking();
+  // 自動發送回報訊息給治療師（治療師端的未讀數與通知由這則訊息推算）
+  getMsgs(PIDX).push({id:uid(),ts:nextTs(PIDX),who:'them',t:fmtNow(),txt:'📋 每日回報已提交\n完成率：'+pct+'%（'+done+'/'+total+' 項）\nVAS 疼痛：'+d.vas+' 分'+(d.note?'\n備註：'+d.note:''),auto:true});
+  initDailyRpt();syncHomeStats();renderPMsgs();
+  syncNow(false,true); // 回報要馬上送出，不等待
   toast('已提交，並自動通知治療師','check');
 }
 function resetRpt(){const d=rptDraft;Object.assign(d,{exercises:{},vas:0,note:'',submitted:false,saved:false});delete d.pct;delete d.done;delete d.total;initDailyRpt();syncHomeStats();}
@@ -2327,44 +2711,54 @@ function renderPHomeRec(){
   setHTML(g,list.map((a,idx)=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;${idx<list.length-1?'border-bottom:1px solid var(--border);':''}cursor:pointer;" onclick="openViewModal('${a._t}',${a._ri})"><div style="width:34px;height:34px;border-radius:8px;background:${a._t==='vid'?'var(--ink)':'#F0F0F0'};color:${a._t==='vid'?'#fff':'var(--ink)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${a._t==='vid'?'<svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'}</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${H(a.title)}</div><div style="font-size:11px;color:var(--ink3);">${a._t==='vid'?'影片':'PDF'}</div></div></div>`).join('')||'<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--ink3);">尚無推播內容</div>');
 }
 
-function openViewModal(type,ri){const isVid=type==='vid'||type==='video';const item=isVid?videos[ri]:knows[ri];if(!item){toast('找不到內容');return;}document.getElementById('m-view-ttl').textContent=item.title;const covH=item.coverSrc?`<div style="border-radius:9px;overflow:hidden;aspect-ratio:16/9;margin-bottom:14px;"><img src="${H(item.coverSrc)}" style="width:100%;height:100%;object-fit:cover;display:block;"/></div>`:'';const descH=item.desc?`<p style="font-size:13.5px;color:var(--ink2);line-height:1.65;margin:10px 0 0;">${H(item.desc)}</p>`:'';let actH='';if(isVid){actH=item.url?`<button class="btn pri" id="play-btn">▶ 播放影片</button>`:'<button class="btn" disabled style="opacity:.45;">尚未設定連結</button>';}else{actH=item.pdfSrc?`<button class="btn pri" id="dl-btn" data-ri="${ri}">⬇ 下載 PDF</button>`:'<button class="btn" disabled style="opacity:.45;">尚未上傳 PDF</button>';}document.getElementById('m-view-body').innerHTML=covH+descH+`<div style="margin-top:14px;">${actH}</div>`;if(isVid&&item.url){setTimeout(()=>{const btn=document.getElementById('play-btn');if(btn)btn.onclick=()=>{const u=normUrl(item.url);if(!/^https?:\/\//i.test(u)){toast('連結格式不正確');}else{window.open(u,'_blank','noopener');}closeM('m-view');};},0);}if(!isVid&&item.pdfSrc){setTimeout(()=>{const btn=document.getElementById('dl-btn');if(btn)btn.onclick=()=>dlPdf(ri);},0);}openM('m-view');}
-function dlPdf(ri){const item=knows[ri];if(!item?.pdfSrc)return;try{const b64=item.pdfSrc.split(',')[1];const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);const blob=new Blob([arr],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(item.pdfName||item.title||'doc').replace(/\.pdf$/i,'')+'.pdf';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000);toast('PDF 下載中…');}catch(e){window.open(item.pdfSrc,'_blank');}}
-
-function applyPtAv(inp){const f=inp.files[0];inp.value='';readImg(f,256,src=>{pendingPtAvImg=src;setAv(document.getElementById('p-av-disp'),src,patientSelf.initials);},true);}
-function savePtAccount(){
-  const p=patients[PIDX];if(!p)return;
-  const nm=document.getElementById('p-nm').value.trim()||p.name;
-  const newAcct=document.getElementById('p-acct').value.trim();
-  const newPwd=document.getElementById('p-pwd-new').value.trim();
-  // 帳號重複檢查
-  if(newAcct&&patients.some((x,i)=>i!==PIDX&&x.acct===newAcct)){toast('⚠️ 此帳號已被使用，請換一個');return;}
-  p.name=nm;p.av=nm[0]||'?';
-  if(pendingPtAvImg!==null)p.imgSrc=pendingPtAvImg;
-  if(newAcct)p.acct=newAcct;
-  if(newPwd)p.pwd=newPwd;
-  pendingPtAvImg=null;
-  syncPatientUI();goP('pac'); // 側欄、問候語與本頁欄位都更新成儲存後的內容
-  syncChatHdr();renderPt();renderOv();toast('已儲存');
+function openViewModal(type,ri){const isVid=type==='vid'||type==='video';const item=isVid?videos[ri]:knows[ri];if(!item){toast('找不到內容');return;}document.getElementById('m-view-ttl').textContent=item.title;const covH=item.coverSrc?`<div style="border-radius:9px;overflow:hidden;aspect-ratio:16/9;margin-bottom:14px;"><img src="${H(item.coverSrc)}" style="width:100%;height:100%;object-fit:cover;display:block;"/></div>`:'';const descH=item.desc?`<p style="font-size:13.5px;color:var(--ink2);line-height:1.65;margin:10px 0 0;">${H(item.desc)}</p>`:'';let actH='';if(isVid){actH=item.url?`<button class="btn pri" id="play-btn">▶ 播放影片</button>`:'<button class="btn" disabled style="opacity:.45;">尚未設定連結</button>';}else{actH=(item.pdfSrc||item.pdfRef)?`<button class="btn pri" id="dl-btn" data-ri="${ri}">⬇ 下載 PDF</button>`:'<button class="btn" disabled style="opacity:.45;">尚未上傳 PDF</button>';}document.getElementById('m-view-body').innerHTML=covH+descH+`<div style="margin-top:14px;">${actH}</div>`;if(isVid&&item.url){setTimeout(()=>{const btn=document.getElementById('play-btn');if(btn)btn.onclick=()=>{const u=normUrl(item.url);if(!/^https?:\/\//i.test(u)){toast('連結格式不正確');}else{window.open(u,'_blank','noopener');}closeM('m-view');};},0);}if(!isVid&&(item.pdfSrc||item.pdfRef)){setTimeout(()=>{const btn=document.getElementById('dl-btn');if(btn)btn.onclick=()=>dlPdf(ri);},0);}openM('m-view');}
+async function dlPdf(ri){
+  const item=knows[ri];if(!item)return;
+  let src=item.pdfSrc;
+  if(!src&&item.pdfRef){ // 個案端：PDF 不在同步的資料裡，要看的時候才向伺服器下載
+    toast('PDF 下載中…');
+    try{const r=await api('/blob/'+item.pdfRef);if(!r.ok)throw 0;src=await r.text();}
+    catch(e){if(!(e instanceof AuthLost))toast('⚠️ PDF 下載失敗，請稍後再試');return;}
+  }
+  if(!src)return;
+  try{const b64=src.split(',')[1];const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);const blob=new Blob([arr],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(item.pdfName||item.title||'doc').replace(/\.pdf$/i,'')+'.pdf';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000);toast('PDF 下載中…');}catch(e){toast('⚠️ PDF 檔案無法開啟');}
 }
 
-// ── 雲端同步（同源 Worker /api/state → KV）──
-// 靜態頁面與 API 由同一個 Cloudflare Worker 提供，狀態 JSON 存於 KV（key: sky_state_v1）。
-// 治療師與個案各用各的裝置，所以不能「整份覆蓋」：
+function applyPtAv(inp){const f=inp.files[0];inp.value='';readImg(f,256,src=>{pendingPtAvImg=src;setAv(document.getElementById('p-av-disp'),src,patientSelf.initials);},true);}
+async function savePtAccount(){
+  const p=patients[PIDX];if(!p)return;
+  const nm=document.getElementById('p-nm').value.trim()||p.name;
+  const acct=await changeOwnAccount('p-acct','p-pwd-new','p-pwd-cur');
+  if(acct===null)return;
+  p.acct=acct;p.name=nm;p.av=nm[0]||'?';
+  if(pendingPtAvImg!==null)p.imgSrc=pendingPtAvImg;
+  pendingPtAvImg=null;
+  syncPatientUI();goP('pac'); // 側欄、問候語與本頁欄位都更新成儲存後的內容
+  toast('已儲存');
+  _touched=true;
+}
+
+// ── 雲端同步（同源 Worker /api → KV）──
+// 資料分成多份文件（主文件 m、每位個案的 t:<id> 與 p:<id>），每一份各自有版本號、各自同步：
 //   1. 沒有變更就不寫入；寫入時附上自己手上的版本，雲端若已有別人的新版，就先取回、合併再寫。
-//   2. 定時（以及切回頁面、登入時）向雲端確認有沒有新版，有就合併進來並更新畫面。
-//   3. 每份資料都記下它是從哪些版本改來的（_sync.hist），合併時才找得到雙方共同的舊版本。
-const API_STATE='/api/state';
+//   2. 定時（以及切回頁面時）向雲端確認各文件的版本，有新版才下載、合併並更新畫面。
+//   3. 每份文件都記下它是從哪些版本改來的（_sync.hist），合併時才找得到雙方共同的舊版本。
+// 治療師同步全部文件；個案只拿得到自己的 t（唯讀）與 p。
+const API='/api';
 const HIST_MAX=200;      // 版本來歷最多保留幾筆
-const PUSH_GAP=4000;     // 兩次上傳至少間隔（KV 同一筆資料每秒限寫一次，免費方案另有每日寫入上限）
-const DRAFT_WAIT=20000;  // 只改了「每日回報草稿」時，停手這麼久才上傳，節省寫入次數
-let _ver='0';                    // 目前雲端版本（'0'＝尚無版本號的舊資料，或雲端還沒有資料）
-let _baseVer='0',_baseJson='';   // 最近一次從雲端取回的版本與內容（合併時的共同基準）
-let _pushed=[];                  // 取回之後自己上傳過的版本 [{ver,json}]，新的在前
-let _hist=[];                    // 目前這份資料的版本來歷（含 _ver），新的在前
-let _syncP=null,_again=false,_wantPull=false,_flush=false,_needPull=false;
-let _touched=true,_lastCheck=0,_recheckAt=Infinity,_lastPoll=0,_lastPush=0,_lastAct=Date.now();
-let _fails=0,_retryAt=0,_tooBig='',_cloudEmpty=false;
-window._cloudReady=false;
+const PUSH_GAP=4000;     // 同一份文件兩次上傳至少間隔（KV 同一筆資料每秒限寫一次，免費方案另有每日寫入上限）
+const LAZY_WAIT=20000;   // 只改了「已讀位置」或「每日回報草稿」時，停手這麼久才上傳，節省寫入次數
+let SESSION=null;        // 登入後：{role:'t'|'p',pid,acct}
+let MODE='ready',PREVIEW=false,_brand=null; // 系統狀態與登入頁的標題／Logo（公開資訊）
+let chans={};            // 每一份文件一個同步頻道
+let _tDoc=null;          // 個案端：目前的畫面是依這一份治療師文件組出來的
+let _syncP=null,_again=false,_wantPull=false,_wantFull=false,_flush=false,_leaving=false,_paused=false;
+let _touched=true,_lastCheck=0,_recheckAt=Infinity,_lastPoll=0,_lastFull=0,_lastAct=Date.now();
+let _fails=0,_retryAt=0,_sweepN=0,_pubSent='',_booting=false;
+const _blobOk=new Set();
+class AuthLost extends Error{}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function pool(items,n,fn){let i=0;await Promise.all(Array.from({length:Math.min(n,items.length)},async()=>{while(i<items.length)await fn(items[i++]);}));}
 // 連線或儲存失敗：逐次拉長重試間隔，連續 3 次就提醒使用者；恢復後告知
 function netFail(code){
   _fails++;_retryAt=Date.now()+Math.min(30000,2000*_fails);
@@ -2372,184 +2766,376 @@ function netFail(code){
 }
 function netOk(){if(_fails>=3)toast('雲端同步已恢復','check');_fails=0;_retryAt=0;}
 
-function liveState(){return{patients,tags,cats,mediaSubs,videos,knows,medRecords,notifications,msgMap,annMap,tAlbumsMap,tNotesMap,pAlbumsMap,pNotesMap,ptStats,rptDraftMap,frontState,therapistState};}
+function liveState(){return{patients,tags,cats,mediaSubs,videos,knows,medRecords,notifications,msgMap,annMap,tAlbumsMap,tNotesMap,pAlbumsMap,pNotesMap,ptStats,rptDraftMap,frontState,therapistState,ntf};}
 function snapshotState(){return canonState(liveState());}
-const serverJson=()=>_pushed.length?_pushed[0].json:_baseJson; // 我們認為雲端目前的內容
 function _copyInto(target,src){if(target===src)return;Object.keys(target).forEach(k=>delete target[k]);Object.keys(src||{}).forEach(k=>{target[k]=src[k];});}
 function _replaceArr(target,src){if(target===src)return;const a=[...(src||[])];target.length=0;a.forEach(x=>target.push(x));}
 // 把一份完整資料套用到程式的全域狀態
 function applyStateData(d){
   prepState(d);
   patients=d.patients;tags=d.tags;cats=d.cats;mediaSubs=d.mediaSubs;videos=d.videos;knows=d.knows;
-  medRecords=d.medRecords;notifications=d.notifications;msgMap=d.msgMap;annMap=d.annMap;
+  medRecords=d.medRecords;msgMap=d.msgMap;annMap=d.annMap;
   _copyInto(tAlbumsMap,d.tAlbumsMap);_copyInto(tNotesMap,d.tNotesMap);_copyInto(pAlbumsMap,d.pAlbumsMap);_copyInto(pNotesMap,d.pNotesMap);_copyInto(rptDraftMap,d.rptDraftMap);
   _replaceArr(ptStats,d.ptStats);
-  _copyInto(frontState,d.frontState);_copyInto(therapistState,d.therapistState);
+  _copyInto(frontState,d.frontState);_copyInto(therapistState,d.therapistState);_copyInto(ntf,d.ntf);
   therapistImg=therapistState.img||'';
+  notifications=SESSION&&SESSION.role==='t'?deriveNotifs(liveState()):[];
 }
 
-async function apiGet(have){
+// ── 與伺服器的往來 ──
+// 通行證放在 HttpOnly cookie，瀏覽器會自動帶上；伺服器回 401 表示通行證已失效（逾時、改過密碼、帳號被移除）
+async function api(path,opt={}){
+  const h={...(opt.headers||{})};
+  if(opt.method&&opt.method!=='GET'&&opt.method!=='HEAD')h['X-Sky-Req']='1';
+  if(Date.now()-_lastAct<300000)h['X-Sky-Active']='1'; // 使用者還在操作 → 通行證快到期時自動延長
+  const r=await fetch(API+path,{cache:'no-store',credentials:'same-origin',...opt,headers:h});
+  if(r.status===401&&SESSION){const j=await r.json().catch(()=>null);authLost(j&&j.error);throw new AuthLost();}
+  return r;
+}
+async function apiJson(path,body){
+  const r=await api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+  return{ok:r.ok,status:r.status,data:await r.json().catch(()=>null)};
+}
+// 離開目前的登入狀態：重新載入頁面，記憶體與畫面上的資料一併清空（下一位使用這台裝置的人看不到）
+function leave(msg){
+  _leaving=true;SESSION=null;LOGGED=false;
+  try{if(msg)sessionStorage.setItem('sky_msg',msg);}catch(e){}
+  location.reload();
+}
+function authLost(code){if(!_leaving)leave(code==='gone'?'此帳號已被移除，請聯絡治療師':'登入已失效，請重新登入');}
+
+// ── 同步頻道（一份文件一個）──
+// st：unknown＝還沒確認雲端有沒有這份文件（確認前不上傳，以免蓋掉別台裝置剛建立的內容）；new＝本機新建；ok＝已同步過
+const canonOf={m:canonM,t:canonT,p:canonP},mergeOf={m:mergeM,t:mergeT,p:mergeP};
+const emptyJson=kind=>JSON.stringify(canonOf[kind](null));
+function chanOf(kind,pid,st){
+  const key=kind+(pid?':'+pid:'');
+  return chans[key]||(chans[key]={kind,pid:pid||'',key,path:'/doc/'+kind+(pid?'/'+pid:''),st:st||'unknown',ro:false,
+    ver:'0',baseVer:'0',baseJson:'',pushed:[],hist:[],dirty:st!=='new',since:Date.now(),lastPush:0,tooBig:'',at:0,miss:0,lz:null});
+}
+const srvJson=c=>c.pushed.length?c.pushed[0].json:c.baseJson; // 我們認為雲端目前的內容
+async function chanGet(c){
   try{
-    const r=await fetch(API_STATE,{cache:'no-store',headers:have&&have!=='0'?{'X-Sky-Have':have}:{}});
+    const r=await api(c.path,{headers:c.ver!=='0'?{'X-Sky-Have':c.ver}:{}});
     if(r.status===204)return{st:'same'};
     if(r.status===404)return{st:'empty'};
     if(!r.ok)return{st:'error',code:r.status};
     const ver=r.headers.get('X-Sky-Version')||'0';
     // 偶爾會讀到尚未更新的舊快取（版本已在我們的來歷裡）→ 視同沒有新資料
-    if(have&&ver!=='0'&&ver!==_ver&&_hist.includes(ver)){try{r.body&&r.body.cancel();}catch(e){}return{st:'same'};}
-    return{st:'ok',ver,text:await r.text()};
-  }catch(e){return{st:'error'};}
+    if(c.ver!=='0'&&ver!=='0'&&ver!==c.ver&&c.hist.includes(ver)){try{r.body&&r.body.cancel();}catch(e){}return{st:'same'};}
+    return{st:'ok',ver,at:+r.headers.get('X-Sky-At')||0,text:await r.text()};
+  }catch(e){if(e instanceof AuthLost)throw e;return{st:'error'};}
 }
-async function apiPut(body,newVer){
+async function chanPut(c,body,newVer,force){
   try{
-    const r=await fetch(API_STATE,{method:'PUT',headers:{'Content-Type':'application/json','X-Sky-Base':_ver,'X-Sky-Version':newVer},body,keepalive:body.length<20000});
+    const r=await api(c.path,{method:'PUT',headers:{'Content-Type':'application/json','X-Sky-Base':c.ver,'X-Sky-Version':newVer,...(force?{'X-Sky-Force':'1'}:{})},body,keepalive:body.length<20000});
     if(r.ok){
       // 一定要收到 Worker 的明確回覆才算成功（有些網路會用自己的頁面回 200）；ok:false＝雲端已有別人的新版本
       const j=await r.json().catch(()=>null);
-      return{st:j&&j.ok===true?'ok':j&&j.conflict?'conflict':'error'};
+      return{st:j&&j.ok===true?'ok':j&&j.conflict?'conflict':'error',at:j&&j.at};
     }
-    return{st:r.status===412?'conflict':r.status===413?'toobig':'error',code:r.status};
-  }catch(e){return{st:'error'};}
+    return{st:r.status===413?'toobig':'error',code:r.status};
+  }catch(e){if(e instanceof AuthLost)throw e;return{st:'error'};}
 }
-function parseRemote(text){
-  let d;try{d=JSON.parse(text);}catch(e){return null;}
-  if(!isObj(d)||!Array.isArray(d.patients))return null;
+// 取回這份文件的雲端新版，與本機內容 cur 合併。回傳合併後的 JSON；null＝讀取失敗
+async function chanPull(c,cur){
+  const res=await chanGet(c);
+  if(res.st==='error')return null;
+  c.dirty=false;
+  if(res.st==='same')return cur;
+  if(res.st==='empty'){
+    // 雲端沒有這份文件：可能是別台裝置剛建立、還沒同步過來，等一陣子仍然沒有才由本機建立
+    if(c.st==='ok'){c.st='unknown';c.since=Date.now();c.ver=c.baseVer='0';c.baseJson='';c.pushed=[];c.hist=[];}
+    else if(c.st==='unknown'&&Date.now()-c.since>90000)c.st='new';
+    return cur;
+  }
+  let d;try{d=JSON.parse(res.text);}catch(e){return null;}
+  if(!isObj(d))return null;
   const hist=d._sync&&Array.isArray(d._sync.hist)?d._sync.hist.filter(x=>typeof x==='string'):[];
   delete d._sync;
-  return{d:prepState(d),hist};
-}
-// 開啟頁面時的第一次載入：成功之前不開放儲存
-async function firstLoad(){
-  for(let n=0;;n++){
-    const res=await apiGet('');
-    // 雲端尚無資料：先用預設資料操作，等到真的有變更才建立雲端資料（單純開啟頁面不寫入）
-    if(res.st==='empty'){_ver=_baseVer='0';_hist=[];_baseJson=JSON.stringify(snapshotState());_cloudEmpty=true;return;}
-    const p=res.st==='ok'?parseRemote(res.text):null;
-    if(p){
-      applyStateData(p.d);
-      _ver=_baseVer=res.ver;_hist=[res.ver,...p.hist].slice(0,HIST_MAX);_pushed=[];
-      _baseJson=JSON.stringify(snapshotState());
-      return;
-    }
-    // 讀取失敗或內容無法辨識：絕不能當成「沒有資料」而用預設資料蓋掉雲端，只能等待重試
-    toast(res.st==='ok'?'⚠️ 雲端資料格式異常，已暫停儲存以免覆蓋':'⚠️ 無法連線到雲端，重試中…');
-    await new Promise(r=>setTimeout(r,Math.min(15000,2000*(n+1))));
-  }
-}
-// 取回雲端新版並合併進本機。回傳 false＝讀取失敗
-async function pullRemote(){
-  const res=await apiGet(_ver);
-  if(res.st==='error')return false;
-  _lastPoll=Date.now();
-  if(res.st==='same')return true;
-  if(res.st==='empty'){ // 原本有資料的雲端被清空 → 以本機資料重建
-    if(!_cloudEmpty){_ver=_baseVer='0';_baseJson='';_pushed=[];_hist=[];_touched=true;}
-    return true;
-  }
-  const p=parseRemote(res.text);if(!p)return false;
-  const anc=new Set([res.ver,...p.hist]);            // 雲端這一版的來歷
-  const cur=JSON.stringify(snapshotState());
-  const rJson=JSON.stringify(canonState(p.d));
-  const keep={a:patients[activeCI]?.id,s:patients[selPtIdx]?.id,m:patients[mrPtIdx]?.id};
-  const seen=_pushed.find(x=>anc.has(x.ver));        // 對方是從我們哪一次上傳的內容改來的
-  if(cur===serverJson()&&(!_pushed.length||seen===_pushed[0])){
-    applyStateData(p.d);                             // 本機沒有未上傳的變更 → 直接採用雲端版本
-    _hist=[...anc].slice(0,HIST_MAX);
+  const rJson=JSON.stringify(canonOf[c.kind](d)),anc=new Set([res.ver,...hist]); // anc＝雲端這一版的來歷
+  const seen=c.pushed.find(x=>anc.has(x.ver));                                   // 對方是從我們哪一次上傳的內容改來的
+  let out;
+  // 本機沒有未上傳的變更（或剛登入、畫面上還只是預設內容）→ 直接採用雲端版本
+  if((c.st==='unknown'&&(_booting||cur===emptyJson(c.kind)))||(c.st!=='unknown'&&cur===srvJson(c)&&(!c.pushed.length||seen===c.pushed[0]))){
+    out=rJson;
+    c.hist=[...anc].slice(0,HIST_MAX);
   }else{
     // 以雙方共同的舊版本做三方合併；對方若不是從我們看過的版本改來的，只接收它新增的內容
-    const additive=!seen&&!anc.has(_baseVer);
-    applyStateData(mergeStates(JSON.parse((seen?seen.json:_baseJson)||'{}'),JSON.parse(cur),p.d,additive));
-    _hist=[...new Set([...anc,..._hist])].slice(0,HIST_MAX);
-    _touched=true;
+    const additive=c.st!=='unknown'&&!seen&&!anc.has(c.baseVer);
+    const base=seen?seen.json:c.baseJson;
+    out=JSON.stringify(mergeOf[c.kind](base?JSON.parse(base):null,JSON.parse(cur),JSON.parse(rJson),additive));
+    c.hist=[...new Set([...anc,...c.hist])].slice(0,HIST_MAX);
   }
-  _ver=_baseVer=res.ver;_baseJson=rJson;_pushed=[];
-  afterRemoteApply(keep);
-  return true;
+  c.ver=c.baseVer=res.ver;c.baseJson=rJson;c.pushed=[];c.st='ok';c.at=res.at||c.at;c.miss=0;
+  return out;
 }
-// 套用雲端資料後：個案可能被排序或刪除，依 id 找回原本選取的對象，再重畫畫面
-function afterRemoteApply(keep){
-  const at=id=>Math.max(0,patients.findIndex(p=>p.id===id));
-  activeCI=at(keep.a);selPtIdx=at(keep.s);mrPtIdx=at(keep.m);
-  ptTagFilter=ptTagFilter.filter(i=>i<tags.length);
-  if(LOGGED&&ROLE==='patient'){
-    const i=patients.findIndex(p=>p.id===myPid);
-    if(i<0){logout();renderAll();toast('此帳號已被移除，請聯絡治療師');return;}
-    PIDX=i;
-  }else if(PIDX>=patients.length)PIDX=0;
-  renderAll();markSeen();
+// 與雲端的差異是否只有「已讀位置」或「每日回報草稿」（不必每按一下就上傳）
+function lazyOnly(c,cur){
+  if(c.kind==='m'||c.ver==='0')return false;
+  if(c.lz&&c.lz.cur===cur)return c.lz.v;
+  let v=false;
+  try{
+    const a=JSON.parse(cur),b=JSON.parse(srvJson(c));
+    if(c.kind==='t')a.chat.seen=b.chat.seen=null;else{a.seen=b.seen=null;a.rpt=b.rpt=null;}
+    v=JSON.stringify(a)===JSON.stringify(b);
+  }catch(e){}
+  c.lz={cur,v};
+  return v;
+}
+// 上傳這份文件。回傳 'ok'｜'conflict'（雲端已有別人的新版本，要先取回合併）｜'error'
+async function chanPush(c,cur,force){
+  const ver=uid();
+  const res=await chanPut(c,cur.slice(0,-1)+',"_sync":'+JSON.stringify({hist:c.hist.slice(0,HIST_MAX)})+'}',ver,force);
+  if(res.st==='ok'){
+    // 保留最近幾次上傳的內容當合併基準；資料很大時只留最新一份以節省記憶體
+    c.pushed.unshift({ver,json:cur});
+    let size=0;c.pushed=c.pushed.filter((x,i)=>i===0||(i<8&&(size+=x.json.length)<6e6));
+    c.ver=ver;c.hist=[ver,...c.hist].slice(0,HIST_MAX);c.lastPush=Date.now();c.st='ok';c.tooBig='';c.at=res.at||Date.now();c.miss=0;
+    return'ok';
+  }
+  if(res.st==='conflict'){c.dirty=true;return'conflict';}
+  if(res.st==='toobig'){c.tooBig=cur;toast('⚠️ 資料量超過雲端上限（約 24 MB），請刪除部分照片或 PDF');return'ok';}
+  netFail(res.code);
+  return'error';
+}
+
+// ── 畫面資料 ⇄ 各文件的 JSON ──
+// 把目前的畫面資料拆成各文件：{頻道 key: JSON 字串}
+function localJson(){
+  const out={};
+  if(SESSION.role==='t'){
+    const D=splitState(liveState());
+    out.m=JSON.stringify(D.m);
+    D.m.order.forEach(id=>{out['t:'+id]=JSON.stringify(D.t[id]);out['p:'+id]=JSON.stringify(D.p[id]);});
+  }else out['p:'+SESSION.pid]=patients.length?JSON.stringify(splitPatient(liveState(),_tDoc)):emptyJson('p');
+  return out;
+}
+// 把各文件組回畫面資料並重畫
+function applyJson(L){
+  const keep={a:patients[activeCI]?.id,s:patients[selPtIdx]?.id,m:patients[mrPtIdx]?.id};
+  let F;
+  if(SESSION.role==='t'){
+    const D={m:JSON.parse(L.m),t:{},p:{}};
+    D.m.order.forEach(id=>{D.t[id]=JSON.parse(L['t:'+id]||'null');D.p[id]=JSON.parse(L['p:'+id]||'null');});
+    F=joinState(D,SESSION.acct);
+  }else{
+    _tDoc=JSON.parse(L['t:'+SESSION.pid]||'null');
+    F=joinPatient(_tDoc,JSON.parse(L['p:'+SESSION.pid]||'null'),SESSION.pid,_brand);
+  }
+  applyStateData(F);
+  afterRemoteApply(keep);
+  if(SESSION.role==='t')hashPdfs(knows).then(ch=>{if(ch)_touched=true;});
+}
+// 個案名單變動時：補上新個案的頻道、移除已刪除個案的頻道
+function syncChanSet(order){
+  const want=new Set(order);
+  Object.values(chans).forEach(c=>{if(c.pid&&!want.has(c.pid))delete chans[c.key];});
+  order.forEach(id=>{chanOf('t',id);chanOf('p',id);});
+}
+// 向雲端確認各文件目前的版本，與手上不同的標記為「需要取回」
+function markVer(c,v){
+  if(!c)return;
+  if(!v){ // 雲端回報沒有這份文件：連續幾次都沒有才當真（可能只是還沒同步到這個地區）
+    if(c.st==='unknown'||(c.st==='ok'&&++c.miss>=3))c.dirty=true;
+    return;
+  }
+  c.miss=0;c.at=v[1]||c.at;
+  if(c.st==='unknown'||(v[0]!==c.ver&&!c.hist.includes(v[0])))c.dirty=true;
+}
+// 治療師每次要問哪些個案：個案多時，平常只問最近兩週有動靜的，每 5 分鐘再全部問一次（節省 KV 讀取額度）
+function sweepPids(full){
+  const all=patients.map(p=>p.id).filter(id=>chans['p:'+id]);
+  if(full||all.length<=12)return all;
+  const now=Date.now(),open=patients[activeCI]?.id;
+  return all.filter(id=>{const c=chans['p:'+id];return id===open||c.st!=='ok'||now-(c.at||0)<14*86400000;});
+}
+async function sweep(full){
+  try{
+    if(SESSION.role==='t'){
+      const pids=sweepPids(full);
+      const r=await apiJson('/versions',{p:pids,t:full?1:0});
+      if(!r.ok||!isObj(r.data))return false;
+      markVer(chanOf('m'),r.data.m);
+      pids.forEach(id=>{markVer(chans['p:'+id],(r.data.p||{})[id]);if(full)markVer(chans['t:'+id],(r.data.t||{})[id]);});
+      _sweepN=pids.length;
+    }else{
+      const r=await api('/versions');
+      const d=r.ok?await r.json().catch(()=>null):null;
+      if(!isObj(d))return false;
+      markVer(chans['t:'+SESSION.pid],d.t);markVer(chans['p:'+SESSION.pid],d.p);
+    }
+    _lastPoll=Date.now();if(full)_lastFull=_lastPoll;
+    return true;
+  }catch(e){if(e instanceof AuthLost)throw e;return false;}
+}
+// 取回所有有新版的文件並合併進畫面資料。回傳 false＝有文件讀取失敗（已成功取回的部分仍會套用）
+async function pullDirty(){
+  const L=localJson(),isT=SESSION.role==='t';
+  let changed=false,ok=true;
+  const one=async c=>{
+    const had=c.ro||c.key in L;
+    const cur=c.ro?(srvJson(c)||emptyJson(c.kind)):(c.key in L?L[c.key]:emptyJson(c.kind));
+    const out=await chanPull(c,cur);
+    if(out===null){ok=false;return;}
+    if(out!==cur||!had)changed=true;
+    L[c.key]=out;
+  };
+  if(isT){
+    const cm=chanOf('m'),was=L.m;
+    if(cm.dirty){await one(cm);if(!ok)return false;}
+    syncChanSet(L.m===was?patients.map(p=>p.id):JSON.parse(L.m).order);
+  }
+  await pool(Object.values(chans).filter(c=>c.dirty&&c.kind!=='m'),6,one);
+  if(changed){
+    if(!isT&&!('t:'+SESSION.pid in L))L['t:'+SESSION.pid]=srvJson(chans['t:'+SESSION.pid])||emptyJson('t');
+    applyJson(L);_touched=true;
+  }
+  return ok;
+}
+// 推播給個案的 PDF 另外上傳（以內容雜湊為名，雲端已經有的不重傳）
+async function ensureBlobs(){
+  const need=new Map();
+  patients.forEach(p=>(p.assignedKnows||[]).forEach(i=>{const k=knows[i];if(k&&k.pdfSrc&&k.pdfHash&&!_blobOk.has(k.pdfHash))need.set(k.pdfHash,k.pdfSrc);}));
+  for(const[h,src]of need){
+    try{
+      let r=await api('/blob/'+h,{method:'HEAD'});
+      if(r.status===404)r=await api('/blob/'+h,{method:'PUT',headers:{'Content-Type':'text/plain'},body:src});
+      if(r.ok)_blobOk.add(h);
+    }catch(e){if(e instanceof AuthLost)throw e;}
+  }
+}
+// 登入頁的標題與 Logo 是公開資訊，另存一份給登入頁與個案端使用
+async function pushBrand(){
+  const cur=JSON.stringify({title:frontState.title,sub:frontState.sub,logoSrc:frontState.logoSrc});
+  if(cur===_pubSent||(chans.m&&chans.m.st!=='ok'))return;
+  try{
+    const r=await api('/public',{method:'PUT',headers:{'Content-Type':'application/json'},body:cur});
+    if(r.ok){_pubSent=cur;_brand=JSON.parse(cur);}
+  }catch(e){if(e instanceof AuthLost)throw e;}
+}
+// 上傳本機有變更的文件。回傳 true＝還有事要做（被拒絕的文件要先取回新版再合併）
+async function pushAll(){
+  const L=localJson(),now=Date.now(),isT=SESSION.role==='t';
+  if(isT){syncChanSet(patients.map(p=>p.id));await ensureBlobs();}
+  const list=Object.keys(L).map(k=>chans[k]).filter(Boolean).sort((a,b)=>(a.kind==='m')-(b.kind==='m')); // 主文件最後上傳
+  let again=false;
+  for(const c of list){
+    const cur=L[c.key];
+    if(c.st==='unknown'||c.ro||cur===srvJson(c)||cur===c.tooBig)continue;
+    if(!_flush){
+      const wait=(lazyOnly(c,cur)?_lastAct+LAZY_WAIT:c.lastPush+PUSH_GAP)-now;
+      if(wait>0){_recheckAt=Math.min(_recheckAt,now+wait);continue;}
+    }
+    const r=await chanPush(c,cur);
+    if(r==='conflict'){again=true;_touched=true;}
+    else if(r==='error'){_touched=true;return false;}
+    else netOk();
+  }
+  if(isT)await pushBrand();
+  return again;
 }
 // 視窗或右鍵選單開著時先不套用雲端更新，以免操作到一半資料被換掉
 const uiBusy=()=>!!document.querySelector('.mbg.on,#ctx-menu.on');
-// 多久向雲端確認一次：操作中較頻繁，閒置越久越少（節省免費方案的讀取額度）
-function pollEvery(){const idle=Date.now()-_lastAct;return!LOGGED?60000:idle<120000?8000:idle<600000?20000:60000;}
-// 與雲端的差異是否只有「每日回報草稿」（個案填表過程不必每按一下就上傳）
-function draftOnly(cur){
-  const srv=serverJson();if(!srv||_ver==='0')return false;
-  const cut=j=>{const a=j.lastIndexOf('"rptDraftMap":'),b=j.indexOf(',"frontState":',a);return a<0||b<0?null:j.slice(0,a)+j.slice(b);};
-  const x=cut(cur);return x!==null&&x===cut(srv);
-}
+// 多久向雲端確認一次：操作中較頻繁，閒置越久越少；要問的個案越多也拉長（節省免費方案的讀取額度）
+function pollEvery(){const idle=Date.now()-_lastAct,base=idle<120000?8000:idle<600000?20000:60000;return Math.max(base,_sweepN*750);}
 async function syncLoop(){
-  const stamp=()=>_ver==='0'&&!_cloudEmpty; // 雲端是沒有版本號的舊資料 → 即使內容沒變也要上傳一次補上版本號
+  const dirty=()=>Object.values(chans).some(c=>c.dirty);
   for(let round=0;round<6;round++){
+    if(!LOGGED||!SESSION||_paused)return;
     if(Date.now()<_retryAt&&!_wantPull&&!_flush)return; // 剛失敗過，稍後再試（使用者主動操作時不等）
-    // 1) 取回雲端新版（上傳被拒、有人要求、或到了確認時間）
-    if((_needPull||_wantPull||Date.now()-_lastPoll>=pollEvery())&&!uiBusy()){
-      _wantPull=false;
-      if(!await pullRemote()){netFail();return;}
-      netOk();_needPull=false;
+    // 1) 確認版本、取回新版並合併
+    if(!uiBusy()){
+      if(_wantPull||Date.now()-_lastPoll>=pollEvery()){
+        const full=_wantFull||Date.now()-_lastFull>300000;
+        if(!await sweep(full)){netFail();return;}
+        _wantPull=_wantFull=false;netOk();
+      }
+      if(dirty()){if(!await pullDirty()){netFail();return;}netOk();}
     }
-    if(_needPull)return; // 上傳被拒但視窗開著不能合併，等關閉後再處理
+    if(dirty())return; // 上傳被拒但視窗開著不能合併，等關閉後再處理
     // 2) 本機有變更就上傳
     const now=Date.now();
-    if(!(_flush||_touched||now>=_recheckAt||now-_lastCheck>12000||stamp()))return;
+    if(!(_flush||_touched||now>=_recheckAt||now-_lastCheck>12000))return;
     _touched=false;_lastCheck=now;_recheckAt=Infinity;
-    const cur=JSON.stringify(snapshotState());
-    if((cur===serverJson()&&!stamp())||cur===_tooBig)return;
-    if(!_flush){
-      const wait=draftOnly(cur)?_lastAct+DRAFT_WAIT-now:_lastPush+PUSH_GAP-now;
-      if(wait>0){_recheckAt=now+wait;return;}
-    }
-    const ver=uid();
-    const res=await apiPut(cur.slice(0,-1)+',"_sync":'+JSON.stringify({hist:_hist.slice(0,HIST_MAX)})+'}',ver);
-    if(res.st==='ok'){
-      // 保留最近幾次上傳的內容當合併基準；資料很大時只留最新一份以節省記憶體
-      _pushed.unshift({ver,json:cur});
-      let size=0;_pushed=_pushed.filter((x,i)=>i===0||(i<8&&(size+=x.json.length)<6e6));
-      _ver=ver;_hist=[ver,..._hist].slice(0,HIST_MAX);_lastPush=Date.now();
-      _cloudEmpty=false;_tooBig='';netOk();
-      return;
-    }
-    _touched=true;
-    if(res.st==='conflict'){_needPull=true;continue;} // 雲端已有別人的新版本 → 取回合併後再上傳
-    if(res.st==='toobig'){_tooBig=cur;toast('⚠️ 資料量超過雲端上限（約 24 MB），請刪除部分照片或 PDF');return;}
-    netFail(res.code);
-    return;
+    if(!await pushAll())return;
   }
 }
 // pull：順便向雲端確認有沒有新版；flush：有變更就立刻上傳，不等待
 function syncNow(pull,flush){
   if(pull)_wantPull=true;
   if(flush)_flush=true;
-  if(!window._cloudReady)return Promise.resolve();
+  if(!LOGGED)return Promise.resolve();
   if(_syncP){if(pull||flush)_again=true;return _syncP;}
-  _syncP=syncLoop().catch(e=>console.warn('sync error',e)).then(()=>{_syncP=null;if(_again){_again=false;return syncNow();}_flush=false;});
+  _syncP=syncLoop().catch(e=>{if(!(e instanceof AuthLost))console.warn('sync error',e);}).then(()=>{_syncP=null;if(_again){_again=false;return syncNow();}_flush=false;});
   return _syncP;
 }
 ['pointerdown','click','keydown','input','change'].forEach(t=>document.addEventListener(t,()=>{_touched=true;_lastAct=Date.now();},{capture:true,passive:true}));
 setInterval(()=>{if(!document.hidden)syncNow();},1500);
 // 切回頁面／視窗取得焦點／恢復連線時馬上確認一次（剛確認過就不重複）
-const softPull=()=>{if(Date.now()-_lastPoll>2500)syncNow(true);};
+const softPull=()=>{if(Date.now()-_lastPoll>2500){_wantFull=true;syncNow(true);}};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)syncNow(false,true);else{_lastAct=Date.now();softPull();}});
 window.addEventListener('pagehide',()=>syncNow(false,true));
 window.addEventListener('focus',softPull);
 window.addEventListener('online',()=>{_retryAt=0;softPull();});
+// 還有哪些文件的變更沒上傳完
+function pendingDocs(){
+  if(!LOGGED||!SESSION)return[];
+  const L=localJson();
+  return Object.keys(L).filter(k=>{const c=chans[k];return c&&!c.ro&&c.st!=='unknown'&&L[k]!==srvJson(c)&&L[k]!==c.tooBig&&!lazyOnly(c,L[k]);});
+}
 window.addEventListener('beforeunload',e=>{
-  if(!window._cloudReady)return;
-  const cur=JSON.stringify(snapshotState());
-  if(cur===serverJson())return;
+  if(_leaving||!LOGGED)return;
   syncNow(false,true);
-  if(!draftOnly(cur)){e.preventDefault();e.returnValue='';} // 還有變更沒上傳完 → 請瀏覽器提醒使用者先別離開
+  if(pendingDocs().length){e.preventDefault();e.returnValue='';} // 還有變更沒上傳完 → 請瀏覽器提醒使用者先別離開
 });
+
+// 登入後的第一次載入：所有文件都成功取回才進入畫面（拿不完整的資料去操作可能蓋掉雲端的內容）
+async function firstLoad(){
+  chans={};_tDoc=null;_blobOk.clear();
+  if(SESSION.role==='t')chanOf('m');
+  else{chanOf('t',SESSION.pid).ro=true;chanOf('p',SESSION.pid);}
+  _booting=true;
+  try{
+    for(let n=0;;n++){
+      if(await pullDirty())break;
+      if(n>=5)return false;
+      toast('⚠️ 無法連線到雲端，重試中…');
+      await sleep(Math.min(15000,2000*(n+1)));
+    }
+  }finally{_booting=false;}
+  const cm=chans.m;
+  // 雲端還沒有任何資料（全新安裝）：先用預設內容操作，等到真的有變更才建立雲端資料
+  if(cm&&cm.st==='unknown'){cm.st='new';cm.dirty=false;cm.baseJson=localJson().m;}
+  // 個案端：兩份文件都還不存在（治療師剛建立帳號、資料尚未同步過來）→ 先以空白畫面開始
+  if(SESSION.role==='p'&&!patients.length)applyJson({['t:'+SESSION.pid]:srvJson(chans['t:'+SESSION.pid])||emptyJson('t'),['p:'+SESSION.pid]:emptyJson('p')});
+  _lastPoll=_lastFull=Date.now();
+  return true;
+}
+// 套用雲端資料後：個案可能被排序或刪除，依 id 找回原本選取的對象，再重畫畫面
+function afterRemoteApply(keep){
+  const at=id=>Math.max(0,patients.findIndex(p=>p.id===id));
+  activeCI=at(keep.a);selPtIdx=at(keep.s);mrPtIdx=at(keep.m);PIDX=0;
+  ptTagFilter=ptTagFilter.filter(i=>i<tags.length);
+  renderAll();markSeen();
+}
+
+// 衛教知識的 PDF：算出內容雜湊（個案下載時以它為檔名；同一份 PDF 推播給多人也只存一份）
+async function sha256Hex(s){
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+async function hashPdfs(list){
+  let changed=false;
+  if(!window.crypto||!crypto.subtle)return false;
+  for(const k of list||[]){
+    if(!isObj(k))continue;
+    if(!k.pdfSrc){if(k.pdfHash){delete k.pdfHash;changed=true;}continue;}
+    if(/^[a-f0-9]{64}$/.test(k.pdfHash||''))continue;
+    try{k.pdfHash=await sha256Hex(k.pdfSrc);changed=true;}catch(e){}
+  }
+  return changed;
+}
 
 // 依目前資料重畫整個畫面（各清單只有內容不同時才會真的更新）
 function renderAll(){
@@ -2575,14 +3161,18 @@ document.getElementById('login').classList.add('on');
   b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
   hdr.insertBefore(b,hdr.firstChild);
 })();
-syncSettingsInputs();renderAll(); // 先以預設資料畫出畫面
+syncSettingsInputs();renderAll(); // 先畫出登入頁（此時沒有任何個案資料）
 (async()=>{
-  toast('載入雲端資料中…');
-  await firstLoad();
-  try{syncSettingsInputs();renderAll();}catch(e){console.error(e);}
-  window._cloudReady=true; // 資料已載入就要開放儲存；即使畫面某處出錯也不能卡住，否則之後的修改永遠存不進雲端
-  toast('雲端資料載入完成','check');
-  syncNow();
+  // 上一頁留下的提示（例如「登入已失效」）
+  try{const m=sessionStorage.getItem('sky_msg');if(m){sessionStorage.removeItem('sky_msg');setTimeout(()=>toast(m),400);}}catch(e){}
+  _loggingIn=true;document.querySelector('.l-submit').textContent='載入中…';
+  await loadPublic();
+  // 重新整理頁面時通行證若仍有效，直接回到原本的畫面
+  try{
+    const r=await fetch(API+'/session',{cache:'no-store',credentials:'same-origin'});
+    if(r.ok){const s=await r.json();if(s&&s.role)await enterApp(s);}
+  }catch(e){if(!(e instanceof AuthLost))console.error(e);}
+  _loggingIn=false;renderLoginNote();
 })();
 
 // ── 備份匯出 / 匯入 ──
@@ -2605,21 +3195,60 @@ function importBackup(inp){
   r.onload=ev=>{
     let d;try{d=JSON.parse(ev.target.result);}catch(e){toast('❌ 檔案格式錯誤');return;}
     if(!isObj(d)||!Array.isArray(d.patients)){toast('❌ 不是有效的備份檔');return;}
-    skyConfirm('匯入備份將覆蓋目前所有資料，確定繼續？',ok=>{
-      if(!ok)return;
-      delete d._sync;
-      // 舊備份缺少的區塊沿用目前資料
-      const cur=liveState();
-      ['tags','cats','mediaSubs','videos','knows','medRecords','notifications','frontState','therapistState'].forEach(k=>{if(d[k]==null)d[k]=cur[k];});
-      // 匯入的個案一律視為新個案（重新給 id），以免和雲端上現有的個案資料混在一起
-      d.patients.forEach((p,i)=>{if(isObj(p))p.id='p'+uid()+i;});
-      applyStateData(d);
-      activeCI=selPtIdx=mrPtIdx=0;if(PIDX>=patients.length)PIDX=0;
-      syncSettingsInputs();renderAll();
-      toast('備份匯入成功','check');
-    },'匯入備份','確認匯入');
+    skyConfirm('匯入備份將覆蓋目前所有資料，確定繼續？',ok=>{if(ok)doImport(d);},'匯入備份','確認匯入');
   };
   r.readAsText(f);
+}
+async function doImport(d){
+  if(_paused)return;
+  _paused=true; // 匯入期間暫停同步，以免新舊資料混在一起
+  try{
+    if(_syncP)await _syncP;
+    delete d._sync;
+    // 舊備份缺少的區塊沿用目前資料
+    const cur=liveState();
+    ['tags','cats','mediaSubs','videos','knows','medRecords','frontState','therapistState'].forEach(k=>{if(d[k]==null)d[k]=cur[k];});
+    // 舊版的備份檔裡有明碼密碼：只用來重建帳號，不會留在資料裡
+    d.patients=arr(d.patients).map(p=>isObj(p)?p:{});
+    const pwds=d.patients.map(p=>typeof p.pwd==='string'?p.pwd:'');
+    normLegacy(d);
+    const ls=await acctCall({op:'list'}); // 雲端上目前有哪些個案帳號
+    if(!ls)return;
+    toast('匯入中，請稍候…');
+    const have=ls.accounts||{},byAcct=new Map(),used=new Set();
+    Object.keys(have).forEach(id=>{if(have[id]&&!byAcct.has(have[id]))byAcct.set(have[id],id);});
+    let lost=0;
+    // 匯入的個案一律視為新個案（重新給 id），以免和雲端上現有的個案資料混在一起。
+    // 帳號：備份檔裡有密碼的以檔案為準；沒有的話，帳號相同就沿用原本的密碼；其餘需要重新設定。
+    for(let i=0;i<d.patients.length;i++){
+      const p=d.patients[i],pid='p'+uid()+i,from=byAcct.get(p.acct);
+      p.id=pid;
+      let ok=false;
+      if(p.acct&&pwds[i].length>=PWD_MIN){
+        if(from&&!used.has(from)){used.add(from);await acctCall({op:'delete',pid:from},true);}
+        ok=!!(await acctCall({op:'set',pid,acct:p.acct,pwd:pwds[i]},true));
+      }else if(p.acct&&from&&!used.has(from)){
+        used.add(from);
+        const r=await acctCall({op:'move',from,pid},true);
+        ok=!!(r&&r.ok);
+      }
+      if(!ok){p.acct='';lost++;}
+    }
+    // 沒有被沿用的舊帳號連同其資料一併移除
+    for(const id of Object.keys(have)){if(!used.has(id))await acctCall({op:'delete',pid:id},true);}
+    const cm=chans.m;chans={};if(cm)chans.m=cm;
+    d.therapistState.acct=SESSION.acct;
+    applyStateData(d);
+    patients.forEach(p=>{chanOf('t',p.id,'new');chanOf('p',p.id,'new');});
+    activeCI=selPtIdx=mrPtIdx=PIDX=0;
+    syncSettingsInputs();renderAll();
+    hashPdfs(knows).then(ch=>{if(ch)_touched=true;});
+    toast(lost?'備份已匯入；有 '+lost+' 位個案需要重新設定帳號密碼':'備份匯入成功','check');
+  }catch(e){
+    if(!(e instanceof AuthLost)){console.error(e);toast('⚠️ 匯入未完成，請再匯入一次');}
+  }finally{
+    _paused=false;_touched=true;syncNow(false,true);
+  }
 }
 
 // ── 手機版：更多選單 / 聊天返回 ──

@@ -1,0 +1,9 @@
+# 所有頁面與靜態檔案的安全標頭
+#  - 不允許被別的網站用框架內嵌（防止點擊劫持）
+#  - 只允許載入本站的資源、只允許連線到本站（就算頁面被植入惡意內容，也無法把資料傳到別的網站）
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'

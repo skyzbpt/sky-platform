@@ -14,6 +14,14 @@
       "id": "82ba4ca48a8a4e96aa4953f5a530edde"
     }
   ],
+  // 登入嘗試次數限制（防止猜密碼）：同一個帳號每分鐘 10 次、同一個 IP 每分鐘 60 次
+  "ratelimits": [
+    { "name": "LOGIN_RL", "namespace_id": "5101", "simple": { "limit": 10, "period": 60 } },
+    { "name": "LOGIN_IP_RL", "namespace_id": "5102", "simple": { "limit": 60, "period": 60 } }
+  ],
+  // 關閉「版本／預覽網址」：每一個舊版本都有自己的公開網址，而且連到同一份正式資料。
+  // 加上登入驗證之前的舊版本沒有任何保護，所以把這些網址全部關掉。
+  "preview_urls": false,
   "observability": {
     "enabled": true
   }
