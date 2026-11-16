@@ -34,6 +34,7 @@ const K = {
   pub: NS + 'pub',
   m: NS + 'm',
   backup: NS + 'legacy',
+  reset: NS + 'reset',
   tAcct: NS + 'a:t',
   pAcct: (pid) => NS + 'a:p:' + pid,
   idx: (h) => NS + 'u:' + h,
@@ -120,11 +121,17 @@ async function getCfg(env, fresh) {
   _cfgAt = Date.now();
   return _cfg;
 }
-// ready＝正常使用；migrating＝治療師已登入、舊資料升級中；legacy＝只有舊資料、尚未升級；setup＝全新安裝
+// ready＝正常使用；migrating＝治療師已登入、舊資料升級中；legacy＝只有舊資料、尚未升級；setup＝全新安裝；
+// reset＝帳號擁有者在 KV 放了重設碼，可以重設治療師帳密；locked＝系統設定不見了但資料還在（不允許任何人重新設定）
 async function getMode(env) {
   const cfg = await getCfg(env);
-  if (cfg) return { mode: cfg.mig === 'done' ? 'ready' : 'migrating', cfg };
-  return { mode: (await kvMeta(env, LEGACY_KEY)) ? 'legacy' : 'setup', cfg: null };
+  if (cfg) {
+    if (cfg.mig !== 'done') return { mode: 'migrating', cfg };
+    return { mode: (await kvMeta(env, K.reset)) ? 'reset' : 'ready', cfg };
+  }
+  if (await kvMeta(env, LEGACY_KEY)) return { mode: 'legacy', cfg: null };
+  // 「首次設定」只允許在完全沒有資料時進行：否則一旦設定遺失，任何人都能自稱治療師、接管既有的資料
+  return { mode: (await kvMeta(env, K.m)) ? 'locked' : 'setup', cfg: null };
 }
 // 預覽網址（<前綴>-sky-platform.<帳號>.workers.dev）與正式站共用同一個 KV：
 // 升級會讓舊版頁面讀不到資料，所以只允許在正式網址進行。可用環境變數 SKY_PREVIEW=0／1 強制指定。
@@ -499,6 +506,22 @@ async function handleLogin(request, env, url) {
     _cfgAt = Date.now();
   };
 
+  if (mode === 'locked') throw fail(503, 'locked');
+
+  if (mode === 'reset' && role === 't' && d.setup === true) {
+    // 忘記治療師密碼時的重設：只有能進 Cloudflare 後台的人（帳號擁有者）才放得進重設碼。
+    // 重設碼用過即刪；舊的通行證全部失效。
+    const code = ((await env.SKY_KV.get(K.reset)) || '').trim();
+    if (code.length < 8 || !(await sameText(typeof d.code === 'string' ? d.code.trim() : '', code))) throw fail(401, 'code');
+    if (!validAcct(acct)) throw fail(400, 'bad');
+    if (!validPwd(pwd)) throw fail(400, 'weak');
+    const old = await getAcct(env, K.tAcct, true);
+    const rec = { acct, ...(await makeHash(pwd)), ep: Math.max(Date.now(), ((old && old.ep) || 0) + 1) };
+    await putAcct(env, K.tAcct, rec);
+    await env.SKY_KV.delete(K.reset);
+    return done(rec, '', { reset: true });
+  }
+
   if (mode === 'setup') {
     // 全新安裝：第一位登入的治療師設定帳密（前端會先顯示「首次設定」並請使用者確認）
     if (role !== 't') throw fail(401, 'login');
@@ -538,7 +561,7 @@ async function handleLogin(request, env, url) {
     return done(rec, '', cfg.mig === 'done' ? {} : { mig: 'pending' });
   }
 
-  if (mode !== 'ready') throw fail(409, 'upgrading');
+  if (mode === 'migrating') throw fail(409, 'upgrading');
   // 舊資料裡可能有重複的帳號（靠密碼區分），逐一比對
   const pids = (await idxPids(env, acct)).slice(0, 5);
   for (const pid of pids) {
@@ -831,6 +854,8 @@ async function handleApi(request, env, url) {
   else if (a === 'legacy' && path.length === 1) resp = await handleMigrate(request, env, sess, 'legacy');
   else throw fail(404, 'notfound');
 
+  // 告訴頁面「這個請求是以誰的身分處理的」：同一個瀏覽器的其他分頁若改用別的帳號登入，頁面可以察覺
+  resp.headers.set('x-sky-who', sess.role === 't' ? 't' : 'p:' + sess.pid);
   // 使用者還在操作時，通行證過半就自動延長
   const ttl = sess.role === 't' ? TTL_T : TTL_P;
   if (request.headers.get('x-sky-active') === '1' && sess.exp - Date.now() < ttl / 2 && !resp.headers.has('set-cookie')) {

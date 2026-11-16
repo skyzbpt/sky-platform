@@ -48,9 +48,11 @@ export async function startServer({ port, legacy, vars = {} } = {}) {
     log: () => log,
     // 直接讀本機 KV（檢查伺服器端實際存了什麼）
     kvKeys: () => JSON.parse(kv(['key', 'list'])).map((k) => k.name),
+    kvPut: (key, value) => kv(['key', 'put', key, value]),
     kvGet: (key) => {
       try {
-        return kv(['key', 'get', key]);
+        const out = kv(['key', 'get', key]);
+        return out.trim() === 'Value not found' ? null : out; // wrangler 對不存在的 key 印出這行字
       } catch (e) {
         return null;
       }

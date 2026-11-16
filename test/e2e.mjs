@@ -245,6 +245,22 @@ async function fresh(browser) {
     const both = (await chat(t, bobI)).join('|');
     check(both.includes('電腦同時傳') && both.includes('平板同時傳') && both === (await chat(t2, bobI)).join('|'), '兩台同時傳訊息，兩則都保留且兩邊一致');
 
+    // 下載雲端新版要花時間；這段時間內使用者的操作不能被蓋掉
+    await say(t2, 't', '平板在電腦下載期間傳的', bobI);
+    await synced(t2);
+    await t.page.route('**/api/doc/t/**', async (route) => { if (route.request().method() === 'GET') await new Promise((r) => setTimeout(r, 2500)); await route.continue(); });
+    const slowPull = pull(t);                       // 電腦開始下載（被拖慢 2.5 秒）
+    await t.page.waitForTimeout(600);
+    await t.page.fill('#ch-inp', '電腦在下載途中傳的');
+    await t.page.press('#ch-inp', 'Enter');         // 下載還沒回來，使用者先傳了一則
+    await slowPull;
+    await t.page.unroute('**/api/doc/t/**');
+    await synced(t);
+    const mid = (await chat(t, bobI)).join('|');
+    check(mid.includes('電腦在下載途中傳的') && mid.includes('平板在電腦下載期間傳的'), '下載雲端新版的等待期間所做的操作不會被蓋掉');
+    await pull(t2);
+    await t2.page.waitForFunction((i) => getMsgs(i).some((m) => m.txt === '電腦在下載途中傳的'), bobI, { timeout: 30000 });
+
     // ── 改密碼 ──
     const bob = await openPage(browser, srv.base, { mobile: true, name: '陳大文' });
     await login(bob, 'patient', 'bob', 'bob-pass-1');
@@ -327,12 +343,60 @@ async function fresh(browser) {
     check(true, '被刪除的個案無法再登入');
     check(srv.kvKeys().filter((k) => k.includes(bobNew) || k.includes(bobId)).length === 0, 'KV 內沒有殘留被刪除個案的資料');
 
+    // ── 同一個瀏覽器的另一個分頁改用別的帳號登入 → 原本的分頁立刻鎖定 ──
+    const tab2 = await t.ctx.newPage();
+    await tab2.goto(srv.base);
+    await tab2.waitForSelector('#t-app.on');        // 同一個瀏覽器共用通行證，直接進入
+    const sw = await tab2.evaluate(async () => (await fetch('/api/login', { method: 'POST', headers: { 'X-Sky-Req': '1', 'Content-Type': 'application/json' }, body: JSON.stringify({ role: 'patient', acct: 'amy', pwd: 'amy-pass-1' }) })).status);
+    check(sw === 200, '另一個分頁改用個案帳號登入');
+    await pull(t).catch(() => {});
+    // 原本的分頁會重新載入：治療師的資料從記憶體與畫面清空，之後顯示的是「現在登入的那個帳號」的畫面
+    await t.page.waitForSelector('#p-app.on', { timeout: 30000 });
+    const html = await t.page.content();
+    check((await ev(t, () => ROLE + patients.length + medRecords.filter((r) => !r.sent).length)) === 'patient10' && !html.includes('未傳送草稿') && !html.includes('治療師私人記事') && !html.includes('私人備註'),
+      '原本治療師的分頁立刻清空，不再留有治療師的資料');
+    await tab2.close();
+    await ev(t, () => logout());
+    await t.page.waitForSelector('#login.on');
+    await t.page.waitForFunction(() => document.querySelector('.l-submit').textContent === '登入');
+    await login(t, 'therapist', 'boss', 'boss-pass-2');
+    await appReady(t);
+
+    // ── 登入頁的標題是公開資訊：治療師改了之後，沒登入的人打開登入頁就看得到 ──
+    await ev(t, () => goT('st'));
+    await t.page.fill('#st-f-title', '天空物理治療所');
+    await t.page.click('[data-tv="st"] .card:nth-child(2) .btn.pri');
+    await synced(t);
+    const visitor = await openPage(browser, srv.base, { name: '訪客' });
+    check((await visitor.page.textContent('#front-title')) === '天空物理治療所' && (await visitor.page.title()) === '天空物理治療所', '登入頁顯示治療師設定的標題');
+    await visitor.ctx.close();
+
     // ── 登出：資料從這台裝置清空 ──
     await ev(t, () => logout());
     await t.page.waitForSelector('#login.on');
     await t.page.waitForFunction(() => document.querySelector('.l-submit').textContent === '登入');
     check((await ev(t, () => patients.length + medRecords.length)) === 0 && !(await t.page.content()).includes('王小明'), '登出後頁面上沒有任何個案資料');
     check((await ev(t, async () => (await fetch('/api/doc/m')).status)) === 401, '登出後通行證失效');
+    // ── 忘記治療師密碼：帳號擁有者在 Cloudflare 後台放入重設碼後，在登入頁重設 ──
+    check(!(await t.page.isVisible('#l-code-row')), '平常登入頁沒有重設碼欄位');
+    srv.kvPut('sky2:reset', 'my-reset-code-77');
+    await t.page.reload();
+    await t.page.waitForFunction(() => document.querySelector('.l-submit').textContent === '登入' && MODE === 'reset');
+    check((await t.page.isVisible('#l-code-row')) && (await t.page.textContent('#l-note')).includes('重設治療師帳密'), '放入重設碼後，治療師分頁出現重設說明與重設碼欄位');
+    await t.page.click('.l-tab:nth-child(2)');
+    check(!(await t.page.isVisible('#l-code-row')), '個案分頁不顯示重設碼欄位');
+    await t.page.click('.l-tab:nth-child(1)');
+    await t.page.fill('#l-acct', 'newboss');
+    await t.page.fill('#l-pwd', 'brand-new-pass');
+    await t.page.fill('#l-code', 'wrong-code-0000');
+    await t.page.click('.l-submit');
+    await waitToast(t, /重設碼不正確/);
+    await t.page.fill('#l-pwd', 'brand-new-pass');
+    await t.page.fill('#l-code', 'my-reset-code-77');
+    await t.page.click('.l-submit');
+    await appReady(t);
+    check((await ev(t, () => patients.map((p) => p.name).join())) === '王小明（膝）' && (await ev(t, () => therapistState.acct)) === 'newboss', '重設後以新帳密登入，資料都在');
+    check(srv.kvGet('sky2:reset') === null, '重設碼用過即刪');
     noErrors(t, amy, bob);
   } finally {
     await srv.stop();

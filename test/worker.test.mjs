@@ -401,6 +401,57 @@ test('使用中的通行證過半會自動延長', async () => {
   }
 });
 
+test('忘記治療師密碼：帳號擁有者在 KV 放入重設碼後才能重設', async () => {
+  const mf = newWorker();
+  try {
+    const t = await ready(mf);
+    await addPatient(t, 'p1', 'amy', 'amy-secret-9');
+    await t.putDoc('m', doc({ order: ['p1'] }));
+    const anon = browser(mf);
+    // 沒有重設碼：帶著「設定」的請求也只是一般登入，密碼不對就失敗
+    assert.equal((await anon.login('therapist', 'new', 'new-pass-1', { setup: true, code: 'anything-123' })).status, 401);
+    const kv = await mf.getKVNamespace('SKY_KV');
+    await kv.put('sky2:reset', 'short'); // 太短的重設碼無效
+    assert.equal((await anon.get('/api/public')).data.mode, 'reset');
+    assert.equal((await anon.login('therapist', 'new', 'new-pass-1', { setup: true, code: 'short' })).data.error, 'code');
+    await kv.put('sky2:reset', 'one-time-code-42\n');
+    assert.equal((await anon.login('therapist', 'new', 'new-pass-1', { setup: true, code: 'wrong-code-000' })).data.error, 'code');
+    assert.equal((await anon.login('therapist', 'new', 'new-pass-1', { setup: true })).data.error, 'code');
+    assert.equal((await anon.login('therapist', 'new', '123', { setup: true, code: 'one-time-code-42' })).data.error, 'weak');
+    // 等待重設期間，原本的帳密與個案登入都照常
+    assert.equal((await browser(mf).login('therapist', 'boss', 'boss-pass-1')).status, 200);
+    assert.equal((await browser(mf).login('patient', 'amy', 'amy-secret-9')).status, 200);
+    assert.equal((await browser(mf).login('patient', 'amy', 'amy-secret-9', { setup: true, code: 'one-time-code-42' })).data.pid, 'p1', '個案不能用重設碼');
+    const r = await anon.login('therapist', 'new', 'new-pass-1', { setup: true, code: 'one-time-code-42' });
+    assert.deepEqual(r.data, { ok: true, role: 't', pid: '', acct: 'new', reset: true });
+    assert.equal(await kv.get('sky2:reset'), null, '重設碼用過即刪');
+    assert.equal((await anon.get('/api/public')).data.mode, 'ready');
+    assert.equal((await t.get('/api/doc/m')).status, 401, '舊的通行證失效');
+    assert.equal((await browser(mf).login('therapist', 'boss', 'boss-pass-1')).status, 401);
+    assert.equal((await anon.get('/api/doc/m')).status, 200, '資料都還在');
+    assert.equal((await browser(mf).login('therapist', 'x', 'another-1', { setup: true, code: 'one-time-code-42' })).status, 401);
+    assert.equal((await browser(mf).login('patient', 'amy', 'amy-secret-9')).status, 200);
+  } finally {
+    await mf.dispose();
+  }
+});
+
+test('系統設定不見了但資料還在：不允許任何人重新做「首次設定」', async () => {
+  const mf = newWorker();
+  try {
+    const kv = await mf.getKVNamespace('SKY_KV');
+    await kv.put('sky2:m', doc({ order: [] }));
+    const b = browser(mf);
+    assert.equal((await b.get('/api/public')).data.mode, 'locked');
+    const r = await b.login('therapist', 'evil', 'evil-pass-1', { setup: true });
+    assert.deepEqual([r.status, r.data.error], [503, 'locked']);
+    assert.equal((await b.get('/api/doc/m')).status, 401);
+    assert.deepEqual(Object.keys(await kvAll(mf)), ['sky2:m']);
+  } finally {
+    await mf.dispose();
+  }
+});
+
 // ── 舊資料升級 ──
 const BIG = 'data:image/jpeg;base64,' + 'QUJD'.repeat(300000); // 約 1.2 MB 的圖片
 function legacyMain() {

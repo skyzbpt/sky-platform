@@ -623,6 +623,7 @@ input,textarea,select,.fld-w input,.fg input,.fg textarea,.fg select,
         </button>
       </div>
     </div>
+    <div class="fld" id="l-code-row" style="display:none;"><label>重設碼</label><div class="fld-w"><input type="text" id="l-code" placeholder="在 Cloudflare 後台填入的重設碼" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/></div></div>
     <button class="l-submit" onclick="doLogin()">登入</button>
     <div class="l-foot">sky · 守護每一次康復</div>
   </div>
@@ -1727,11 +1728,11 @@ function toggleSb(appId){
 
 // ── AUTH ──
 // 帳號密碼由伺服器驗證（密碼只存雜湊），通過後才拿得到資料；頁面本身不含任何個案資料。
-function pickRole(r){ROLE=r;document.querySelectorAll('.l-tab').forEach((t,i)=>t.classList.toggle('on',(r==='therapist'&&i===0)||(r==='patient'&&i===1)));}
+function pickRole(r){ROLE=r;document.querySelectorAll('.l-tab').forEach((t,i)=>t.classList.toggle('on',(r==='therapist'&&i===0)||(r==='patient'&&i===1)));if(MODE==='reset')renderLoginNote();}
 function togglePwd(){const i=document.getElementById('l-pwd');pwdOn=!pwdOn;i.type=pwdOn?'text':'password';document.getElementById('eye-ic').innerHTML=pwdOn?'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/>':'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';}
 let _loggingIn=false,_setup=false;
 const PWD_MIN=6;
-const LOGIN_ERR={login:'帳號或密碼錯誤',rate:'嘗試次數過多，請稍候一分鐘再試',weak:'密碼至少 '+PWD_MIN+' 個字元',bad:'帳號或密碼格式不正確',
+const LOGIN_ERR={login:'帳號或密碼錯誤',code:'重設碼不正確',locked:'系統設定異常，為了保護資料已暫停登入，請聯絡系統管理者',rate:'嘗試次數過多，請稍候一分鐘再試',weak:'密碼至少 '+PWD_MIN+' 個字元',bad:'帳號或密碼格式不正確',
   setup:'這是全新的系統，請先設定治療師的帳號與密碼',upgrading:'系統升級中：請治療師先登入完成升級，稍後再試',preview:'這是預覽網址，無法在這裡升級資料，請改用正式網址登入'};
 // 取得公開資訊：登入頁的標題與 Logo、系統目前的狀態
 async function loadPublic(){
@@ -1752,8 +1753,12 @@ async function loadPublic(){
 function renderLoginNote(){
   const el=document.getElementById('l-note'),btn=document.querySelector('.l-submit');
   _setup=MODE==='setup';
+  const reset=MODE==='reset'&&ROLE==='therapist';
+  document.getElementById('l-code-row').style.display=reset?'':'none';
   let msg='';
   if(_setup){msg='首次使用：請設定治療師的帳號與密碼（密碼至少 '+PWD_MIN+' 個字元），之後以這組帳密登入。';pickRole('therapist');}
+  else if(reset)msg='重設治療師帳密：請輸入新的帳號、新的密碼與重設碼。（知道原本的密碼也可以照常登入，重設碼留空即可。）';
+  else if(MODE==='locked')msg=LOGIN_ERR.locked+'。';
   else if(MODE==='legacy')msg=PREVIEW?'這是預覽網址，無法在這裡升級資料。請改用正式網址登入。':'系統已更新，資料需要升級一次。請治療師先登入完成升級，個案之後即可照常登入。';
   else if(MODE==='migrating')msg='資料升級尚未完成，請治療師登入後繼續。';
   el.textContent=msg;el.style.display=msg?'':'none';
@@ -1763,21 +1768,25 @@ async function doLogin(){
   const acct=(document.getElementById('l-acct').value||'').trim();
   const pwd=document.getElementById('l-pwd').value||'';
   if(!acct||!pwd){toast('請輸入帳號與密碼');return;}
-  if(_setup&&ROLE==='therapist'&&pwd.length<PWD_MIN){toast(LOGIN_ERR.weak);return;}
+  // 首次設定，或以重設碼重設治療師帳密
+  const code=MODE==='reset'&&ROLE==='therapist'?document.getElementById('l-code').value.trim():'';
+  const setting=ROLE==='therapist'&&(_setup||!!code);
+  if(setting&&pwd.length<PWD_MIN){toast(LOGIN_ERR.weak);return;}
   if(_loggingIn)return;
   _loggingIn=true;
   const btn=document.querySelector('.l-submit');btn.textContent=_setup?'建立中…':'登入中…';
   try{
     const r=await fetch(API+'/login',{method:'POST',cache:'no-store',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Sky-Req':'1'},
-      body:JSON.stringify({role:ROLE,acct,pwd,...(_setup&&ROLE==='therapist'?{setup:true}:{})})});
+      body:JSON.stringify({role:ROLE,acct,pwd,...(setting?{setup:true}:{}),...(code?{code}:{})})});
     const d=await r.json().catch(()=>null);
     if(r.ok&&d&&d.ok){
-      document.getElementById('l-pwd').value='';
+      document.getElementById('l-pwd').value='';document.getElementById('l-code').value='';
+      if(d.reset){MODE='ready';toast('治療師帳密已重設','check');}
       await enterApp(d);
     }else{
-      const code=d&&d.error;
-      if(code==='setup'||code==='upgrading'||code==='preview')await loadPublic();
-      toast(LOGIN_ERR[code]||(r.status===401?LOGIN_ERR.login:'登入失敗，請稍後再試'));
+      const err=d&&d.error;
+      if(err==='setup'||err==='upgrading'||err==='preview'||err==='locked')await loadPublic();
+      toast(LOGIN_ERR[err]||(r.status===401?LOGIN_ERR.login:'登入失敗，請稍後再試'));
       if(r.status===401)document.getElementById('l-pwd').value='';
     }
   }catch(e){if(!(e instanceof AuthLost)){console.error(e);toast('⚠️ 無法連線到雲端，請稍後再試');}}
@@ -2790,6 +2799,9 @@ async function api(path,opt={}){
   if(Date.now()-_lastAct<300000)h['X-Sky-Active']='1'; // 使用者還在操作 → 通行證快到期時自動延長
   const r=await fetch(API+path,{cache:'no-store',credentials:'same-origin',...opt,headers:h});
   if(r.status===401&&SESSION){const j=await r.json().catch(()=>null);authLost(j&&j.error);throw new AuthLost();}
+  // 同一個瀏覽器的另一個分頁改用別的帳號登入了（通行證是共用的）→ 這個分頁立刻離開，不讓畫面上的資料留著
+  const who=r.headers.get('X-Sky-Who');
+  if(SESSION&&who&&who!==(SESSION.role==='t'?'t':'p:'+SESSION.pid)){leave('這個瀏覽器已改用其他帳號登入');throw new AuthLost();}
   return r;
 }
 async function apiJson(path,body){
@@ -2837,13 +2849,13 @@ async function chanPut(c,body,newVer,force){
     return{st:r.status===413?'toobig':'error',code:r.status};
   }catch(e){if(e instanceof AuthLost)throw e;return{st:'error'};}
 }
-// 取回這份文件的雲端新版，與本機內容 cur 合併。回傳合併後的 JSON；null＝讀取失敗
-async function chanPull(c,cur){
-  const res=await chanGet(c);
-  if(res.st==='error')return null;
-  c.dirty=false;
-  if(res.st==='same')return cur;
+// 把剛下載到的雲端內容 res 與本機內容 cur 合併。回傳合併後的 JSON；null＝內容無法辨識。
+// 這個函式是同步的：下載（要等網路）與合併分開進行，合併時一定拿「當下」的本機內容，
+// 否則使用者在等待下載期間做的操作會被舊的快照蓋掉。
+function chanMerge(c,res,cur){
+  if(res.st==='same'){c.dirty=false;return cur;}
   if(res.st==='empty'){
+    c.dirty=false;
     // 雲端沒有這份文件：可能是別台裝置剛建立、還沒同步過來，等一陣子仍然沒有才由本機建立
     if(c.st==='ok'){c.st='unknown';c.since=Date.now();c.ver=c.baseVer='0';c.baseJson='';c.pushed=[];c.hist=[];}
     else if(c.st==='unknown'&&Date.now()-c.since>90000)c.st='new';
@@ -2867,7 +2879,7 @@ async function chanPull(c,cur){
     out=JSON.stringify(mergeOf[c.kind](base?JSON.parse(base):null,JSON.parse(cur),JSON.parse(rJson),additive));
     c.hist=[...new Set([...anc,...c.hist])].slice(0,HIST_MAX);
   }
-  c.ver=c.baseVer=res.ver;c.baseJson=rJson;c.pushed=[];c.st='ok';c.at=res.at||c.at;c.miss=0;
+  c.ver=c.baseVer=res.ver;c.baseJson=rJson;c.pushed=[];c.st='ok';c.at=res.at||c.at;c.miss=0;c.dirty=false;
   return out;
 }
 // 與雲端的差異是否只有「已讀位置」或「每日回報草稿」（不必每按一下就上傳）
@@ -2969,28 +2981,37 @@ async function sweep(full){
     return true;
   }catch(e){if(e instanceof AuthLost)throw e;return false;}
 }
-// 取回所有有新版的文件並合併進畫面資料。回傳 false＝有文件讀取失敗（已成功取回的部分仍會套用）
+// 取回所有有新版的文件並合併進畫面資料。回傳 false＝有文件沒取回成功（之後會再試；已取回的部分照常套用）
 async function pullDirty(){
-  const L=localJson(),isT=SESSION.role==='t';
-  let changed=false,ok=true;
-  const one=async c=>{
-    const had=c.ro||c.key in L;
-    const cur=c.ro?(srvJson(c)||emptyJson(c.kind)):(c.key in L?L[c.key]:emptyJson(c.kind));
-    const out=await chanPull(c,cur);
-    if(out===null){ok=false;return;}
-    if(out!==cur||!had)changed=true;
-    L[c.key]=out;
+  const isT=SESSION.role==='t';
+  let ok=true;
+  const get=async cs=>{const out=[];await pool(cs,6,async c=>{out.push([c,await chanGet(c)]);});return out;};
+  // 套用一批下載結果。從「取得本機內容」到「套用」之間沒有任何等待
+  const settle=list=>{
+    if(!_booting&&uiBusy()){ok=false;return;} // 下載期間使用者開了視窗：這一批先不套用，關閉後再重新取回
+    const L=localJson();
+    let changed=false;
+    for(const[c,res]of list){
+      if(res.st==='error'){ok=false;continue;}
+      const had=c.ro||c.key in L;
+      const cur=c.ro?(srvJson(c)||emptyJson(c.kind)):(had?L[c.key]:emptyJson(c.kind));
+      const out=chanMerge(c,res,cur);
+      if(out===null){ok=false;continue;}
+      if(out!==cur||!had)changed=true;
+      L[c.key]=out;
+    }
+    if(changed){
+      if(!isT&&!('t:'+SESSION.pid in L))L['t:'+SESSION.pid]=srvJson(chans['t:'+SESSION.pid])||emptyJson('t');
+      applyJson(L);_touched=true;
+    }
   };
   if(isT){
-    const cm=chanOf('m'),was=L.m;
-    if(cm.dirty){await one(cm);if(!ok)return false;}
-    syncChanSet(L.m===was?patients.map(p=>p.id):JSON.parse(L.m).order);
+    // 先取主文件：個案名單變了的話，要補上新個案的頻道、移除已刪除個案的頻道
+    const cm=chanOf('m');
+    if(cm.dirty){settle(await get([cm]));if(!ok)return false;}
+    syncChanSet(patients.map(p=>p.id));
   }
-  await pool(Object.values(chans).filter(c=>c.dirty&&c.kind!=='m'),6,one);
-  if(changed){
-    if(!isT&&!('t:'+SESSION.pid in L))L['t:'+SESSION.pid]=srvJson(chans['t:'+SESSION.pid])||emptyJson('t');
-    applyJson(L);_touched=true;
-  }
+  settle(await get(Object.values(chans).filter(c=>c.dirty&&c.kind!=='m')));
   return ok;
 }
 // 推播給個案的 PDF 另外上傳（以內容雜湊為名，雲端已經有的不重傳）
