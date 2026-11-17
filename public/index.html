@@ -2746,10 +2746,12 @@ async function dlPdf(ri){
 
 function applyPtAv(inp){const f=inp.files[0];inp.value='';readImg(f,256,src=>{pendingPtAvImg=src;setAv(document.getElementById('p-av-disp'),src,patientSelf.initials);},true);}
 async function savePtAccount(){
-  const p=patients[PIDX];if(!p)return;
-  const nm=document.getElementById('p-nm').value.trim()||p.name;
+  if(!patients[PIDX])return;
+  const nm=document.getElementById('p-nm').value.trim()||patients[PIDX].name;
   const acct=await changeOwnAccount('p-acct','p-pwd-new','p-pwd-cur');
   if(acct===null)return;
+  // 等待伺服器回覆的期間，雲端更新可能已換掉個案資料（這一頁不是彈出視窗，同步不會暫停）→ 回覆後重新取一次
+  const p=patients[PIDX];if(!p)return;
   p.acct=acct;p.name=nm;p.av=nm[0]||'?';
   if(pendingPtAvImg!==null)p.imgSrc=pendingPtAvImg;
   pendingPtAvImg=null;
