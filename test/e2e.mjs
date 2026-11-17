@@ -290,8 +290,11 @@ async function fresh(browser) {
     await bob.page.fill('#p-pwd-new', 'bob-new-pass');
     await bob.page.fill('#p-acct', 'bobby');
     await bob.page.fill('#p-pwd-cur', 'bob-pass-1');
+    // 等待伺服器回覆的期間剛好有雲端更新套用進來（個案資料物件被換掉）：儲存的內容仍要落在目前的資料上
+    await ev(bob, () => { const orig = acctCall; acctCall = async (...a) => { const r = await orig(...a); acctCall = orig; applyJson(localJson()); return r; }; });
     await bob.page.click('[data-pv="pac"] .btn.pri');
     await waitToast(bob, /已儲存/);
+    check((await ev(bob, () => patients[0].acct)) === 'bobby', '改帳號時剛好有雲端更新：新帳號仍套用在目前的資料上');
     await synced(bob);
     await pull(t);
     await t.page.waitForFunction((i) => patients[i].acct === 'bobby', bobI, { timeout: 30000 });
