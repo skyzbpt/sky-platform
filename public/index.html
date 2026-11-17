@@ -1249,10 +1249,19 @@ function prepState(d){
     if(typeof p.unread!=='number')p.unread=0;
   });
   ['tags','cats','videos','knows','medRecords','notifications'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[];});
+  ['tags','cats','videos','knows'].forEach(k=>{if(!d[k].every(isObj))d[k]=d[k].map(x=>isObj(x)?x:{});}); // 位置不能變（個案的標籤與推播內容是記位置的）
   if(!Array.isArray(d.mediaSubs)||!d.mediaSubs.length)d.mediaSubs=['入門','進階','一般'];
   d.cats.forEach(c=>{if(!Array.isArray(c.subs))c.subs=[];});
   if(!isObj(d.rptDraftMap)&&isObj(d.rptDraft))d.rptDraftMap={0:d.rptDraft}; // 舊版資料相容
   ['msgMap','annMap','tAlbumsMap','tNotesMap','pAlbumsMap','pNotesMap','rptDraftMap'].forEach(k=>{if(!isObj(d[k]))d[k]={};});
+  // 形狀不對的項目直接丟掉（舊資料曾經是任何人都能改寫的，不能假設它的形狀正確）
+  ['msgMap','annMap','tAlbumsMap','tNotesMap','pAlbumsMap','pNotesMap'].forEach(k=>{Object.keys(d[k]).forEach(i=>{
+    const a=d[k][i],bad=!Array.isArray(a);
+    if(bad)delete d[k][i];else if(!a.every(isObj))d[k][i]=a.filter(isObj);else return;
+    if(k==='msgMap')delete d.annMap[i]; // 公告記的是訊息位置，訊息有被丟掉的話位置就對不上了
+  });});
+  Object.keys(d.rptDraftMap).forEach(i=>{if(!isObj(d.rptDraftMap[i]))delete d.rptDraftMap[i];});
+  d.medRecords=d.medRecords.filter(isObj);
   const st=Array.isArray(d.ptStats)?d.ptStats:[];
   d.ptStats=d.patients.map((_,i)=>{const s=isObj(st[i])?st[i]:newStat();if(!Array.isArray(s.logs))s.logs=[];return s;});
   d.frontState=Object.assign({title:'sky 衛教平台',sub:'Physiotherapy Platform',logoSrc:'logo.png'},isObj(d.frontState)?d.frontState:{});
@@ -1613,7 +1622,9 @@ const PRESET={
   orange:{bg:'#FEF3C7',ink:'#92400E'},
   gray:{bg:'#F3F4F6',ink:'#374151'}
 };
-function tPair(t){if(!t)return PRESET.blue;if(t.clr==='custom')return{bg:t.bg||'#DBEAFE',ink:t.ink||'#1D4ED8'};return PRESET[t.clr]||PRESET.blue;}
+// 顏色會直接放進畫面的 style 屬性，只接受 #RRGGBB 這種格式（其他內容一律換成預設色）
+const hexClr=(v,d)=>typeof v==='string'&&/^#[0-9a-fA-F]{3,8}$/.test(v)?v:d;
+function tPair(t){if(!t)return PRESET.blue;if(t.clr==='custom')return{bg:hexClr(t.bg,'#DBEAFE'),ink:hexClr(t.ink,'#1D4ED8')};return(typeof t.clr==='string'&&Object.prototype.hasOwnProperty.call(PRESET,t.clr)&&PRESET[t.clr])||PRESET.blue;}
 function tStyle(t){const p=tPair(t);return`background:${p.bg};color:${p.ink};`;}
 function autoInk(hex){hex=hex.replace('#','');const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);const l=(0.299*r+0.587*g+0.114*b)/255;return l>0.6?'#'+[r,g,b].map(v=>Math.round(v*0.35).toString(16).padStart(2,'0')).join(''):'#fff';}
 
@@ -2206,7 +2217,7 @@ function markAnn(){
 // flip：個案端看到的左右相反（治療師的訊息在左、自己的在右）
 function paintMsgs(bdId,msgs,flip){
   const bd=document.getElementById(bdId);if(!bd)return;
-  const html=msgs.map((m,i)=>{const content=m.type==='img'&&m.src?`<img src="${H(m.src)}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${flip?(m.who==='me'?'them':'me'):m.who}" data-idx="${i}"><div>${content}<div class="msg-time">${H(m.t)}</div></div></div>`;}).join('');
+  const html=msgs.map((m,i)=>{const content=m.type==='img'&&m.src?`<img src="${H(m.src)}" class="msg-img" alt="圖片"/>`:`<div class="bubble">${H(m.txt)}</div>`;return`<div class="msg-row ${(m.who==='them')===!flip?'them':'me'}" data-idx="${i}"><div>${content}<div class="msg-time">${H(m.t)}</div></div></div>`;}).join('');
   // 內容有變、或第一次顯示在畫面上時才捲到最底；否則維持使用者目前的捲動位置
   const vis=bd.offsetParent!==null;
   if(setHTML(bd,html)||(vis&&!bd._vis))bd.scrollTop=bd.scrollHeight;
@@ -2370,7 +2381,7 @@ function medCoverHTML(item,isVid,ri){
   const pdfIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
   const ca=ri!=null?`style="cursor:pointer;" onclick="openViewModal('${isVid?'video':'pdf'}',${ri})"` :'';
   if(item.coverSrc)return`<div class="media-cov" ${ca}><img src="${H(item.coverSrc)}"/>${isVid?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);">'+playIco+'</div>':''}</div>`;
-  return`<div class="media-cov ${item.cv||''}" ${ca}>${isVid?playIco:pdfIco}</div>`;
+  return`<div class="media-cov ${/^c[23]$/.test(item.cv)?item.cv:''}" ${ca}>${isVid?playIco:pdfIco}</div>`;
 }
 // 篩選中的分類若已不存在（被刪除或改名），退回「全部」
 const catAlive=(c,arr)=>c==='all'||cats.some(x=>x.name===c)||arr.some(x=>x.cat===c);
@@ -2981,14 +2992,16 @@ async function sweep(full){
     return true;
   }catch(e){if(e instanceof AuthLost)throw e;return false;}
 }
-// 取回所有有新版的文件並合併進畫面資料。回傳 false＝有文件沒取回成功（之後會再試；已取回的部分照常套用）
+// 取回所有有新版的文件並合併進畫面資料。
+// 回傳 true＝完成；false＝有文件沒取回成功（之後會再試；已取回的部分照常套用）；'busy'＝使用者正開著視窗，稍後再處理
 async function pullDirty(){
   const isT=SESSION.role==='t';
-  let ok=true;
+  let ok=true,busy=false;
   const get=async cs=>{const out=[];await pool(cs,6,async c=>{out.push([c,await chanGet(c)]);});return out;};
   // 套用一批下載結果。從「取得本機內容」到「套用」之間沒有任何等待
   const settle=list=>{
-    if(!_booting&&uiBusy()){ok=false;return;} // 下載期間使用者開了視窗：這一批先不套用，關閉後再重新取回
+    if(!list.length)return;
+    if(!_booting&&uiBusy()){busy=true;return;} // 下載期間使用者開了視窗：這一批先不套用，關閉後再重新取回
     const L=localJson();
     let changed=false;
     for(const[c,res]of list){
@@ -3008,11 +3021,11 @@ async function pullDirty(){
   if(isT){
     // 先取主文件：個案名單變了的話，要補上新個案的頻道、移除已刪除個案的頻道
     const cm=chanOf('m');
-    if(cm.dirty){settle(await get([cm]));if(!ok)return false;}
+    if(cm.dirty){settle(await get([cm]));if(busy)return'busy';if(!ok)return false;}
     syncChanSet(patients.map(p=>p.id));
   }
   settle(await get(Object.values(chans).filter(c=>c.dirty&&c.kind!=='m')));
-  return ok;
+  return busy?'busy':ok;
 }
 // 推播給個案的 PDF 另外上傳（以內容雜湊為名，雲端已經有的不重傳）
 async function ensureBlobs(){
@@ -3045,7 +3058,7 @@ async function pushAll(){
     const cur=L[c.key];
     if(c.st==='unknown'||c.ro||cur===srvJson(c)||cur===c.tooBig)continue;
     if(!_flush){
-      const wait=(lazyOnly(c,cur)?_lastAct+LAZY_WAIT:c.lastPush+PUSH_GAP)-now;
+      const wait=(lazyOnly(c,cur)?Math.max(_lastAct,c.lastPush)+LAZY_WAIT:c.lastPush+PUSH_GAP)-now;
       if(wait>0){_recheckAt=Math.min(_recheckAt,now+wait);continue;}
     }
     const r=await chanPush(c,cur);
@@ -3072,7 +3085,7 @@ async function syncLoop(){
         if(!await sweep(full)){netFail();return;}
         _wantPull=_wantFull=false;netOk();
       }
-      if(dirty()){if(!await pullDirty()){netFail();return;}netOk();}
+      if(dirty()){const r=await pullDirty();if(r==='busy')return;if(!r){netFail();return;}netOk();}
     }
     if(dirty())return; // 上傳被拒但視窗開著不能合併，等關閉後再處理
     // 2) 本機有變更就上傳
@@ -3119,7 +3132,7 @@ async function firstLoad(){
   _booting=true;
   try{
     for(let n=0;;n++){
-      if(await pullDirty())break;
+      if(await pullDirty()===true)break;
       if(n>=5)return false;
       toast('⚠️ 無法連線到雲端，重試中…');
       await sleep(Math.min(15000,2000*(n+1)));

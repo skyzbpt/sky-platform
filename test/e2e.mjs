@@ -1,5 +1,5 @@
 // 瀏覽器端對端測試：用真的瀏覽器操作頁面，連到本機的 Worker（wrangler dev）。
-// 執行：npm run test:e2e        只跑其中一段：npm run test:e2e -- fresh｜legacy｜sync｜preview
+// 執行：npm run test:e2e        只跑其中一段：npm run test:e2e -- fresh｜features｜legacy｜sync｜preview
 import { readFileSync } from 'node:fs';
 import { startServer, openPage, login, appReady, waitToast, synced, pull, check, loadPlaywright } from './e2e-lib.mjs';
 
@@ -168,6 +168,18 @@ async function fresh(browser) {
     await amy.page.waitForFunction(() => getMsgs(0).length === 5, null, { timeout: 30000 });
     check((await chat(amy)).pop() === 'T:很好，繼續保持', '個案收到治療師的回覆');
 
+    // ── 治療師開著編輯視窗時，雲端的更新先不套用（操作到一半資料不會被換掉），關閉後才更新 ──
+    await ev(t, (i) => { goT('pt'); openPtModal(i); }, amyI);
+    await ev(amy, () => { pNotes.unshift({ title: '視窗開著時新增', body: '' }); renderNotes('p'); _touched = true; });
+    await synced(amy);
+    await pull(t);
+    await t.page.waitForTimeout(800);
+    check((await ev(t, (i) => (pNotesMap[i] || []).some((n) => n.title === '視窗開著時新增'), amyI)) === false && (await ev(t, () => _fails)) === 0, '視窗開著時不套用雲端更新，也不會被誤判成連線失敗');
+    await ev(t, () => closeM('m-pt'));
+    await pull(t);
+    await t.page.waitForFunction((i) => (pNotesMap[i] || []).some((n) => n.title === '視窗開著時新增'), amyI, { timeout: 30000 });
+    check(true, '視窗關閉後更新就進來了');
+
     // ── 個案刪訊息：自己的真的刪掉；治療師的只在自己這邊隱藏 ──
     await ev(amy, () => goP('pc'));
     await ev(amy, () => { ctxIdx = getMsgs(0).findIndex((m) => m.txt === '小明你好，記得每天做伸展'); deleteMsg(); });
@@ -326,7 +338,7 @@ async function fresh(browser) {
     await appReady(amy, 'patient');
     const afterImport = (await chat(amy)).join('|');
     check(afterImport === 'T:[圖]|P:📋 每日回報已提交|T:很好，繼續保持', '匯入後個案用原本的密碼登入，對話都在（先前自己隱藏的那一則仍然隱藏）：' + afterImport);
-    check((await ev(amy, () => pNotes.map((n) => n.title).join())) === '小明的日記', '個案自己的記事也還原了');
+    check((await ev(amy, () => pNotes.map((n) => n.title).join())) === '視窗開著時新增,小明的日記', '個案自己的記事也還原了');
     await ev(amy, () => goP('lrn'));
     check((await amy.page.textContent('#lrn-grid')).includes('居家運動手冊'), '推播的衛教內容也還原了');
 
@@ -398,6 +410,93 @@ async function fresh(browser) {
     check((await ev(t, () => patients.map((p) => p.name).join())) === '王小明（膝）' && (await ev(t, () => therapistState.acct)) === 'newboss', '重設後以新帳密登入，資料都在');
     check(srv.kvGet('sky2:reset') === null, '重設碼用過即刪');
     noErrors(t, amy, bob);
+  } finally {
+    await srv.stop();
+  }
+}
+
+// ───────────────────────── 逐一操作各項功能 ─────────────────────────
+// 治療師與個案把每個功能都用過一輪：不能有執行期錯誤，而且結果都同步得出去、兩邊看到的一致
+async function features(browser) {
+  console.log('\n■ 逐一操作治療師與個案的各項功能');
+  const srv = await startServer({ port: 8805 });
+  try {
+  const t=await openPage(browser,srv.base,{name:'T'});
+  await login(t,'therapist','boss','boss-pass-1'); await appReady(t);
+  for(const [n,a] of [['甲','pa'],['乙','pb'],['丙','pc']]){
+    await ev(t,()=>goT('pt')); await t.page.click('text=+ 新增個案'); await t.page.fill('#m-pt-nm',n); await t.page.fill('#m-pt-acct',a); await t.page.fill('#m-pt-pwd','pass-'+a+'-1'); await t.page.click('#m-pt .mf .btn.pri');
+    await t.page.waitForFunction((x)=>patients.some(p=>p.name===x)&&!document.querySelector('#m-pt.on'),n);
+  }
+  // 標籤：新增、套用到個案、編輯、刪除
+  await ev(t,()=>{goT('tg');openTagModal(-1);}); await t.page.fill('#m-tag-nm','新標籤'); await t.page.click('#m-tag .mf .btn.pri');
+  await ev(t,()=>{openTagModal(0);}); await t.page.fill('#m-tag-nm','改名標籤'); await ev(t,()=>onCustomClr('#ff8800')); await t.page.click('#m-tag .mf .btn.pri');
+  await ev(t,()=>{goT('pt');openPtModal(0);togglePtTag(0);togglePtTag(5);}); await t.page.click('#m-pt .mf .btn.pri'); await waitToast(t,/已更新個案/);
+  await ev(t,()=>delTag(1)); await confirmOk(t);
+  // 分類：新增、改名（影片跟著改）、次主題、刪除
+  await ev(t,()=>{openCatModal(-1);}); await t.page.fill('#m-cat-nm','新分類'); await t.page.fill('#m-cat-subs','子一\n子二'); await t.page.click('#m-cat .mf .btn.pri');
+  await ev(t,()=>{openCatModal(0);}); await t.page.fill('#m-cat-nm','肩部復健改名'); await t.page.click('#m-cat .mf .btn.pri');
+  await ev(t,()=>addSub(0)); await t.page.fill('#m-prompt-inp','新次主題'); await t.page.press('#m-prompt-inp','Enter');
+  await ev(t,()=>delSub(0,0)); await confirmOk(t);
+  await ev(t,()=>delCat(2)); await confirmOk(t);
+  // 影片／知識：編輯、封面、推播、收回、刪除（推播序號要跟著調整）
+  await ev(t,()=>{goT('vd');openMediaModal('video',0);}); await t.page.fill('#m-med-desc','改過說明'); await t.page.setInputFiles('#m-cov-inp',{name:'c.png',mimeType:'image/png',buffer:PNG}); await t.page.waitForFunction(()=>document.getElementById('m-cov-prev').style.display==='block'); await t.page.click('#m-med .mf .btn.pri');
+  for(const i of [0,1,2]){await ev(t,(k)=>openPush(k,'video'),i); await t.page.check('#push-pt-list input[data-pi="0"]'); if(i===1)await t.page.check('#push-pt-list input[data-pi="1"]'); await t.page.click('#m-push .mf .btn.pri');}
+  await ev(t,()=>openPush(2,'video')); await t.page.uncheck('#push-pt-list input[data-pi="0"]'); await t.page.click('#m-push .mf .btn.pri');
+  await ev(t,()=>delVideo(0)); await confirmOk(t);
+  await ev(t,()=>{goT('kn');openPush(0,'know');}); await t.page.check('#push-pt-list input[data-pi="0"]'); await t.page.click('#m-push .mf .btn.pri');
+  await ev(t,()=>delKnow(1)); await confirmOk(t);
+  // 病歷：新增（附圖）、編輯、傳送、刪除
+  await ev(t,()=>{goT('mr');openMrNew();}); await t.page.fill('#m-mr-s','S1'); await t.page.setInputFiles('#m-mr-img-inp',{name:'r.png',mimeType:'image/png',buffer:PNG}); await t.page.waitForFunction(()=>pendingMrImgs.length===1); await t.page.click('#m-mr .mf .btn.pri');
+  await ev(t,()=>openMrNew()); await t.page.fill('#m-mr-s','S2'); await t.page.click('#m-mr .mf .btn.pri');
+  await ev(t,()=>openMrModal(0)); await t.page.fill('#m-mr-o','O1'); await t.page.click('#m-mr .mf .btn.pri');
+  await ev(t,()=>sendMr(0)); await ev(t,()=>delMr(1,false)); await confirmOk(t);
+  // 對話：文字、圖片、公告、刪訊息、搜尋、相簿（含照片與改名）、記事、清除
+  await ev(t,()=>{goT('ch');selectContact(0);});
+  for(const m of ['一','二','三']){await t.page.fill('#ch-inp',m); await t.page.press('#ch-inp','Enter');}
+  await t.page.setInputFiles('#t-img-inp',{name:'x.png',mimeType:'image/png',buffer:PNG}); await t.page.click('#m-img-prev.on .mf .btn.pri');
+  await ev(t,()=>{ctxIdx=0;markAnn();ctxIdx=2;markAnn();});
+  await ev(t,()=>{ctxIdx=1;deleteMsg();}); await confirmOk(t);
+  await ev(t,()=>{openMsgSearch();searchMsgs('三');closeM('m-msearch');});
+  await ev(t,()=>{addAlbum('t');openAlbum(0,'t');}); await t.page.setInputFiles('#m-alb-file-inp',{name:'a.png',mimeType:'image/png',buffer:PNG}); await t.page.waitForFunction(()=>albPhotos.length===1); await ev(t,()=>{albEdit();document.getElementById('m-alb-inp-ttl').value='相簿改名';}); await t.page.click('#m-alb .mf .btn.pri');
+  await ev(t,()=>addNote('t')); await t.page.fill('#m-note-nm','記事'); await t.page.fill('#m-note-body','內容'); await t.page.click('#m-note .mf .btn.pri');
+  await ev(t,()=>{selectContact(1);}); await t.page.fill('#ch-inp','給乙'); await t.page.press('#ch-inp','Enter'); await ev(t,()=>clearChat()); await confirmOk(t);
+  // 排序、設定（名稱、頭像、Logo、標題）
+  await ev(t,()=>{goT('pt');movePt(0,1);movePt(2,-1);});
+  await ev(t,()=>goT('st')); await t.page.fill('#st-nm','天空治療師'); await t.page.setInputFiles('#st-av-inp',{name:'av.png',mimeType:'image/png',buffer:PNG}); await t.page.waitForFunction(()=>therapistImg.startsWith('data:')); await t.page.click('[data-tv="st"] .card:nth-child(1) .btn.pri');
+  await t.page.setInputFiles('#st-logo-inp',{name:'lg.png',mimeType:'image/png',buffer:PNG}); await t.page.waitForFunction(()=>pendingLogoSrc); await t.page.click('[data-tv="st"] .card:nth-child(2) .btn.pri');
+  for(const v of ['ov','ex','tg','vd','kn','mr','ch','pt','st'])await ev(t,(x)=>goT(x),v);
+  await ev(t,()=>{selStatPt(1);exportPdf();toggleNotif();toggleTagFilter();});
+  await synced(t,60000);
+  const snap=()=>ev(t,()=>JSON.stringify(canonState(liveState())));
+    // 個案甲（現在排第 2）登入：看到的內容與治療師端一致
+  const p=await openPage(browser,srv.base,{mobile:true,name:'P'});
+  await login(p,'patient','pa','pass-pa-1'); await appReady(p,'patient');
+  const seenByPt=await ev(p,()=>[getMsgs(0).map(m=>m.txt||'[圖]').join('|'),getAnns(0).map(a=>a.text+'@'+a.msgIdx).join(),videos.map(v=>v.title).join(),knows.map(k=>k.title).join(),medRecords.map(r=>r.s+r.o+(r.imgs||[]).length).join(),therapistState.name+(therapistState.img?'(有頭像)':'')].join(' / '));
+  check(seenByPt==='一|三|[圖] / 一@0,三@1 / 麥肯基伸展訓練 / 肩部手術術後照護手冊 / S1O11 / 天空治療師(有頭像)','個案看到的對話、公告、推播內容、病歷與治療師資料都正確：'+seenByPt);
+  // 個案端各項功能
+  for(const v of ['ph','dr','lrn','pmr','pc','pac'])await ev(p,(x)=>goP(x),v);
+  await ev(p,()=>goP('dr')); await p.page.check('.ex-cb >> nth=0'); await ev(p,()=>saveDraft()); await ev(p,()=>{document.getElementById('vas-inp').value=7;setVas(7);}); await p.page.click('#rpt-btns .btn.pri'); await waitToast(p,/已提交/);
+  await ev(p,()=>resetRpt()); await p.page.check('.ex-cb >> nth=0'); await p.page.click('#rpt-btns .btn.pri'); await waitToast(p,/已提交/);
+  await ev(p,()=>goP('pc')); await p.page.setInputFiles('#p-img-inp',{name:'x.png',mimeType:'image/png',buffer:PNG}); await p.page.click('#m-img-prev.on .mf .btn.pri');
+  await ev(p,()=>{addAlbum('p');openAlbum(0,'p');}); await p.page.setInputFiles('#m-alb-file-inp',{name:'a.png',mimeType:'image/png',buffer:PNG}); await p.page.waitForFunction(()=>albPhotos.length===1); await p.page.click('#m-alb .mf .btn.pri');
+  await ev(p,()=>addNote('p')); await p.page.fill('#m-note-nm','個案記事'); await p.page.click('#m-note .mf .btn.pri');
+  await ev(p,()=>{openNote(0,'p');}); await p.page.fill('#m-note-body','改內容'); await p.page.click('#m-note .mf .btn.pri');
+  await ev(p,()=>goP('pac')); await p.page.setInputFiles('#p-av-inp',{name:'av.png',mimeType:'image/png',buffer:PNG}); await p.page.waitForFunction(()=>pendingPtAvImg); await p.page.click('[data-pv="pac"] .btn.pri'); await waitToast(p,/已儲存/);
+  await ev(p,()=>{openMsgSearch();searchMsgs('一');closeM('m-msearch');openChatOv('palb');openChatOv('pnt');closeChatOv('p');openViewModal('vid',0);closeM('m-view');});
+  await synced(p,60000);
+  await pull(t); await t.page.waitForFunction(()=>ptStats.some(s=>s.logs.length===1),null,{timeout:30000}); await synced(t,60000);
+  const i=await ev(t,()=>patients.findIndex(x=>x.name==='甲'));
+  const seenByT=await ev(t,(k)=>JSON.stringify({msgs:getMsgs(k).map(m=>(m.who==='me'?'T:':'P:')+(m.txt?m.txt.split('\n')[0]:'[圖]')),log:ptStats[k].logs.map(l=>[l.pct,l.done,l.total,l.vas]),unread:patients[k].unread,av:!!patients[k].imgSrc,pAlb:(pAlbumsMap[k]||[]).map(a=>a.photos.length),pNt:(pNotesMap[k]||[]).map(n=>n.title+'/'+n.body),rpt:rptDraftMap[k]&&rptDraftMap[k].submitted}),i);
+  check(seenByT==='{"msgs":["T:一","T:三","T:[圖]","P:📋 每日回報已提交","P:📋 每日回報已提交","P:[圖]"],"log":[[100,1,1,0]],"unread":3,"av":true,"pAlb":[1],"pNt":["個案記事/改內容"],"rpt":true}','治療師看到個案的回報、圖片、頭像、相簿與記事：'+seenByT);
+  // 重新載入後，治療師端的資料與雲端一致（拆開存放再組回來，內容不變）
+  const mid=await snap();
+  await t.page.reload(); await appReady(t); await t.page.waitForTimeout(1500);
+  const after=await snap();
+  const strip=(j)=>JSON.stringify(JSON.parse(j,(k,v)=>k==='ptUnread'?undefined:v));
+  check(strip(mid)===strip(after),'治療師重新載入後，資料與重新載入前完全一致');
+  await t.page.waitForTimeout(6000);
+  check((await ev(t,()=>pendingDocs().length))===0,'重新載入後沒有多餘的寫入');
+    noErrors(t, p);
   } finally {
     await srv.stop();
   }
@@ -565,6 +664,7 @@ const browser = await chromium.launch();
 let failed = false;
 try {
   if (want('fresh')) await fresh(browser);
+  if (want('features')) await features(browser);
   if (want('legacy')) await legacy(browser);
   if (want('sync')) await syncFormat(browser);
   if (want('preview')) await preview(browser);

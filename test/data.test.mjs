@@ -449,3 +449,25 @@ test('空資料與缺欄位都不會出錯', () => {
   assert.equal(X.countAfter([], null), 0);
   same(X.mergeByTs([{ id: 1, ts: 5 }], [{ id: 2, ts: 5 }, { id: 3 }]).map((m) => m.id), [1, 2, 3]);
 });
+
+test('形狀不完整或奇怪的舊資料也能轉換，不會出錯', () => {
+  const weird = {
+    patients: [{ name: 123, acct: null, tags: 'x', unread: '3', pwd: 'p1' }, { id: 'dup' }, { id: 'dup', name: 'B', assignedVids: [0, 7, 'x'] }, null],
+    msgMap: { 0: 'notarray', 1: [null, 'x', { who: 'them', txt: 'ok' }, { who: 'other', txt: '身分不明的一律算治療師' }], 9: [{ who: 'me', txt: '不存在的個案' }] },
+    annMap: { 1: [{ text: 'a', msgIdx: 2 }], 2: 'x' },
+    medRecords: [{ ptIdx: 9, date: 'x' }, { ptIdx: 0, date: '2026-01-01', s: 's', sent: 1 }, 'junk'],
+    ptStats: 'x', rptDraftMap: [], tags: null, cats: [{ name: 'c' }], videos: [{ title: 'v' }], knows: {}, frontState: 'x', therapistState: null, notifications: 'x', mediaSubs: [],
+  };
+  const F = X.normLegacy(clone(weird));
+  same(F.patients.map((p) => [p.id, p.name, p.acct]), [['L0', '123', ''], ['dup', '', ''], ['L2', 'B', ''], ['L3', '', '']]);
+  assert.ok(!J(F).includes('"pwd"'));
+  same(F.msgMap[1].map((m) => [m.id, m.who, m.txt]), [['L0', 'them', 'ok'], ['L1', 'me', '身分不明的一律算治療師']]);
+  assert.equal(F.annMap[1], undefined, '訊息位置對不上時不保留公告');
+  const D = X.splitState(F);
+  same(D.m.order, ['L0', 'dup', 'L2', 'L3']);
+  same(D.m.mr.map((r) => r._pid), ['L0']);
+  same(D.t.L2.pub.vids.map((v) => v.title), ['v']);
+  const F2 = roundTrip(F);
+  assert.equal(J(X.splitState(F2)), J(D));
+  for (const p of F.patients) X.splitPatient(X.prepState(X.joinPatient(clone(D.t[p.id]), clone(D.p[p.id]), p.id, null)), clone(D.t[p.id]));
+});
